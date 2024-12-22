@@ -289,17 +289,6 @@ func (s *YamlPathContext) ToStringTree(ruleNames []string, recog antlr.Recognize
 }
 
 
-func (s *YamlPathContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitYamlPath(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
-
 
 
 func (p *yamlpathParser) YamlPath() (localctx IYamlPathContext) {
@@ -398,17 +387,6 @@ func (s *RootContext) GetRuleContext() antlr.RuleContext {
 
 func (s *RootContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-
-func (s *RootContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitRoot(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
 }
 
 
@@ -531,17 +509,6 @@ func (s *SelectorContext) ToStringTree(ruleNames []string, recog antlr.Recognize
 }
 
 
-func (s *SelectorContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitSelector(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
-
 
 
 func (p *yamlpathParser) Selector() (localctx ISelectorContext) {
@@ -647,17 +614,6 @@ func (s *DotSelectorContext) GetRuleContext() antlr.RuleContext {
 
 func (s *DotSelectorContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-
-func (s *DotSelectorContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitDotSelector(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
 }
 
 
@@ -790,17 +746,6 @@ func (s *BracketSelectorContext) GetRuleContext() antlr.RuleContext {
 
 func (s *BracketSelectorContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-
-func (s *BracketSelectorContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitBracketSelector(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
 }
 
 
@@ -996,17 +941,6 @@ func (s *BracketExpressionContext) ToStringTree(ruleNames []string, recog antlr.
 }
 
 
-func (s *BracketExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitBracketExpression(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
-
 
 
 func (p *yamlpathParser) BracketExpression() (localctx IBracketExpressionContext) {
@@ -1142,17 +1076,6 @@ func (s *SliceContext) GetRuleContext() antlr.RuleContext {
 
 func (s *SliceContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-
-func (s *SliceContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitSlice(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
 }
 
 
@@ -1325,17 +1248,6 @@ func (s *FilterContext) ToStringTree(ruleNames []string, recog antlr.Recognizer)
 }
 
 
-func (s *FilterContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitFilter(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
-
 
 
 func (p *yamlpathParser) Filter() (localctx IFilterContext) {
@@ -1491,17 +1403,6 @@ func (s *UnionContext) GetRuleContext() antlr.RuleContext {
 
 func (s *UnionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-
-func (s *UnionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitUnion(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
 }
 
 
@@ -1713,17 +1614,6 @@ func (s *ExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recogni
 }
 
 
-func (s *ExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitExpression(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
-
 
 
 func (p *yamlpathParser) Expression() (localctx IExpressionContext) {
@@ -1872,17 +1762,6 @@ func (s *SubexpressionContext) ToStringTree(ruleNames []string, recog antlr.Reco
 }
 
 
-func (s *SubexpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitSubexpression(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
-
 
 
 func (p *yamlpathParser) Subexpression() (localctx ISubexpressionContext) {
@@ -2018,17 +1897,6 @@ func (s *ValueContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) 
 }
 
 
-func (s *ValueContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitValue(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
-
 
 
 func (p *yamlpathParser) Value() (localctx IValueContext) {
@@ -2124,17 +1992,6 @@ func (s *QuotedNameContext) ToStringTree(ruleNames []string, recog antlr.Recogni
 }
 
 
-func (s *QuotedNameContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitQuotedName(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
-
 
 
 func (p *yamlpathParser) QuotedName() (localctx IQuotedNameContext) {
@@ -2213,17 +2070,6 @@ func (s *WildcardContext) GetRuleContext() antlr.RuleContext {
 
 func (s *WildcardContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-
-func (s *WildcardContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case yamlpathVisitor:
-		return t.VisitWildcard(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
 }
 
 

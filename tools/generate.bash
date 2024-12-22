@@ -20,7 +20,7 @@ docker run                                                                     \
   openjdk:11 -jar "../tools/${jar_file}"                                       \
     -Dlanguage=Go                                                              \
     -o ../internal/parser                                                      \
-    -visitor                                                                   \
+    -no-visitor                                                                \
     -no-listener                                                               \
     yamlpath.g4
 

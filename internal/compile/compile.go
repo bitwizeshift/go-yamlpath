@@ -3,7 +3,7 @@ package compile
 import (
 	"errors"
 
-	"github.com/antlr4-go/antlr/v4"
+	antlr "github.com/antlr4-go/antlr/v4"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/parser"
 )

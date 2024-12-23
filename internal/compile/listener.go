@@ -1,6 +1,8 @@
 package compile
 
-import "github.com/antlr4-go/antlr/v4"
+import (
+	antlr "github.com/antlr4-go/antlr/v4"
+)
 
 // ErrorListener is both an Syntax and Parse error listener, which is used to
 // accumulate any errors encountered as part of the compilation process.

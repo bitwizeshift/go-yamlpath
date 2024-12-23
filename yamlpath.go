@@ -13,6 +13,17 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 )
 
+var (
+	// ErrSyntax is returned when an error occurs during parsing.
+	ErrSyntax = compile.ErrSyntax
+
+	// ErrCompile is returned when an error occurs during compilation.
+	ErrCompile = compile.ErrCompile
+)
+
+// CompileError represents an error that occurs during compilation.
+type CompileError = compile.CompileError
+
 // YAMLPath represents a compiled YAMLPath expression.
 type YAMLPath struct {
 	path       string
@@ -49,6 +60,8 @@ func (yp *YAMLPath) String() string {
 	return yp.path
 }
 
+var _ fmt.Stringer = (*YAMLPath)(nil)
+
 // Eval evaluates the YAMLPath expression against the given YAML node.
 func (yp *YAMLPath) Eval(node *yaml.Node) ([]*yaml.Node, error) {
 	if yp == nil {
@@ -82,4 +95,12 @@ func Eval(path string, node *yaml.Node) ([]*yaml.Node, error) {
 	return yp.Eval(node)
 }
 
-var _ fmt.Stringer = (*YAMLPath)(nil)
+// MustEval evaluates the YAMLPath expression against the given YAML node. It
+// panics if an error occurs.
+func MustEval(path string, node *yaml.Node) []*yaml.Node {
+	nodes, err := Eval(path, node)
+	if err != nil {
+		panic(err)
+	}
+	return nodes
+}

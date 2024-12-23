@@ -3,6 +3,7 @@ grammar yamlpath;
 // Parser Rules
 yamlPath       : root selector* ;
 root           : '$' ;
+current        : '@' ;
 selector       : dotSelector | bracketSelector ;
 dotSelector    : '.' (NAME | '*' | '..') ;
 bracketSelector: '[' (bracketExpression | wildcard) ']' ;
@@ -17,7 +18,8 @@ slice          : (NUMBER)? ':' (NUMBER)? (':' NUMBER)? ;
 filter         : '?' '(' expression ')' ;
 union          : (quotedName | NUMBER) (',' (quotedName | NUMBER))* ;
 expression     : subexpression (('==' | '!=' | '<' | '>' | '<=' | '>=') subexpression)? ;
-subexpression  : value | NAME | yamlPath ;
+subexpression  : value | NAME | yamlPath | currentSubPath ;
+currentSubPath : current selector*;
 value          : STRING | NUMBER | BOOLEAN | NULL ;
 
 // Lexer Rules

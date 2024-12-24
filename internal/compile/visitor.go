@@ -46,9 +46,7 @@ func (v *Visitor) visitDotSelector(ctx parser.IDotSelectorContext) (expr.Express
 			Name: node.GetText(),
 		}
 	} else if node := ctx.WILDCARD(); node != nil {
-		result = &expr.FieldExpression{
-			Name: node.GetText(),
-		}
+		result = &expr.WildcardExpression{}
 	} else {
 		return nil, ErrInternalf(ctx, "unhandled dot selector: %q", ctx.GetText())
 	}
@@ -62,9 +60,7 @@ func (v *Visitor) visitRecursiveSelector(ctx parser.IRecursiveSelectorContext) (
 			Name: node.GetText(),
 		}}
 	} else if node := ctx.WILDCARD(); node != nil {
-		result = expr.SequenceExpression{result, &expr.FieldExpression{
-			Name: node.GetText(),
-		}}
+		result = expr.SequenceExpression{result, &expr.WildcardExpression{}}
 	}
 	return result, nil
 }

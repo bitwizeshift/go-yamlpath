@@ -28,22 +28,29 @@ func (v *Visitor) visitPath(ctx *parser.YamlPathContext) (expr.Expression, error
 
 func (v *Visitor) visitSelector(ctx parser.ISelectorContext) (expr.Expression, error) {
 	if selector := ctx.DotSelector(); selector != nil {
-		return v.visitDotSelector(selector.(*parser.DotSelectorContext))
+		return v.visitDotSelector(selector)
 	}
 	if selector := ctx.BracketSelector(); selector != nil {
-		return v.visitBracketSelector(selector.(*parser.BracketSelectorContext))
+		return v.visitBracketSelector(selector)
 	}
 	return nil, ErrInternalf(ctx, "unexpected selector type: %T", ctx)
 }
 
-func (v *Visitor) visitDotSelector(ctx *parser.DotSelectorContext) (expr.Expression, error) {
-	expr := &expr.FieldExpression{
-		Name: ctx.NAME().GetText(),
+func (v *Visitor) visitDotSelector(ctx parser.IDotSelectorContext) (expr.Expression, error) {
+	var result expr.Expression
+	if node := ctx.NAME(); node != nil {
+		result = &expr.FieldExpression{
+			Name: node.GetText(),
+		}
+	} else if node := ctx.WILDCARD(); node != nil {
+		result = &expr.FieldExpression{
+			Name: node.GetText(),
+		}
 	}
-	return expr, nil
+	return result, nil
 }
 
-func (v *Visitor) visitBracketSelector(ctx *parser.BracketSelectorContext) (expr.Expression, error) {
+func (v *Visitor) visitBracketSelector(ctx parser.IBracketSelectorContext) (expr.Expression, error) {
 	return v.visitNode(ctx)
 }
 
@@ -79,10 +86,6 @@ func (v *Visitor) visitQuotedName(ctx *parser.QuotedNameContext) (expr.Expressio
 	return nil, nil
 }
 
-func (v *Visitor) visitWildcard(ctx *parser.WildcardContext) (expr.Expression, error) {
-	return nil, nil
-}
-
 func (v *Visitor) visitNode(node antlr.ParseTree) (expr.Expression, error) {
 	switch ctx := node.(type) {
 	case *parser.YamlPathContext:
@@ -109,8 +112,6 @@ func (v *Visitor) visitNode(node antlr.ParseTree) (expr.Expression, error) {
 		return v.visitValue(ctx)
 	case *parser.QuotedNameContext:
 		return v.visitQuotedName(ctx)
-	case *parser.WildcardContext:
-		return v.visitWildcard(ctx)
 	}
 	return nil, ErrInternalf(node, "unexpected node type: %T", node)
 }

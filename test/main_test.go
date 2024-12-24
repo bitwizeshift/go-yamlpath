@@ -145,8 +145,8 @@ func TheEvaluationResultIs(ctx context.Context, content string) error {
 	got, _ := GetResult(ctx)
 	var want []*yaml.Node
 	decoder := yaml.NewDecoder(strings.NewReader(content))
-	var next yaml.Node
 	for {
+		var next yaml.Node
 		if err := decoder.Decode(&next); err != nil {
 			if !errors.Is(err, io.EOF) {
 				return fmt.Errorf("error decoding expected yaml: %v", err)

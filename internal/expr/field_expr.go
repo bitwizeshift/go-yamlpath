@@ -20,7 +20,7 @@ func (f *FieldExpression) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml
 			continue
 		}
 		for i := 0; (i + 1) < len(n.Content); i += 2 {
-			if n.Content[i].Value == f.Name {
+			if f.Name == "*" || n.Content[i].Value == f.Name {
 				result = append(result, n.Content[i+1])
 			}
 		}

@@ -5,8 +5,8 @@ yamlPath       : root selector* ;
 root           : '$' ;
 current        : '@' ;
 selector       : dotSelector | bracketSelector ;
-dotSelector    : '.' (NAME | '*' | '..') ;
-bracketSelector: '[' (bracketExpression | wildcard) ']' ;
+dotSelector    : '.' (NAME | WILDCARD | '..') ;
+bracketSelector: '[' (bracketExpression | WILDCARD) ']' ;
 bracketExpression
                : quotedName
                | NUMBER
@@ -29,6 +29,6 @@ STRING         : '"' (~["\\] | '\\' .)* '"' ;
 BOOLEAN        : 'true' | 'false' ;
 NULL           : 'null' ;
 quotedName     : STRING ;
-wildcard       : '*' ;
+WILDCARD       : '*' ;
 WS             : [ \t\r\n]+ -> skip ;
 COMMENT        : '//' ~[\r\n]* -> skip ;

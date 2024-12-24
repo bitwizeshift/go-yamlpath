@@ -48,3 +48,25 @@ Feature: Navigation and Path selection
         """
       When the yamlpath "$.foo.baz.buzzz" is evaluated
       Then the evaluation result is empty
+
+  Rule: Wildcards shall match all fields
+
+    Wildcards shall match all fields in the YAML structure.
+
+    Scenario: Wildcard matches all subfields
+
+      Given the yaml input:
+        """
+        foo:
+          bar-1:
+            baz: "hello"
+          bar-2:
+            baz: "world"
+        """
+      When the yamlpath "$.foo.*" is evaluated
+      Then the evaluation result is:
+        """
+        baz: "hello"
+        ---
+        baz: "world"
+        """

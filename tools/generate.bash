@@ -24,3 +24,4 @@ docker run                                                                     \
     -no-listener                                                               \
     yamlpath.g4
 
+go fmt "${REPO_DIR}/internal/parser"

@@ -68,7 +68,7 @@ func SetYAMLInput(ctx context.Context, input string) (context.Context, error) {
 	decoder := yaml.NewDecoder(strings.NewReader(input))
 	var node yaml.Node
 	if err := decoder.Decode(&node); err != nil {
-		return nil, err
+		return ctx, err
 	}
 	return context.WithValue(ctx, ctxKeyInput, &node), nil
 }
@@ -86,7 +86,7 @@ func EvaluateYAMLPath(ctx context.Context, path string) (context.Context, error)
 
 	yp, err := yamlpath.Compile(path)
 	if err != nil {
-		return nil, err
+		return ctx, err
 	}
 	got, err := yp.Eval(node)
 	if err != nil {

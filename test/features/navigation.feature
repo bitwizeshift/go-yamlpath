@@ -70,3 +70,182 @@ Feature: Navigation and Path selection
         ---
         baz: "world"
         """
+
+  Rule: Recursive descent shall return all fields
+
+    Recursive descent shall match all fields in the YAML structure, flattening
+    and returning all elements along the way.
+
+    Scenario: Recursive descent matches all subfields
+
+      Given the yaml input:
+        """
+        store:
+          book:
+            - category: fiction
+              author: Author A
+              title: Book A
+            - category: non-fiction
+              author: Author B
+              title: Book B
+          bicycle:
+            color: red
+            price: 19.95
+        expensive: 50
+        """
+      When the yamlpath "$.." is evaluated
+      Then the evaluation result is:
+        """
+        store:
+          book:
+            - category: fiction
+              author: Author A
+              title: Book A
+            - category: non-fiction
+              author: Author B
+              title: Book B
+          bicycle:
+            color: red
+            price: 19.95
+        expensive: 50
+        ---
+        book:
+          - category: fiction
+            author: Author A
+            title: Book A
+          - category: non-fiction
+            author: Author B
+            title: Book B
+        bicycle:
+          color: red
+          price: 19.95
+        ---
+          - category: fiction
+            author: Author A
+            title: Book A
+          - category: non-fiction
+            author: Author B
+            title: Book B
+        ---
+        category: fiction
+        author: Author A
+        title: Book A
+        ---
+        "fiction"
+        ---
+        "Author A"
+        ---
+        "Book A"
+        ---
+        category: non-fiction
+        author: Author B
+        title: Book B
+        ---
+        "non-fiction"
+        ---
+        "Author B"
+        ---
+        "Book B"
+        ---
+        color: red
+        price: 19.95
+        ---
+        "red"
+        ---
+        19.95
+        ---
+        50
+        """
+
+    Scenario: Recursive descent with trailing fields filter matching entries
+
+      Given the yaml input:
+        """
+        store:
+          book:
+            - category: fiction
+              author: Author A
+              title: Book A
+            - category: non-fiction
+              author: Author B
+              title: Book B
+          bicycle:
+            color: red
+            price: 19.95
+        expensive: 50
+        """
+      When the yamlpath "$..author" is evaluated
+      Then the evaluation result is:
+        """
+        "Author A"
+        ---
+        "Author B"
+        """
+
+    Scenario: Recursive descent with wildcard matches all subfields
+
+      Given the yaml input:
+        """
+        store:
+          book:
+            - category: fiction
+              author: Author A
+              title: Book A
+            - category: non-fiction
+              author: Author B
+              title: Book B
+          bicycle:
+            color: red
+            price: 19.95
+        expensive: 50
+        """
+      When the yamlpath "$..*" is evaluated
+      Then the evaluation result is:
+        """
+        book:
+          - category: fiction
+            author: Author A
+            title: Book A
+          - category: non-fiction
+            author: Author B
+            title: Book B
+        bicycle:
+          color: red
+          price: 19.95
+        ---
+        50
+        ---
+        - category: fiction
+          author: Author A
+          title: Book A
+        - category: non-fiction
+          author: Author B
+          title: Book B
+        ---
+        color: red
+        price: 19.95
+        ---
+        category: fiction
+        author: Author A
+        title: Book A
+        ---
+        category: non-fiction
+        author: Author B
+        title: Book B
+        ---
+        fiction
+        ---
+        Author A
+        ---
+        Book A
+        ---
+        non-fiction
+        ---
+        Author B
+        ---
+        Book B
+        ---
+        red
+        ---
+        19.95
+        """

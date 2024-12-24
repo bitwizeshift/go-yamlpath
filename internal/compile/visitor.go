@@ -33,6 +33,9 @@ func (v *Visitor) visitSelector(ctx parser.ISelectorContext) (expr.Expression, e
 	if selector := ctx.BracketSelector(); selector != nil {
 		return v.visitBracketSelector(selector)
 	}
+	if selector := ctx.RecursiveSelector(); selector != nil {
+		return v.visitRecursiveSelector(selector)
+	}
 	return nil, ErrInternalf(ctx, "unexpected selector type: %T", ctx)
 }
 
@@ -46,6 +49,22 @@ func (v *Visitor) visitDotSelector(ctx parser.IDotSelectorContext) (expr.Express
 		result = &expr.FieldExpression{
 			Name: node.GetText(),
 		}
+	} else {
+		return nil, ErrInternalf(ctx, "unhandled dot selector: %q", ctx.GetText())
+	}
+	return result, nil
+}
+
+func (v *Visitor) visitRecursiveSelector(ctx parser.IRecursiveSelectorContext) (expr.Expression, error) {
+	var result expr.Expression = &expr.RecursiveDescentExpression{}
+	if node := ctx.NAME(); node != nil {
+		result = expr.SequenceExpression{result, &expr.FieldExpression{
+			Name: node.GetText(),
+		}}
+	} else if node := ctx.WILDCARD(); node != nil {
+		result = expr.SequenceExpression{result, &expr.FieldExpression{
+			Name: node.GetText(),
+		}}
 	}
 	return result, nil
 }
@@ -90,10 +109,12 @@ func (v *Visitor) visitNode(node antlr.ParseTree) (expr.Expression, error) {
 	switch ctx := node.(type) {
 	case *parser.YamlPathContext:
 		return v.visitPath(ctx)
-	case *parser.SelectorContext:
+	case parser.ISelectorContext:
 		return v.visitSelector(ctx)
-	case *parser.DotSelectorContext:
+	case parser.IDotSelectorContext:
 		return v.visitDotSelector(ctx)
+	case parser.IRecursiveSelectorContext:
+		return v.visitRecursiveSelector(ctx)
 	case *parser.BracketSelectorContext:
 		return v.visitBracketSelector(ctx)
 	case *parser.BracketExpressionContext:

@@ -1,26 +1,27 @@
 grammar yamlpath;
 
 // Parser Rules
-yamlPath       : root selector* ;
-root           : '$' ;
-current        : '@' ;
-selector       : dotSelector | bracketSelector ;
-dotSelector    : '.' (NAME | WILDCARD | '..') ;
-bracketSelector: '[' (bracketExpression | WILDCARD) ']' ;
+yamlPath          : root selector* EOF;
+root              : '$' ;
+current           : '@' ;
+selector          : dotSelector | recursiveSelector | bracketSelector ;
+recursiveSelector : '..' (NAME | WILDCARD)? ;
+dotSelector       : '.' (NAME | WILDCARD) ;
+bracketSelector   : '[' (bracketExpression | WILDCARD) ']' ;
 bracketExpression
-               : quotedName
-               | NUMBER
-               | slice
-               | filter
-               | union
-               ;
-slice          : (NUMBER)? ':' (NUMBER)? (':' NUMBER)? ;
-filter         : '?' '(' expression ')' ;
-union          : (quotedName | NUMBER) (',' (quotedName | NUMBER))* ;
-expression     : subexpression (('==' | '!=' | '<' | '>' | '<=' | '>=') subexpression)? ;
-subexpression  : value | NAME | yamlPath | currentSubPath ;
-currentSubPath : current selector*;
-value          : STRING | NUMBER | BOOLEAN | NULL ;
+                  : quotedName
+                  | NUMBER
+                  | slice
+                  | filter
+                  | union
+                  ;
+slice             : (NUMBER)? ':' (NUMBER)? (':' NUMBER)? ;
+filter            : '?' '(' expression ')' ;
+union             : (quotedName | NUMBER) (',' (quotedName | NUMBER))* ;
+expression        : subexpression (('==' | '!=' | '<' | '>' | '<=' | '>=') subexpression)? ;
+subexpression     : value | NAME | yamlPath | currentSubPath ;
+currentSubPath    : current selector*;
+value             : STRING | NUMBER | BOOLEAN | NULL ;
 
 // Lexer Rules
 NAME           : [a-zA-Z_][a-zA-Z0-9_]* ;

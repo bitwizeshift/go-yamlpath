@@ -13,6 +13,11 @@ if [ ! -f "${jar_path}" ]; then
   curl "https://www.antlr.org/download/${jar_file}" > "${jar_path}"
 fi
 
+if ! command -v docker > /dev/null; then
+  echo "error: Docker is not installed. Please install Docker to run the ANTLR tool." >&2
+  exit 1
+fi
+
 docker run                                                                     \
   -v "${REPO_DIR}:/workspace"                                                  \
   -w /workspace/data                                                           \

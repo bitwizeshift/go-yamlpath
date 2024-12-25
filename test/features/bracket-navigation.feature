@@ -114,3 +114,108 @@ Feature: Bracket path navigation
         """
         bar: "world"
         """
+
+  Rule: Slices shall match a range of elements
+
+    Scenario: Slice specifies only start index
+
+      Given the yaml input:
+        """
+        foo:
+          - bar: "hello"
+          - bar: "world"
+          - bar: "goodbye"
+        """
+      When the yamlpath `$["foo"][1:]` is evaluated
+      Then the evaluation result is:
+        """
+        bar: "world"
+        ---
+        bar: "goodbye"
+        """
+
+    Scenario: Slice specifies start and end index
+
+      Given the yaml input:
+        """
+        foo:
+          - bar: "hello"
+          - bar: "world"
+          - bar: "goodbye"
+        """
+      When the yamlpath `$["foo"][1:2]` is evaluated
+      Then the evaluation result is:
+        """
+        bar: "world"
+        """
+
+    Scenario: Slice specifies end
+
+      Given the yaml input:
+        """
+        foo:
+          - bar: "hello"
+          - bar: "world"
+          - bar: "goodbye"
+        """
+      When the yamlpath `$["foo"][:2]` is evaluated
+      Then the evaluation result is:
+        """
+        bar: "hello"
+        ---
+        bar: "world"
+        """
+
+    Scenario: Slice specifies end and step index
+
+      Given the yaml input:
+        """
+        foo:
+          - bar: 1
+          - bar: 2
+          - bar: 3
+          - bar: 4
+        """
+      When the yamlpath `$["foo"][:3:2]` is evaluated
+      Then the evaluation result is:
+        """
+        bar: 1
+        ---
+        bar: 3
+        """
+
+    Scenario: Slice specifies step
+
+      Given the yaml input:
+        """
+        foo:
+          - bar: 1
+          - bar: 2
+          - bar: 3
+          - bar: 4
+        """
+      When the yamlpath `$["foo"][::2]` is evaluated
+      Then the evaluation result is:
+        """
+        bar: 1
+        ---
+        bar: 3
+        """
+
+    Scenario: Slice specifies start, end, and step index
+
+      Given the yaml input:
+        """
+        foo:
+          - bar: 1
+          - bar: 2
+          - bar: 3
+          - bar: 4
+        """
+      When the yamlpath `$["foo"][0:3:2]` is evaluated
+      Then the evaluation result is:
+        """
+        bar: 1
+        ---
+        bar: 3
+        """

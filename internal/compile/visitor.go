@@ -95,6 +95,15 @@ func (v *Visitor) visitBracketExpression(ctx parser.IBracketExpressionContext) (
 			Index: i,
 		}, nil
 	}
+	if slice := ctx.Slice(); slice != nil {
+		s, err := expr.ParseSlice(slice.GetText())
+		if err != nil {
+			return nil, NewSemanticErrorf(slice, "slice: %s", slice.GetText())
+		}
+		return &expr.SliceExpression{
+			Slice: s,
+		}, nil
+	}
 	return nil, ErrInternalf(ctx, "unexpected bracket expression: %q", ctx.GetText())
 }
 

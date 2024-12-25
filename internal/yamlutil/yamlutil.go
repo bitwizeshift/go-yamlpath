@@ -4,7 +4,51 @@ the yaml library.
 */
 package yamlutil
 
-import "gopkg.in/yaml.v3"
+import (
+	"fmt"
+	"strconv"
+
+	"gopkg.in/yaml.v3"
+)
+
+var (
+	// True is a yaml node representing a boolean true value
+	True = &yaml.Node{Kind: yaml.ScalarNode, Value: "true", Tag: "!!bool"}
+
+	// False is a yaml node representing a boolean false value
+	False = &yaml.Node{Kind: yaml.ScalarNode, Value: "false", Tag: "!!bool"}
+)
+
+// Number returns a yaml node representing an integer.
+func Number(i int) *yaml.Node {
+	return &yaml.Node{Kind: yaml.ScalarNode, Value: fmt.Sprintf("%d", i), Tag: "!!int"}
+}
+
+// String returns a yaml node representing a string.
+func String(s string) *yaml.Node {
+	return &yaml.Node{Kind: yaml.ScalarNode, Value: s, Tag: "!!str"}
+}
+
+func ToBool(node *yaml.Node) (bool, error) {
+	if node.Kind != yaml.ScalarNode || node.Tag != "!!bool" {
+		return false, fmt.Errorf("expected boolean node, but got %s", node.Tag)
+	}
+	return node.Value == "true", nil
+}
+
+func ToString(node *yaml.Node) (string, error) {
+	if node.Kind != yaml.ScalarNode || node.Tag != "!!str" {
+		return "", fmt.Errorf("expected string node, but got %s", node.Tag)
+	}
+	return node.Value, nil
+}
+
+func ToInt(node *yaml.Node) (int, error) {
+	if node.Kind != yaml.ScalarNode || node.Tag != "!!int" {
+		return 0, fmt.Errorf("expected integer node, but got %s", node.Tag)
+	}
+	return strconv.Atoi(node.Value)
+}
 
 // Normalize normalizes a list of yaml nodes by flattening any document nodes
 // into their content nodes.

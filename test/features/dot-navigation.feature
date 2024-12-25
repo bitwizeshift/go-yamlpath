@@ -1,4 +1,4 @@
-Feature: Navigation and Path selection
+Feature: Dot path navigation
 
   The JSONPath specification defines how fields should be accessed.
   Fields are specified between dots, which are used to navigate the
@@ -17,7 +17,7 @@ Feature: Navigation and Path selection
           bar:
             baz: "hello"
         """
-      When the yamlpath "$.foo.bar.baz" is evaluated
+      When the yamlpath `$.foo.bar.baz` is evaluated
       Then the evaluation result is:
         """
         "hello"
@@ -31,7 +31,7 @@ Feature: Navigation and Path selection
           bar:
             baz: "hello"
         """
-      When the yamlpath "$.foo.bar" is evaluated
+      When the yamlpath `$.foo.bar` is evaluated
       Then the evaluation result is:
         """
         baz: "hello"
@@ -46,7 +46,7 @@ Feature: Navigation and Path selection
           baz:
             buzz: "hello"
         """
-      When the yamlpath "$.foo.baz.buzzz" is evaluated
+      When the yamlpath `$.foo.baz.buzzz` is evaluated
       Then the evaluation result is empty
 
   Rule: Wildcards shall match all fields
@@ -63,7 +63,7 @@ Feature: Navigation and Path selection
           bar-2:
             baz: "world"
         """
-      When the yamlpath "$.foo.*" is evaluated
+      When the yamlpath `$.foo.*` is evaluated
       Then the evaluation result is:
         """
         baz: "hello"
@@ -93,7 +93,7 @@ Feature: Navigation and Path selection
             price: 19.95
         expensive: 50
         """
-      When the yamlpath "$.." is evaluated
+      When the yamlpath `$..` is evaluated
       Then the evaluation result is:
         """
         store:
@@ -174,7 +174,7 @@ Feature: Navigation and Path selection
             price: 19.95
         expensive: 50
         """
-      When the yamlpath "$..author" is evaluated
+      When the yamlpath `$..author` is evaluated
       Then the evaluation result is:
         """
         "Author A"
@@ -199,7 +199,7 @@ Feature: Navigation and Path selection
             price: 19.95
         expensive: 50
         """
-      When the yamlpath "$..*" is evaluated
+      When the yamlpath `$..*` is evaluated
       Then the evaluation result is:
         """
         book:

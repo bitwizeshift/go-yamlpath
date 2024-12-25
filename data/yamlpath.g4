@@ -7,10 +7,11 @@ current           : '@' ;
 selector          : dotSelector | recursiveSelector | bracketSelector ;
 recursiveSelector : '..' (NAME | WILDCARD)? ;
 dotSelector       : '.' (NAME | WILDCARD) ;
-bracketSelector   : '[' (bracketExpression | WILDCARD) ']' ;
+bracketSelector   : '[' bracketExpression ']' ;
 bracketExpression
                   : quotedName
                   | NUMBER
+                  | WILDCARD
                   | slice
                   | filter
                   | union

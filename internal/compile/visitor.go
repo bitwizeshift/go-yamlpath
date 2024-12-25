@@ -1,6 +1,8 @@
 package compile
 
 import (
+	"strconv"
+
 	antlr "github.com/antlr4-go/antlr/v4"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/parser"
@@ -66,11 +68,34 @@ func (v *Visitor) visitRecursiveSelector(ctx parser.IRecursiveSelectorContext) (
 }
 
 func (v *Visitor) visitBracketSelector(ctx parser.IBracketSelectorContext) (expr.Expression, error) {
-	return v.visitNode(ctx)
+	return v.visitBracketExpression(ctx.BracketExpression())
 }
 
-func (v *Visitor) visitBracketExpression(ctx *parser.BracketExpressionContext) (expr.Expression, error) {
-	return v.visitNode(ctx)
+func (v *Visitor) visitBracketExpression(ctx parser.IBracketExpressionContext) (expr.Expression, error) {
+	if qn := ctx.QuotedName(); qn != nil {
+		text := qn.GetText()
+		name, err := strconv.Unquote(text)
+		if err != nil {
+			return nil, NewSemanticErrorf(qn, "string: %s", text)
+		}
+
+		return &expr.FieldExpression{
+			Name: name,
+		}, nil
+	}
+	if wildcard := ctx.WILDCARD(); wildcard != nil {
+		return &expr.WildcardExpression{}, nil
+	}
+	if number := ctx.NUMBER(); number != nil {
+		i, err := strconv.ParseInt(number.GetText(), 10, 64)
+		if err != nil {
+			return nil, NewSemanticErrorf(number, "number: %s", number.GetText())
+		}
+		return &expr.IndexExpression{
+			Index: i,
+		}, nil
+	}
+	return nil, ErrInternalf(ctx, "unexpected bracket expression: %q", ctx.GetText())
 }
 
 func (v *Visitor) visitSlice(ctx *parser.SliceContext) (expr.Expression, error) {

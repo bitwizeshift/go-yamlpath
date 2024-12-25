@@ -46,9 +46,7 @@ func TestFeatures(t *testing.T) {
 
 func InitializeScenario(ctx *godog.ScenarioContext) {
 	ctx.Given(`^the yaml input:$`, SetYAMLInput)
-	ctx.When(`^the yamlpath "(.*)" is evaluated$`, EvaluateYAMLPath)
-	// ctx.Then(`^(\d) results are:$`, nil)
-	// ctx.Then(`^(\d) result is:$`, nil)
+	ctx.When("^the yamlpath `(.*)` is evaluated$", EvaluateYAMLPath)
 	ctx.Then(`^the evaluation contains (\d) entries$`, TheEvaluationContainsNEntries)
 	ctx.Then(`^the evaluation contains (1) entry$`, TheEvaluationContainsNEntries)
 	ctx.Then(`^the evaluation result is empty$`, TheEvaluationIsEmpty)

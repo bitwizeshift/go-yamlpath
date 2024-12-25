@@ -13,20 +13,30 @@ import (
 
 var (
 	// True is a yaml node representing a boolean true value
-	True = &yaml.Node{Kind: yaml.ScalarNode, Value: "true", Tag: "!!bool"}
+	True = Boolean("true")
 
 	// False is a yaml node representing a boolean false value
-	False = &yaml.Node{Kind: yaml.ScalarNode, Value: "false", Tag: "!!bool"}
+	False = Boolean("false")
+
+	// Null is a yaml node representing a null value
+	Null = &yaml.Node{Kind: yaml.ScalarNode, Value: "", Tag: "!!null"}
 )
 
 // Number returns a yaml node representing an integer.
-func Number(i int) *yaml.Node {
-	return &yaml.Node{Kind: yaml.ScalarNode, Value: fmt.Sprintf("%d", i), Tag: "!!int"}
+// The input is assumed to be a valid integer string.
+func Number(s string) *yaml.Node {
+	return &yaml.Node{Kind: yaml.ScalarNode, Value: s, Tag: "!!int"}
 }
 
 // String returns a yaml node representing a string.
 func String(s string) *yaml.Node {
 	return &yaml.Node{Kind: yaml.ScalarNode, Value: s, Tag: "!!str"}
+}
+
+// Boolean returns a yaml node representing a boolean.
+// The input is assumed to be a valid boolean string.
+func Boolean(s string) *yaml.Node {
+	return &yaml.Node{Kind: yaml.ScalarNode, Value: s, Tag: "!!bool"}
 }
 
 func ToBool(node *yaml.Node) (bool, error) {

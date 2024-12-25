@@ -1,7 +1,8 @@
 grammar yamlpath;
 
 // Parser Rules
-yamlPath          : root selector* EOF;
+yamlPath          : path EOF ;
+path              : root selector* ;
 root              : '$' | '@' ;
 selector          : dotSelector | recursiveSelector | bracketSelector ;
 recursiveSelector : '..' (NAME | WILDCARD)? ;
@@ -20,8 +21,18 @@ slice             : (NUMBER)? ':' (NUMBER)? (':' NUMBER)? ;
 filter            : '?' '(' expression ')' ;
 unionString       : (quotedName) (',' (quotedName))* ;
 unionIndices      : (NUMBER) (',' (NUMBER))* ;
-expression        : subexpression (('==' | '!=' | '<' | '>' | '<=' | '>=') subexpression)? ;
-subexpression     : value | NAME | yamlPath ;
+expression        : compareExpr
+                  | booleanExpr
+                  | arithmeticExpr
+                  | containmentExpr
+                  | negationExpr
+                  | subexpression ;
+compareExpr       : subexpression ('==' | '!=' | '<' | '>' | '<=' | '>=') subexpression ;
+booleanExpr       : subexpression ('&&' | '||') subexpression ;
+arithmeticExpr    : subexpression ('+' | '-' | '/' | '*') subexpression ;
+containmentExpr   : subexpression ('in' | 'nin' | 'subsetof') subexpression ;
+negationExpr      : '!' subexpression ;
+subexpression     : value | path ;
 value             : STRING | NUMBER | BOOLEAN | NULL ;
 
 // Lexer Rules

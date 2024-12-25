@@ -6,6 +6,7 @@ import (
 	antlr "github.com/antlr4-go/antlr/v4"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/parser"
+	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 // Visitor is a visitor that walks the parse tree to generate an expression
@@ -16,7 +17,11 @@ func (v *Visitor) VisitRoot(ctx parser.IYamlPathContext) (expr.Expr, error) {
 	return v.visitNode(ctx)
 }
 
-func (v *Visitor) visitPath(ctx *parser.YamlPathContext) (expr.Expr, error) {
+func (v *Visitor) visitYAMLPath(ctx parser.IYamlPathContext) (expr.Expr, error) {
+	return v.visitPath(ctx.Path())
+}
+
+func (v *Visitor) visitPath(ctx parser.IPathContext) (expr.Expr, error) {
 	root, err := v.visitRoot(ctx.Root())
 	if err != nil {
 		return nil, err
@@ -137,6 +142,9 @@ func (v *Visitor) visitBracketExpression(ctx parser.IBracketExpressionContext) (
 			Union: u,
 		}, nil
 	}
+	if filter := ctx.Filter(); filter != nil {
+		return v.visitFilter(filter)
+	}
 	return nil, ErrInternalf(ctx, "unexpected bracket expression: %q", ctx.GetText())
 }
 
@@ -144,24 +152,94 @@ func (v *Visitor) visitSlice(ctx *parser.SliceContext) (expr.Expr, error) {
 	return v.visitNode(ctx)
 }
 
-func (v *Visitor) visitFilter(ctx *parser.FilterContext) (expr.Expr, error) {
-	return v.visitNode(ctx)
+func (v *Visitor) visitFilter(ctx parser.IFilterContext) (expr.Expr, error) {
+	e, err := v.visitExpression(ctx.Expression())
+	if err != nil {
+		return nil, err
+	}
+	return &expr.FilterExpr{
+		Expr: e,
+	}, nil
 }
 
-func (v *Visitor) visitExpression(ctx *parser.ExpressionContext) (expr.Expr, error) {
-	return v.visitNode(ctx)
+func (v *Visitor) visitExpression(ctx parser.IExpressionContext) (expr.Expr, error) {
+	if compare := ctx.CompareExpr(); compare != nil {
+		return v.visitCompareExpr(compare)
+	}
+	if boolean := ctx.BooleanExpr(); boolean != nil {
+		return v.visitBooleanExpr(boolean)
+	}
+	if containment := ctx.ContainmentExpr(); containment != nil {
+		return v.visitContainmentExpr(containment)
+	}
+	if arithmetic := ctx.ArithmeticExpr(); arithmetic != nil {
+		return v.visitArithmeticExpr(arithmetic)
+	}
+	if negation := ctx.NegationExpr(); negation != nil {
+		return v.visitNegationExpr(negation)
+	}
+	if subexpr := ctx.Subexpression(); subexpr != nil {
+		return v.visitSubexpression(subexpr)
+	}
+	return nil, ErrInternalf(ctx, "unexpected expression: %q", ctx.GetText())
 }
 
-func (v *Visitor) visitSubexpression(ctx *parser.SubexpressionContext) (expr.Expr, error) {
-	return v.visitNode(ctx)
+func (v *Visitor) visitCompareExpr(ctx parser.ICompareExprContext) (expr.Expr, error) {
+	return nil, ErrNotImplemented("compare")
 }
 
-func (v *Visitor) visitValue(ctx *parser.ValueContext) (expr.Expr, error) {
-	return nil, nil
+func (v *Visitor) visitBooleanExpr(ctx parser.IBooleanExprContext) (expr.Expr, error) {
+	return nil, ErrNotImplemented("boolean")
 }
 
-func (v *Visitor) visitQuotedName(ctx *parser.QuotedNameContext) (expr.Expr, error) {
-	return nil, nil
+func (v *Visitor) visitContainmentExpr(ctx parser.IContainmentExprContext) (expr.Expr, error) {
+	return nil, ErrNotImplemented("containment")
+}
+
+func (v *Visitor) visitArithmeticExpr(ctx parser.IArithmeticExprContext) (expr.Expr, error) {
+	return nil, ErrNotImplemented("arithmetic")
+}
+
+func (v *Visitor) visitNegationExpr(ctx parser.INegationExprContext) (expr.Expr, error) {
+	return nil, ErrNotImplemented("negation")
+}
+
+func (v *Visitor) visitSubexpression(ctx parser.ISubexpressionContext) (expr.Expr, error) {
+	if path := ctx.Path(); path != nil {
+		return v.visitPath(path)
+	}
+	if value := ctx.Value(); v != nil {
+		return v.visitValue(value)
+	}
+	return nil, ErrInternalf(ctx, "unexpected subexpression: %q", ctx.GetText())
+}
+
+func (v *Visitor) visitValue(ctx parser.IValueContext) (expr.Expr, error) {
+	if b := ctx.BOOLEAN(); b != nil {
+		return &expr.ValueExpr{
+			Node: yamlutil.Boolean(b.GetText()),
+		}, nil
+	}
+	if n := ctx.NUMBER(); n != nil {
+		return &expr.ValueExpr{
+			Node: yamlutil.Number(n.GetText()),
+		}, nil
+	}
+	if s := ctx.STRING(); s != nil {
+		s, err := strconv.Unquote(s.GetText())
+		if err != nil {
+			return nil, NewSemanticErrorf(ctx, "string: %s", s)
+		}
+		return &expr.ValueExpr{
+			Node: yamlutil.String(s),
+		}, nil
+	}
+	if n := ctx.NULL(); n != nil {
+		return &expr.ValueExpr{
+			Node: yamlutil.Null,
+		}, nil
+	}
+	return nil, ErrInternalf(ctx, "unexpected value expression: %q", ctx.GetText())
 }
 
 func (v *Visitor) visitRoot(ctx parser.IRootContext) (expr.Expr, error) {
@@ -178,7 +256,7 @@ func (v *Visitor) visitRoot(ctx parser.IRootContext) (expr.Expr, error) {
 func (v *Visitor) visitNode(node antlr.ParseTree) (expr.Expr, error) {
 	switch ctx := node.(type) {
 	case *parser.YamlPathContext:
-		return v.visitPath(ctx)
+		return v.visitYAMLPath(ctx)
 	case parser.IRootContext:
 		return v.visitRoot(ctx)
 	case parser.ISelectorContext:
@@ -197,12 +275,20 @@ func (v *Visitor) visitNode(node antlr.ParseTree) (expr.Expr, error) {
 		return v.visitFilter(ctx)
 	case *parser.ExpressionContext:
 		return v.visitExpression(ctx)
-	case *parser.SubexpressionContext:
+	case parser.ICompareExprContext:
+		return v.visitCompareExpr(ctx)
+	case parser.IBooleanExprContext:
+		return v.visitBooleanExpr(ctx)
+	case parser.IContainmentExprContext:
+		return v.visitContainmentExpr(ctx)
+	case parser.IArithmeticExprContext:
+		return v.visitArithmeticExpr(ctx)
+	case parser.INegationExprContext:
+		return v.visitNegationExpr(ctx)
+	case parser.ISubexpressionContext:
 		return v.visitSubexpression(ctx)
-	case *parser.ValueContext:
+	case parser.IValueContext:
 		return v.visitValue(ctx)
-	case *parser.QuotedNameContext:
-		return v.visitQuotedName(ctx)
 	}
 	return nil, ErrInternalf(node, "unexpected node type: %T", node)
 }

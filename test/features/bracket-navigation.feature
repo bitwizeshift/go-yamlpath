@@ -219,3 +219,40 @@ Feature: Bracket path navigation
         ---
         bar: 3
         """
+
+  Rule: Unions shall provide each matching element
+
+    Unions shall provide each matching element in the YAML structure.
+
+    Scenario: Union matches multiple fields
+
+      Given the yaml input:
+        """
+        foo:
+          bar: "hello"
+          baz: "world"
+        """
+      When the yamlpath `$.foo["bar", "baz"]` is evaluated
+      Then the evaluation result is:
+        """
+        "hello"
+        ---
+        "world"
+        """
+
+    Scenario: Union index matches multiple indices
+
+      Given the yaml input:
+        """
+        foo:
+          - bar: "hello"
+          - bar: "world"
+          - bar: "goodbye"
+        """
+      When the yamlpath `$.foo[0, 2]` is evaluated
+      Then the evaluation result is:
+        """
+        bar: "hello"
+        ---
+        bar: "goodbye"
+        """

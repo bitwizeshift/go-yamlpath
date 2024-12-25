@@ -104,6 +104,33 @@ func (v *Visitor) visitBracketExpression(ctx parser.IBracketExpressionContext) (
 			Slice: s,
 		}, nil
 	}
+	if union := ctx.UnionString(); union != nil {
+		var u expr.Union
+		for _, str := range union.AllQuotedName() {
+			text := str.GetText()
+			name, err := strconv.Unquote(text)
+			if err != nil {
+				return nil, NewSemanticErrorf(str, "string: %s", text)
+			}
+			u = append(u, name)
+		}
+		return &expr.UnionExpression{
+			Union: u,
+		}, nil
+	}
+	if union := ctx.UnionIndices(); union != nil {
+		var u expr.Union
+		for _, num := range union.AllNUMBER() {
+			i, err := strconv.ParseInt(num.GetText(), 10, 64)
+			if err != nil {
+				return nil, NewSemanticErrorf(num, "number: %s", num.GetText())
+			}
+			u = append(u, i)
+		}
+		return &expr.UnionExpression{
+			Union: u,
+		}, nil
+	}
 	return nil, ErrInternalf(ctx, "unexpected bracket expression: %q", ctx.GetText())
 }
 
@@ -112,10 +139,6 @@ func (v *Visitor) visitSlice(ctx *parser.SliceContext) (expr.Expression, error) 
 }
 
 func (v *Visitor) visitFilter(ctx *parser.FilterContext) (expr.Expression, error) {
-	return v.visitNode(ctx)
-}
-
-func (v *Visitor) visitUnion(ctx *parser.UnionContext) (expr.Expression, error) {
 	return v.visitNode(ctx)
 }
 
@@ -153,8 +176,6 @@ func (v *Visitor) visitNode(node antlr.ParseTree) (expr.Expression, error) {
 		return v.visitSlice(ctx)
 	case *parser.FilterContext:
 		return v.visitFilter(ctx)
-	case *parser.UnionContext:
-		return v.visitUnion(ctx)
 	case *parser.ExpressionContext:
 		return v.visitExpression(ctx)
 	case *parser.SubexpressionContext:

@@ -14,11 +14,13 @@ bracketExpression
                   | WILDCARD
                   | slice
                   | filter
-                  | union
+                  | unionString
+                  | unionIndices
                   ;
 slice             : (NUMBER)? ':' (NUMBER)? (':' NUMBER)? ;
 filter            : '?' '(' expression ')' ;
-union             : (quotedName | NUMBER) (',' (quotedName | NUMBER))* ;
+unionString       : (quotedName) (',' (quotedName))* ;
+unionIndices      : (NUMBER) (',' (NUMBER))* ;
 expression        : subexpression (('==' | '!=' | '<' | '>' | '<=' | '>=') subexpression)? ;
 subexpression     : value | NAME | yamlPath | currentSubPath ;
 currentSubPath    : current selector*;

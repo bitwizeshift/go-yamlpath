@@ -8,7 +8,7 @@ import (
 )
 
 type IndexExpr struct {
-	Index int64
+	Indices []int64
 }
 
 func (i *IndexExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
@@ -19,13 +19,15 @@ func (i *IndexExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node,
 		if n.Kind != yaml.SequenceNode {
 			continue
 		}
-		if i.Index < 0 {
-			i.Index += int64(len(n.Content))
+		for _, index := range i.Indices {
+			if index < 0 {
+				index += int64(len(n.Content))
+			}
+			if index < 0 || index >= int64(len(n.Content)) {
+				continue
+			}
+			result = append(result, n.Content[index])
 		}
-		if i.Index < 0 || i.Index >= int64(len(n.Content)) {
-			continue
-		}
-		result = append(result, n.Content[i.Index])
 	}
 	return result, nil
 }

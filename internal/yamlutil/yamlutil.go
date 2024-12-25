@@ -39,6 +39,21 @@ func Boolean(s string) *yaml.Node {
 	return &yaml.Node{Kind: yaml.ScalarNode, Value: s, Tag: "!!bool"}
 }
 
+// IsTruthy returns true if any of the nodes are truthy.
+func IsTruthy(nodes ...*yaml.Node) bool {
+	if len(nodes) == 0 {
+		return false
+	}
+	if len(nodes) > 1 {
+		return true
+	}
+	b, err := ToBool(nodes[0])
+	if err != nil {
+		return true
+	}
+	return b
+}
+
 func FromBool(b bool) *yaml.Node {
 	if b {
 		return True

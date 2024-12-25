@@ -1,47 +1,81 @@
 grammar yamlpath;
 
-// Parser Rules
-yamlPath          : path EOF ;
-path              : root selector* ;
-root              : '$' | '@' ;
-selector          : dotSelector | recursiveSelector | bracketSelector ;
-recursiveSelector : '..' (NAME | WILDCARD)? ;
-dotSelector       : '.' (NAME | WILDCARD) ;
-bracketSelector   : '[' bracketExpression ']' ;
-bracketExpression
-                  : quotedName
-                  | NUMBER
-                  | WILDCARD
-                  | slice
-                  | filter
-                  | unionString
-                  | unionIndices
-                  ;
-slice             : (NUMBER)? ':' (NUMBER)? (':' NUMBER)? ;
-filter            : '?' '(' expression ')' ;
-unionString       : (quotedName) (',' (quotedName))* ;
-unionIndices      : (NUMBER) (',' (NUMBER))* ;
-expression        : compareExpr
-                  | booleanExpr
-                  | arithmeticExpr
-                  | containmentExpr
-                  | negationExpr
-                  | subexpression ;
-compareExpr       : subexpression ('==' | '!=' | '<' | '>' | '<=' | '>=') subexpression ;
-booleanExpr       : subexpression ('&&' | '||') subexpression ;
-arithmeticExpr    : subexpression ('+' | '-' | '/' | '*') subexpression ;
-containmentExpr   : subexpression ('in' | 'nin' | 'subsetof') subexpression ;
-negationExpr      : '!' subexpression ;
-subexpression     : value | path ;
-value             : STRING | NUMBER | BOOLEAN | NULL ;
+/*****************************************************************************
+  Parser rules
+******************************************************************************/
+path: expression EOF ;
 
-// Lexer Rules
-NAME           : [a-zA-Z_][a-zA-Z0-9_]* ;
+expression
+      : ('$' | '@')                                       # rootExpression
+      | expression '..' (invocation)?                     # recursiveExpression
+      | expression '.' invocation                         # fieldExpression
+      | expression '[' bracketParam ']'                   # indexExpression
+      ;
+
+bracketParam
+      : STRING (',' (STRING))*                            # bracketUnionString
+      | NUMBER (',' (NUMBER))*                            # bracketUnionNumber
+      | '*'                                               # bracketWildcard
+      | (NUMBER)? ':' (NUMBER)? (':' NUMBER)?             # bracketSlice
+      | '?' '(' subexpression ')'                         # bracketFilter
+      ;
+
+subexpression
+      : subexpression ('+' | '-') subexpression                 # additiveSubexpression
+      | subexpression ('*' | '/') subexpression                 # multiplicativeSubexpression
+      | subexpression ('<=' | '<' | '>' | '>=') subexpression   # inequalitySubexpression
+      | subexpression ('==' | '!=') subexpression               # equalitySubexpression
+      | subexpression ('in' | 'nin' | 'subsetof') subexpression # membershipSubexpression
+      | subexpression ('&&' | 'and') subexpression              # andSubexpression
+      | subexpression ('||' | 'or') subexpression               # orSubexpression
+      | ('!' | 'not') subexpression                             # negationSubexpression
+      | literal                                                 # literalSubexpression
+      | expression                                              # rootSubexpression
+      ;
+
+literal
+      : STRING                                            # stringLiteral
+      | NUMBER                                            # numberLiteral
+      | ('true' | 'false')                                # booleanLiteral
+      | 'null'                                            # nullLiteral
+      ;
+
+invocation
+      : identifier                                        # memberInvocation
+      | '*'                                               # wildcardInvocation
+      | identifier '(' paramList? ')'                     # functionInvocation
+      ;
+
+paramList
+      : subexpression (',' subexpression)*
+      ;
+
+identifier
+      : IDENTIFIER
+      ;
+
+/*****************************************************************************
+  Lexer rules
+******************************************************************************/
+
+IDENTIFIER     : [a-zA-Z_][a-zA-Z0-9_]* ;
 NUMBER         : '-'? [0-9]+ ('.' [0-9]+)? ([eE] [+-]? [0-9]+)? ;
-STRING         : '"' (~["\\] | '\\' .)* '"' ;
-BOOLEAN        : 'true' | 'false' ;
-NULL           : 'null' ;
-quotedName     : STRING ;
-WILDCARD       : '*' ;
-WS             : [ \t\r\n]+ -> skip ;
-COMMENT        : '//' ~[\r\n]* -> skip ;
+STRING         : '"' (ESC | .)*? '"' ;
+
+// Pipe whitespace to the HIDDEN channel to support retrieving source text through the parser.
+WS             : [ \t\r\n]+ -> channel(HIDDEN) ;
+COMMENT        : '//' ~[\r\n]* -> channel(HIDDEN) ;
+
+// Fragments
+
+fragment ESC
+      : '\\' ([`'\\/fnrt] | UNICODE)
+      ;
+
+fragment UNICODE
+        : 'u' HEX HEX HEX HEX
+        ;
+
+fragment HEX
+        : [0-9a-fA-F]
+        ;

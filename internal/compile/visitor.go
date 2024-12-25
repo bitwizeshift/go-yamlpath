@@ -3,7 +3,6 @@ package compile
 import (
 	"strconv"
 
-	antlr "github.com/antlr4-go/antlr/v4"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/parser"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
@@ -13,243 +12,29 @@ import (
 type Visitor struct{}
 
 // VisitRoot visits the root of the parse tree
-func (v *Visitor) VisitRoot(ctx parser.IYamlPathContext) (expr.Expr, error) {
-	return v.visitNode(ctx)
+func (v *Visitor) VisitRoot(ctx parser.IPathContext) (expr.Expr, error) {
+	return v.visitExpression(ctx.Expression())
 }
 
-func (v *Visitor) visitYAMLPath(ctx parser.IYamlPathContext) (expr.Expr, error) {
-	return v.visitPath(ctx.Path())
-}
-
-func (v *Visitor) visitPath(ctx parser.IPathContext) (expr.Expr, error) {
-	root, err := v.visitRoot(ctx.Root())
-	if err != nil {
-		return nil, err
-	}
-
-	var exprs expr.SequenceExpr
-	exprs.Append(root)
-	for _, ctx := range ctx.AllSelector() {
-		expr, err := v.visitSelector(ctx)
-		if err != nil {
-			return nil, err
-		}
-		exprs.Append(expr)
-	}
-	return exprs, nil
-}
-
-func (v *Visitor) visitSelector(ctx parser.ISelectorContext) (expr.Expr, error) {
-	if selector := ctx.DotSelector(); selector != nil {
-		return v.visitDotSelector(selector)
-	}
-	if selector := ctx.BracketSelector(); selector != nil {
-		return v.visitBracketSelector(selector)
-	}
-	if selector := ctx.RecursiveSelector(); selector != nil {
-		return v.visitRecursiveSelector(selector)
-	}
-	return nil, ErrInternalf(ctx, "unexpected selector type: %T", ctx)
-}
-
-func (v *Visitor) visitDotSelector(ctx parser.IDotSelectorContext) (expr.Expr, error) {
-	var result expr.Expr
-	if node := ctx.NAME(); node != nil {
-		result = &expr.FieldExpression{
-			Name: node.GetText(),
-		}
-	} else if node := ctx.WILDCARD(); node != nil {
-		result = &expr.WildcardExpr{}
-	} else {
-		return nil, ErrInternalf(ctx, "unhandled dot selector: %q", ctx.GetText())
-	}
-	return result, nil
-}
-
-func (v *Visitor) visitRecursiveSelector(ctx parser.IRecursiveSelectorContext) (expr.Expr, error) {
-	var result expr.Expr = &expr.RecursiveDescentExpr{}
-	if node := ctx.NAME(); node != nil {
-		result = expr.SequenceExpr{result, &expr.FieldExpression{
-			Name: node.GetText(),
-		}}
-	} else if node := ctx.WILDCARD(); node != nil {
-		result = expr.SequenceExpr{result, &expr.WildcardExpr{}}
-	}
-	return result, nil
-}
-
-func (v *Visitor) visitBracketSelector(ctx parser.IBracketSelectorContext) (expr.Expr, error) {
-	return v.visitBracketExpression(ctx.BracketExpression())
-}
-
-func (v *Visitor) visitBracketExpression(ctx parser.IBracketExpressionContext) (expr.Expr, error) {
-	if qn := ctx.QuotedName(); qn != nil {
-		text := qn.GetText()
-		name, err := strconv.Unquote(text)
-		if err != nil {
-			return nil, NewSemanticErrorf(qn, "string: %s", text)
-		}
-
-		return &expr.FieldExpression{
-			Name: name,
-		}, nil
-	}
-	if wildcard := ctx.WILDCARD(); wildcard != nil {
-		return &expr.WildcardExpr{}, nil
-	}
-	if number := ctx.NUMBER(); number != nil {
-		i, err := strconv.ParseInt(number.GetText(), 10, 64)
-		if err != nil {
-			return nil, NewSemanticErrorf(number, "number: %s", number.GetText())
-		}
-		return &expr.IndexExpr{
-			Index: i,
-		}, nil
-	}
-	if slice := ctx.Slice(); slice != nil {
-		s, err := expr.ParseSlice(slice.GetText())
-		if err != nil {
-			return nil, NewSemanticErrorf(slice, "slice: %s", slice.GetText())
-		}
-		return &expr.SliceExpr{
-			Slice: s,
-		}, nil
-	}
-	if union := ctx.UnionString(); union != nil {
-		var u expr.Union
-		for _, str := range union.AllQuotedName() {
-			text := str.GetText()
-			name, err := strconv.Unquote(text)
-			if err != nil {
-				return nil, NewSemanticErrorf(str, "string: %s", text)
-			}
-			u = append(u, name)
-		}
-		return &expr.UnionExpr{
-			Union: u,
-		}, nil
-	}
-	if union := ctx.UnionIndices(); union != nil {
-		var u expr.Union
-		for _, num := range union.AllNUMBER() {
-			i, err := strconv.ParseInt(num.GetText(), 10, 64)
-			if err != nil {
-				return nil, NewSemanticErrorf(num, "number: %s", num.GetText())
-			}
-			u = append(u, i)
-		}
-		return &expr.UnionExpr{
-			Union: u,
-		}, nil
-	}
-	if filter := ctx.Filter(); filter != nil {
-		return v.visitFilter(filter)
-	}
-	return nil, ErrInternalf(ctx, "unexpected bracket expression: %q", ctx.GetText())
-}
-
-func (v *Visitor) visitSlice(ctx *parser.SliceContext) (expr.Expr, error) {
-	return v.visitNode(ctx)
-}
-
-func (v *Visitor) visitFilter(ctx parser.IFilterContext) (expr.Expr, error) {
-	e, err := v.visitExpression(ctx.Expression())
-	if err != nil {
-		return nil, err
-	}
-	return &expr.FilterExpr{
-		Expr: e,
-	}, nil
-}
+//------------------------------------------------------------------------------
+// Expressions
+//------------------------------------------------------------------------------
 
 func (v *Visitor) visitExpression(ctx parser.IExpressionContext) (expr.Expr, error) {
-	if compare := ctx.CompareExpr(); compare != nil {
-		return v.visitCompareExpr(compare)
+	switch ctx := ctx.(type) {
+	case *parser.RootExpressionContext:
+		return v.visitRootExpression(ctx)
+	case *parser.FieldExpressionContext:
+		return v.visitFieldExpression(ctx)
+	case *parser.RecursiveExpressionContext:
+		return v.visitRecursiveExpression(ctx)
+	case *parser.IndexExpressionContext:
+		return v.visitIndexExpression(ctx)
 	}
-	if boolean := ctx.BooleanExpr(); boolean != nil {
-		return v.visitBooleanExpr(boolean)
-	}
-	if containment := ctx.ContainmentExpr(); containment != nil {
-		return v.visitContainmentExpr(containment)
-	}
-	if arithmetic := ctx.ArithmeticExpr(); arithmetic != nil {
-		return v.visitArithmeticExpr(arithmetic)
-	}
-	if negation := ctx.NegationExpr(); negation != nil {
-		return v.visitNegationExpr(negation)
-	}
-	if subexpr := ctx.Subexpression(); subexpr != nil {
-		return v.visitSubexpression(subexpr)
-	}
-	return nil, ErrInternalf(ctx, "unexpected expression: %q", ctx.GetText())
+	return nil, ErrInternalf(ctx, "unexpected expression type: %T", ctx)
 }
 
-func (v *Visitor) visitCompareExpr(ctx parser.ICompareExprContext) (expr.Expr, error) {
-	return nil, ErrNotImplemented("compare")
-}
-
-func (v *Visitor) visitBooleanExpr(ctx parser.IBooleanExprContext) (expr.Expr, error) {
-	return nil, ErrNotImplemented("boolean")
-}
-
-func (v *Visitor) visitContainmentExpr(ctx parser.IContainmentExprContext) (expr.Expr, error) {
-	return nil, ErrNotImplemented("containment")
-}
-
-func (v *Visitor) visitArithmeticExpr(ctx parser.IArithmeticExprContext) (expr.Expr, error) {
-	return nil, ErrNotImplemented("arithmetic")
-}
-
-func (v *Visitor) visitNegationExpr(ctx parser.INegationExprContext) (expr.Expr, error) {
-	e, err := v.visitSubexpression(ctx.Subexpression())
-	if err != nil {
-		return nil, err
-	}
-
-	return &expr.NegationExpr{
-		Expr: e,
-	}, nil
-}
-
-func (v *Visitor) visitSubexpression(ctx parser.ISubexpressionContext) (expr.Expr, error) {
-	if path := ctx.Path(); path != nil {
-		return v.visitPath(path)
-	}
-	if value := ctx.Value(); v != nil {
-		return v.visitValue(value)
-	}
-	return nil, ErrInternalf(ctx, "unexpected subexpression: %q", ctx.GetText())
-}
-
-func (v *Visitor) visitValue(ctx parser.IValueContext) (expr.Expr, error) {
-	if b := ctx.BOOLEAN(); b != nil {
-		return &expr.ValueExpr{
-			Node: yamlutil.Boolean(b.GetText()),
-		}, nil
-	}
-	if n := ctx.NUMBER(); n != nil {
-		return &expr.ValueExpr{
-			Node: yamlutil.Number(n.GetText()),
-		}, nil
-	}
-	if s := ctx.STRING(); s != nil {
-		s, err := strconv.Unquote(s.GetText())
-		if err != nil {
-			return nil, NewSemanticErrorf(ctx, "string: %s", s)
-		}
-		return &expr.ValueExpr{
-			Node: yamlutil.String(s),
-		}, nil
-	}
-	if n := ctx.NULL(); n != nil {
-		return &expr.ValueExpr{
-			Node: yamlutil.Null,
-		}, nil
-	}
-	return nil, ErrInternalf(ctx, "unexpected value expression: %q", ctx.GetText())
-}
-
-func (v *Visitor) visitRoot(ctx parser.IRootContext) (expr.Expr, error) {
+func (v *Visitor) visitRootExpression(ctx *parser.RootExpressionContext) (expr.Expr, error) {
 	root := ctx.GetText()
 	switch root {
 	case "@", "$":
@@ -260,42 +45,250 @@ func (v *Visitor) visitRoot(ctx parser.IRootContext) (expr.Expr, error) {
 	return nil, ErrInternalf(ctx, "unexpected root expression: %q", root)
 }
 
-func (v *Visitor) visitNode(node antlr.ParseTree) (expr.Expr, error) {
-	switch ctx := node.(type) {
-	case *parser.YamlPathContext:
-		return v.visitYAMLPath(ctx)
-	case parser.IRootContext:
-		return v.visitRoot(ctx)
-	case parser.ISelectorContext:
-		return v.visitSelector(ctx)
-	case parser.IDotSelectorContext:
-		return v.visitDotSelector(ctx)
-	case parser.IRecursiveSelectorContext:
-		return v.visitRecursiveSelector(ctx)
-	case *parser.BracketSelectorContext:
-		return v.visitBracketSelector(ctx)
-	case *parser.BracketExpressionContext:
-		return v.visitBracketExpression(ctx)
-	case *parser.SliceContext:
-		return v.visitSlice(ctx)
-	case *parser.FilterContext:
-		return v.visitFilter(ctx)
-	case *parser.ExpressionContext:
-		return v.visitExpression(ctx)
-	case parser.ICompareExprContext:
-		return v.visitCompareExpr(ctx)
-	case parser.IBooleanExprContext:
-		return v.visitBooleanExpr(ctx)
-	case parser.IContainmentExprContext:
-		return v.visitContainmentExpr(ctx)
-	case parser.IArithmeticExprContext:
-		return v.visitArithmeticExpr(ctx)
-	case parser.INegationExprContext:
-		return v.visitNegationExpr(ctx)
-	case parser.ISubexpressionContext:
-		return v.visitSubexpression(ctx)
-	case parser.IValueContext:
-		return v.visitValue(ctx)
+func (v *Visitor) visitFieldExpression(ctx *parser.FieldExpressionContext) (expr.Expr, error) {
+	var result expr.SequenceExpr
+	left, err := v.visitExpression(ctx.Expression())
+	if err != nil {
+		return nil, err
 	}
-	return nil, ErrInternalf(node, "unexpected node type: %T", node)
+	result.Append(left)
+
+	right, err := v.visitInvocation(ctx.Invocation())
+	if err != nil {
+		return nil, err
+	}
+	result.Append(right)
+	return result, nil
+}
+
+func (v *Visitor) visitRecursiveExpression(ctx *parser.RecursiveExpressionContext) (expr.Expr, error) {
+	var result expr.SequenceExpr
+	result.Append(&expr.RecursiveDescentExpr{})
+	if invocation := ctx.Invocation(); invocation != nil {
+		right, err := v.visitInvocation(invocation)
+		if err != nil {
+			return nil, err
+		}
+		result.Append(right)
+	}
+	return result, nil
+}
+
+func (v *Visitor) visitIndexExpression(ctx *parser.IndexExpressionContext) (expr.Expr, error) {
+	var result expr.SequenceExpr
+	left, err := v.visitExpression(ctx.Expression())
+	if err != nil {
+		return nil, err
+	}
+	result.Append(left)
+
+	right, err := v.visitBracketParam(ctx.BracketParam())
+	if err != nil {
+		return nil, err
+	}
+	result.Append(right)
+	return result, nil
+}
+
+//------------------------------------------------------------------------------
+// Invocations
+//------------------------------------------------------------------------------
+
+func (v *Visitor) visitInvocation(ctx parser.IInvocationContext) (expr.Expr, error) {
+	switch ctx := ctx.(type) {
+	case *parser.MemberInvocationContext:
+		return v.visitMemberInvocation(ctx)
+	case *parser.WildcardInvocationContext:
+		return v.visitWildcardInvocation(ctx)
+	case *parser.FunctionInvocationContext:
+		return v.visitFunctionInvocation(ctx)
+	}
+	return nil, ErrInternalf(ctx, "unexpected invocation type: %T", ctx)
+}
+
+func (v *Visitor) visitMemberInvocation(ctx *parser.MemberInvocationContext) (expr.Expr, error) {
+	return &expr.FieldExpression{
+		Names: []string{ctx.GetText()},
+	}, nil
+}
+
+func (v *Visitor) visitWildcardInvocation(_ *parser.WildcardInvocationContext) (expr.Expr, error) {
+	return &expr.WildcardExpr{}, nil
+}
+
+func (v *Visitor) visitFunctionInvocation(ctx *parser.FunctionInvocationContext) (expr.Expr, error) {
+	return nil, ErrInternalf(ctx, "function invocation not yet implemented")
+}
+
+//------------------------------------------------------------------------------
+// BracketParams
+//------------------------------------------------------------------------------
+
+func (v *Visitor) visitBracketParam(ctx parser.IBracketParamContext) (expr.Expr, error) {
+	switch ctx := ctx.(type) {
+	case *parser.BracketUnionNumberContext:
+		return v.visitBracketUnionNumber(ctx)
+	case *parser.BracketUnionStringContext:
+		return v.visitBracketUnionString(ctx)
+	case *parser.BracketWildcardContext:
+		return v.visitBracketWildcard(ctx)
+	case *parser.BracketSliceContext:
+		return v.visitBracketSlice(ctx)
+	case *parser.BracketFilterContext:
+		return v.visitBracketFilter(ctx)
+	}
+	return nil, ErrInternalf(ctx, "unexpected bracket param type: %T", ctx)
+}
+
+func (v *Visitor) visitBracketUnionString(ctx *parser.BracketUnionStringContext) (expr.Expr, error) {
+	var names []string
+	for _, str := range ctx.AllSTRING() {
+		name, err := strconv.Unquote(str.GetText())
+		if err != nil {
+			return nil, NewSemanticErrorf(str, "string: %s", str.GetText())
+		}
+		names = append(names, name)
+	}
+	return &expr.FieldExpression{
+		Names: names,
+	}, nil
+}
+
+func (v *Visitor) visitBracketUnionNumber(ctx *parser.BracketUnionNumberContext) (expr.Expr, error) {
+	var indicies []int64
+	for _, num := range ctx.AllNUMBER() {
+		i, err := strconv.ParseInt(num.GetText(), 10, 64)
+		if err != nil {
+			return nil, NewSemanticErrorf(num, "number: %s", num.GetText())
+		}
+		indicies = append(indicies, i)
+	}
+	return &expr.IndexExpr{
+		Indices: indicies,
+	}, nil
+}
+
+func (v *Visitor) visitBracketWildcard(_ *parser.BracketWildcardContext) (expr.Expr, error) {
+	return &expr.WildcardExpr{}, nil
+}
+
+func (v *Visitor) visitBracketSlice(ctx *parser.BracketSliceContext) (expr.Expr, error) {
+	s, err := expr.ParseSlice(ctx.GetText())
+	if err != nil {
+		return nil, NewSemanticErrorf(ctx, "slice: %s", ctx.GetText())
+	}
+	return &expr.SliceExpr{
+		Slice: s,
+	}, nil
+}
+
+func (v *Visitor) visitBracketFilter(ctx *parser.BracketFilterContext) (expr.Expr, error) {
+	e, err := v.visitSubexpression(ctx.Subexpression())
+	if err != nil {
+		return nil, err
+	}
+	return &expr.FilterExpr{
+		Expr: e,
+	}, nil
+}
+
+//------------------------------------------------------------------------------
+// Subexpressions
+//------------------------------------------------------------------------------
+
+func (v *Visitor) visitSubexpression(ctx parser.ISubexpressionContext) (expr.Expr, error) {
+	switch ctx := ctx.(type) {
+	case *parser.AdditiveSubexpressionContext:
+
+	case *parser.MultiplicativeSubexpressionContext:
+
+	case *parser.InequalitySubexpressionContext:
+
+	case *parser.EqualitySubexpressionContext:
+
+	case *parser.MembershipSubexpressionContext:
+
+	case *parser.AndSubexpressionContext:
+
+	case *parser.OrSubexpressionContext:
+
+	case *parser.NegationSubexpressionContext:
+		return v.visitNegationSubexpression(ctx)
+	case *parser.LiteralSubexpressionContext:
+		return v.visitLiteral(ctx.Literal())
+	case *parser.RootSubexpressionContext:
+		return v.visitExpression(ctx.Expression())
+	}
+	return nil, ErrInternalf(ctx, "unexpected expression: %q", ctx.GetText())
+}
+
+//------------------------------------------------------------------------------
+// Literals
+//------------------------------------------------------------------------------
+
+func (v *Visitor) visitLiteral(ctx parser.ILiteralContext) (expr.Expr, error) {
+	switch ctx := ctx.(type) {
+	case *parser.StringLiteralContext:
+		return v.visitStringLiteral(ctx)
+	case *parser.NumberLiteralContext:
+		return v.visitNumberLiteral(ctx)
+	case *parser.BooleanLiteralContext:
+		return v.visitBooleanLiteral(ctx)
+	case *parser.NullLiteralContext:
+		return v.visitNullLiteral(ctx)
+	}
+	return nil, ErrInternalf(ctx, "unexpected literal subexpression: %q", ctx.GetText())
+}
+
+func (v *Visitor) visitStringLiteral(ctx *parser.StringLiteralContext) (expr.Expr, error) {
+	s, err := strconv.Unquote(ctx.GetText())
+	if err != nil {
+		return nil, NewSemanticErrorf(ctx, "string: %s", ctx.GetText())
+	}
+	return &expr.ValueExpr{
+		Node: yamlutil.String(s),
+	}, nil
+}
+
+func (v *Visitor) visitNumberLiteral(ctx *parser.NumberLiteralContext) (expr.Expr, error) {
+	return &expr.ValueExpr{
+		Node: yamlutil.Number(ctx.GetText()),
+	}, nil
+}
+
+func (v *Visitor) visitBooleanLiteral(ctx *parser.BooleanLiteralContext) (expr.Expr, error) {
+	return &expr.ValueExpr{
+		Node: yamlutil.Boolean(ctx.GetText()),
+	}, nil
+}
+
+func (v *Visitor) visitNullLiteral(_ *parser.NullLiteralContext) (expr.Expr, error) {
+	return &expr.ValueExpr{
+		Node: yamlutil.Null,
+	}, nil
+}
+
+func (v *Visitor) visitEqualitySubexpression(ctx *parser.EqualitySubexpressionContext) (expr.Expr, error) {
+	lhs, err := v.visitSubexpression(ctx.Subexpression(0))
+	if err != nil {
+		return nil, err
+	}
+	rhs, err := v.visitSubexpression(ctx.Subexpression(1))
+	if err != nil {
+		return nil, err
+	}
+	_, _ = lhs, rhs
+
+	return nil, ErrInternalf(ctx, "unknown binary operator: %q", "")
+}
+
+func (v *Visitor) visitNegationSubexpression(ctx *parser.NegationSubexpressionContext) (expr.Expr, error) {
+	e, err := v.visitSubexpression(ctx.Subexpression())
+	if err != nil {
+		return nil, err
+	}
+
+	return &expr.NegationExpr{
+		Expr: e,
+	}, nil
 }

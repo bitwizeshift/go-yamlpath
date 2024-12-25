@@ -8,10 +8,10 @@ import (
 )
 
 type FieldExpression struct {
-	Name string
+	Names []string
 }
 
-func (f *FieldExpression) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (e *FieldExpression) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes = yamlutil.Normalize(nodes...)
@@ -19,9 +19,11 @@ func (f *FieldExpression) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml
 		if n.Kind != yaml.MappingNode {
 			continue
 		}
-		for i := 0; (i + 1) < len(n.Content); i += 2 {
-			if n.Content[i].Value == f.Name {
-				result = append(result, n.Content[i+1])
+		for _, name := range e.Names {
+			for i := 0; (i + 1) < len(n.Content); i += 2 {
+				if n.Content[i].Value == name {
+					result = append(result, n.Content[i+1])
+				}
 			}
 		}
 	}

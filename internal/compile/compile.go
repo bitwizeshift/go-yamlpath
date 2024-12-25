@@ -26,7 +26,7 @@ func NewTree(str string) (expr.Expr, error) {
 	parser.AddErrorListener(parserErrors)
 
 	parser.BuildParseTrees = true
-	path := parser.YamlPath()
+	path := parser.Path()
 
 	var errs []error
 	errs = append(errs, lexerErrors.Errors...)

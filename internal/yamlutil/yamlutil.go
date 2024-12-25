@@ -39,6 +39,13 @@ func Boolean(s string) *yaml.Node {
 	return &yaml.Node{Kind: yaml.ScalarNode, Value: s, Tag: "!!bool"}
 }
 
+func FromBool(b bool) *yaml.Node {
+	if b {
+		return True
+	}
+	return False
+}
+
 func ToBool(node *yaml.Node) (bool, error) {
 	if node.Kind != yaml.ScalarNode || node.Tag != "!!bool" {
 		return false, fmt.Errorf("expected boolean node, but got %s", node.Tag)

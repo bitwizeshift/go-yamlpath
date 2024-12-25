@@ -201,7 +201,14 @@ func (v *Visitor) visitArithmeticExpr(ctx parser.IArithmeticExprContext) (expr.E
 }
 
 func (v *Visitor) visitNegationExpr(ctx parser.INegationExprContext) (expr.Expr, error) {
-	return nil, ErrNotImplemented("negation")
+	e, err := v.visitSubexpression(ctx.Subexpression())
+	if err != nil {
+		return nil, err
+	}
+
+	return &expr.NegationExpr{
+		Expr: e,
+	}, nil
 }
 
 func (v *Visitor) visitSubexpression(ctx parser.ISubexpressionContext) (expr.Expr, error) {

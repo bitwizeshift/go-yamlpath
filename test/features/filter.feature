@@ -54,3 +54,35 @@ Feature: Filtering
         """
         baz: 42
         """
+
+  Rule: Negation expressions negate the filter
+
+    Negation expressions shall negate the filter expression.
+
+    Scenario: Negation expression matches a false boolean element
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: false
+        """
+      When the yamlpath `$.foo.bar[?(!@.enable)]` is evaluated
+      Then the evaluation result is:
+        """
+        enable: false
+        """
+
+    Scenario: Negation expression doesn't match a path element
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            baz: "hello"
+        """
+      When the yamlpath `$.foo.bar[?(!@.disable)]` is evaluated
+      Then the evaluation result is:
+        """
+        baz: "hello"
+        """

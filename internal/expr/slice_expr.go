@@ -7,14 +7,14 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
-// SliceExpression represents a slice expression
-type SliceExpression struct {
+// SliceExpr represents a slice expression
+type SliceExpr struct {
 	Slice *Slice
 }
 
 // Eval evaluates the slice expression against the provided nodes
 // and returns the resulting nodes that match the slice expression.
-func (s *SliceExpression) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (s *SliceExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes = yamlutil.Normalize(nodes...)

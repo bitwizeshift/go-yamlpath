@@ -7,9 +7,9 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
-type WildcardExpression struct{}
+type WildcardExpr struct{}
 
-func (*WildcardExpression) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (*WildcardExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes = yamlutil.Normalize(nodes...)

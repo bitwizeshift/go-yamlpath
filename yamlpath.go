@@ -28,7 +28,7 @@ type CompileError = compile.CompileError
 // YAMLPath represents a compiled YAMLPath expression.
 type YAMLPath struct {
 	path       string
-	expression expr.Expression
+	expression expr.Expr
 }
 
 // Compile compiles a YAMLPath expression.

@@ -7,9 +7,9 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamlpathctx"
 )
 
-type SequenceExpression []Expression
+type SequenceExpr []Expr
 
-func (s SequenceExpression) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (s SequenceExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
 	ctx = yamlpathctx.SetRoot(ctx, nodes)
 
 	var err error
@@ -23,12 +23,12 @@ func (s SequenceExpression) Eval(ctx context.Context, nodes []*yaml.Node) ([]*ya
 }
 
 // Append appends an expression to the sequence.
-func (s *SequenceExpression) Append(expr Expression) {
-	if seq, ok := expr.(SequenceExpression); ok {
+func (s *SequenceExpr) Append(expr Expr) {
+	if seq, ok := expr.(SequenceExpr); ok {
 		*s = append(*s, seq...)
 	} else {
 		*s = append(*s, expr)
 	}
 }
 
-var _ Expression = (*SequenceExpression)(nil)
+var _ Expr = (*SequenceExpr)(nil)

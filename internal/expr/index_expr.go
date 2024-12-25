@@ -7,11 +7,11 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
-type IndexExpression struct {
+type IndexExpr struct {
 	Index int64
 }
 
-func (i *IndexExpression) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (i *IndexExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes = yamlutil.Normalize(nodes...)

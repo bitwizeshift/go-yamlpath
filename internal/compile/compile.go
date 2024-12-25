@@ -10,7 +10,7 @@ import (
 
 // NewTree converts a string FHIRPath expression into the proper Expression
 // tree.
-func NewTree(str string) (expr.Expression, error) {
+func NewTree(str string) (expr.Expr, error) {
 	input := antlr.NewInputStream(str)
 
 	lexerErrors := &ErrorListener{}

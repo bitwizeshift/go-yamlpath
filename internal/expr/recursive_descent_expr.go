@@ -6,9 +6,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type RecursiveDescentExpression struct{}
+type RecursiveDescentExpr struct{}
 
-func (r *RecursiveDescentExpression) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (r *RecursiveDescentExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 	for _, node := range nodes {
 		result = append(result, r.flatten(node)...)
@@ -16,7 +16,7 @@ func (r *RecursiveDescentExpression) Eval(ctx context.Context, nodes []*yaml.Nod
 	return result, nil
 }
 
-func (r *RecursiveDescentExpression) flatten(node *yaml.Node) []*yaml.Node {
+func (r *RecursiveDescentExpr) flatten(node *yaml.Node) []*yaml.Node {
 	var result []*yaml.Node
 	switch node.Kind {
 	case yaml.DocumentNode:

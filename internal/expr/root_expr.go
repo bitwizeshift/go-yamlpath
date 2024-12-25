@@ -8,13 +8,13 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamlpathctx"
 )
 
-// RootExpression represents a root expression, either '$' or '@' in the path.
-type RootExpression struct {
+// RootExpr represents a root expression, either '$' or '@' in the path.
+type RootExpr struct {
 	Root string
 }
 
 // Eval evaluates the root expression.
-func (e *RootExpression) Eval(ctx context.Context, _ []*yaml.Node) ([]*yaml.Node, error) {
+func (e *RootExpr) Eval(ctx context.Context, _ []*yaml.Node) ([]*yaml.Node, error) {
 	if e.Root == "$" {
 		return yamlpathctx.GetRoot(ctx), nil
 	}

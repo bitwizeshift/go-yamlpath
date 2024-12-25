@@ -12,17 +12,17 @@ import (
 type Visitor struct{}
 
 // VisitRoot visits the root of the parse tree
-func (v *Visitor) VisitRoot(ctx parser.IYamlPathContext) (expr.Expression, error) {
+func (v *Visitor) VisitRoot(ctx parser.IYamlPathContext) (expr.Expr, error) {
 	return v.visitNode(ctx)
 }
 
-func (v *Visitor) visitPath(ctx *parser.YamlPathContext) (expr.Expression, error) {
+func (v *Visitor) visitPath(ctx *parser.YamlPathContext) (expr.Expr, error) {
 	root, err := v.visitRoot(ctx.Root())
 	if err != nil {
 		return nil, err
 	}
 
-	var exprs expr.SequenceExpression
+	var exprs expr.SequenceExpr
 	exprs.Append(root)
 	for _, ctx := range ctx.AllSelector() {
 		expr, err := v.visitSelector(ctx)
@@ -34,7 +34,7 @@ func (v *Visitor) visitPath(ctx *parser.YamlPathContext) (expr.Expression, error
 	return exprs, nil
 }
 
-func (v *Visitor) visitSelector(ctx parser.ISelectorContext) (expr.Expression, error) {
+func (v *Visitor) visitSelector(ctx parser.ISelectorContext) (expr.Expr, error) {
 	if selector := ctx.DotSelector(); selector != nil {
 		return v.visitDotSelector(selector)
 	}
@@ -47,37 +47,37 @@ func (v *Visitor) visitSelector(ctx parser.ISelectorContext) (expr.Expression, e
 	return nil, ErrInternalf(ctx, "unexpected selector type: %T", ctx)
 }
 
-func (v *Visitor) visitDotSelector(ctx parser.IDotSelectorContext) (expr.Expression, error) {
-	var result expr.Expression
+func (v *Visitor) visitDotSelector(ctx parser.IDotSelectorContext) (expr.Expr, error) {
+	var result expr.Expr
 	if node := ctx.NAME(); node != nil {
 		result = &expr.FieldExpression{
 			Name: node.GetText(),
 		}
 	} else if node := ctx.WILDCARD(); node != nil {
-		result = &expr.WildcardExpression{}
+		result = &expr.WildcardExpr{}
 	} else {
 		return nil, ErrInternalf(ctx, "unhandled dot selector: %q", ctx.GetText())
 	}
 	return result, nil
 }
 
-func (v *Visitor) visitRecursiveSelector(ctx parser.IRecursiveSelectorContext) (expr.Expression, error) {
-	var result expr.Expression = &expr.RecursiveDescentExpression{}
+func (v *Visitor) visitRecursiveSelector(ctx parser.IRecursiveSelectorContext) (expr.Expr, error) {
+	var result expr.Expr = &expr.RecursiveDescentExpr{}
 	if node := ctx.NAME(); node != nil {
-		result = expr.SequenceExpression{result, &expr.FieldExpression{
+		result = expr.SequenceExpr{result, &expr.FieldExpression{
 			Name: node.GetText(),
 		}}
 	} else if node := ctx.WILDCARD(); node != nil {
-		result = expr.SequenceExpression{result, &expr.WildcardExpression{}}
+		result = expr.SequenceExpr{result, &expr.WildcardExpr{}}
 	}
 	return result, nil
 }
 
-func (v *Visitor) visitBracketSelector(ctx parser.IBracketSelectorContext) (expr.Expression, error) {
+func (v *Visitor) visitBracketSelector(ctx parser.IBracketSelectorContext) (expr.Expr, error) {
 	return v.visitBracketExpression(ctx.BracketExpression())
 }
 
-func (v *Visitor) visitBracketExpression(ctx parser.IBracketExpressionContext) (expr.Expression, error) {
+func (v *Visitor) visitBracketExpression(ctx parser.IBracketExpressionContext) (expr.Expr, error) {
 	if qn := ctx.QuotedName(); qn != nil {
 		text := qn.GetText()
 		name, err := strconv.Unquote(text)
@@ -90,14 +90,14 @@ func (v *Visitor) visitBracketExpression(ctx parser.IBracketExpressionContext) (
 		}, nil
 	}
 	if wildcard := ctx.WILDCARD(); wildcard != nil {
-		return &expr.WildcardExpression{}, nil
+		return &expr.WildcardExpr{}, nil
 	}
 	if number := ctx.NUMBER(); number != nil {
 		i, err := strconv.ParseInt(number.GetText(), 10, 64)
 		if err != nil {
 			return nil, NewSemanticErrorf(number, "number: %s", number.GetText())
 		}
-		return &expr.IndexExpression{
+		return &expr.IndexExpr{
 			Index: i,
 		}, nil
 	}
@@ -106,7 +106,7 @@ func (v *Visitor) visitBracketExpression(ctx parser.IBracketExpressionContext) (
 		if err != nil {
 			return nil, NewSemanticErrorf(slice, "slice: %s", slice.GetText())
 		}
-		return &expr.SliceExpression{
+		return &expr.SliceExpr{
 			Slice: s,
 		}, nil
 	}
@@ -120,7 +120,7 @@ func (v *Visitor) visitBracketExpression(ctx parser.IBracketExpressionContext) (
 			}
 			u = append(u, name)
 		}
-		return &expr.UnionExpression{
+		return &expr.UnionExpr{
 			Union: u,
 		}, nil
 	}
@@ -133,49 +133,49 @@ func (v *Visitor) visitBracketExpression(ctx parser.IBracketExpressionContext) (
 			}
 			u = append(u, i)
 		}
-		return &expr.UnionExpression{
+		return &expr.UnionExpr{
 			Union: u,
 		}, nil
 	}
 	return nil, ErrInternalf(ctx, "unexpected bracket expression: %q", ctx.GetText())
 }
 
-func (v *Visitor) visitSlice(ctx *parser.SliceContext) (expr.Expression, error) {
+func (v *Visitor) visitSlice(ctx *parser.SliceContext) (expr.Expr, error) {
 	return v.visitNode(ctx)
 }
 
-func (v *Visitor) visitFilter(ctx *parser.FilterContext) (expr.Expression, error) {
+func (v *Visitor) visitFilter(ctx *parser.FilterContext) (expr.Expr, error) {
 	return v.visitNode(ctx)
 }
 
-func (v *Visitor) visitExpression(ctx *parser.ExpressionContext) (expr.Expression, error) {
+func (v *Visitor) visitExpression(ctx *parser.ExpressionContext) (expr.Expr, error) {
 	return v.visitNode(ctx)
 }
 
-func (v *Visitor) visitSubexpression(ctx *parser.SubexpressionContext) (expr.Expression, error) {
+func (v *Visitor) visitSubexpression(ctx *parser.SubexpressionContext) (expr.Expr, error) {
 	return v.visitNode(ctx)
 }
 
-func (v *Visitor) visitValue(ctx *parser.ValueContext) (expr.Expression, error) {
+func (v *Visitor) visitValue(ctx *parser.ValueContext) (expr.Expr, error) {
 	return nil, nil
 }
 
-func (v *Visitor) visitQuotedName(ctx *parser.QuotedNameContext) (expr.Expression, error) {
+func (v *Visitor) visitQuotedName(ctx *parser.QuotedNameContext) (expr.Expr, error) {
 	return nil, nil
 }
 
-func (v *Visitor) visitRoot(ctx parser.IRootContext) (expr.Expression, error) {
+func (v *Visitor) visitRoot(ctx parser.IRootContext) (expr.Expr, error) {
 	root := ctx.GetText()
 	switch root {
 	case "@", "$":
-		return &expr.RootExpression{
+		return &expr.RootExpr{
 			Root: root,
 		}, nil
 	}
 	return nil, ErrInternalf(ctx, "unexpected root expression: %q", root)
 }
 
-func (v *Visitor) visitNode(node antlr.ParseTree) (expr.Expression, error) {
+func (v *Visitor) visitNode(node antlr.ParseTree) (expr.Expr, error) {
 	switch ctx := node.(type) {
 	case *parser.YamlPathContext:
 		return v.visitPath(ctx)

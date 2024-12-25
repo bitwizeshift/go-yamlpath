@@ -6,11 +6,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type UnionExpression struct {
+type UnionExpr struct {
 	Union Union
 }
 
-func (e *UnionExpression) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (e *UnionExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 	for _, node := range nodes {
 		result = append(result, e.Union.Index(node)...)
@@ -18,4 +18,4 @@ func (e *UnionExpression) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml
 	return result, nil
 }
 
-var _ Expression = (*UnionExpression)(nil)
+var _ Expr = (*UnionExpr)(nil)

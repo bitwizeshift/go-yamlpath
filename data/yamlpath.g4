@@ -2,8 +2,7 @@ grammar yamlpath;
 
 // Parser Rules
 yamlPath          : root selector* EOF;
-root              : '$' ;
-current           : '@' ;
+root              : '$' | '@' ;
 selector          : dotSelector | recursiveSelector | bracketSelector ;
 recursiveSelector : '..' (NAME | WILDCARD)? ;
 dotSelector       : '.' (NAME | WILDCARD) ;
@@ -22,8 +21,7 @@ filter            : '?' '(' expression ')' ;
 unionString       : (quotedName) (',' (quotedName))* ;
 unionIndices      : (NUMBER) (',' (NUMBER))* ;
 expression        : subexpression (('==' | '!=' | '<' | '>' | '<=' | '>=') subexpression)? ;
-subexpression     : value | NAME | yamlPath | currentSubPath ;
-currentSubPath    : current selector*;
+subexpression     : value | NAME | yamlPath ;
 value             : STRING | NUMBER | BOOLEAN | NULL ;
 
 // Lexer Rules

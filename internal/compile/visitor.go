@@ -17,13 +17,19 @@ func (v *Visitor) VisitRoot(ctx parser.IYamlPathContext) (expr.Expression, error
 }
 
 func (v *Visitor) visitPath(ctx *parser.YamlPathContext) (expr.Expression, error) {
+	root, err := v.visitRoot(ctx.Root())
+	if err != nil {
+		return nil, err
+	}
+
 	var exprs expr.SequenceExpression
+	exprs.Append(root)
 	for _, ctx := range ctx.AllSelector() {
 		expr, err := v.visitSelector(ctx)
 		if err != nil {
 			return nil, err
 		}
-		exprs = append(exprs, expr)
+		exprs.Append(expr)
 	}
 	return exprs, nil
 }
@@ -158,10 +164,23 @@ func (v *Visitor) visitQuotedName(ctx *parser.QuotedNameContext) (expr.Expressio
 	return nil, nil
 }
 
+func (v *Visitor) visitRoot(ctx parser.IRootContext) (expr.Expression, error) {
+	root := ctx.GetText()
+	switch root {
+	case "@", "$":
+		return &expr.RootExpression{
+			Root: root,
+		}, nil
+	}
+	return nil, ErrInternalf(ctx, "unexpected root expression: %q", root)
+}
+
 func (v *Visitor) visitNode(node antlr.ParseTree) (expr.Expression, error) {
 	switch ctx := node.(type) {
 	case *parser.YamlPathContext:
 		return v.visitPath(ctx)
+	case parser.IRootContext:
+		return v.visitRoot(ctx)
 	case parser.ISelectorContext:
 		return v.visitSelector(ctx)
 	case parser.IDotSelectorContext:

@@ -7,11 +7,14 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
-type FieldExpression struct {
+// FieldExpr extracts the fields from the nodes that match the named fields.
+type FieldExpr struct {
 	Names []string
 }
 
-func (e *FieldExpression) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+// Eval evaluates the field expression by extracting the fields from the nodes
+// that match the named fields.
+func (e *FieldExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes = yamlutil.Normalize(nodes...)

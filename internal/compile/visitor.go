@@ -108,7 +108,7 @@ func (v *Visitor) visitInvocation(ctx parser.IInvocationContext) (expr.Expr, err
 }
 
 func (v *Visitor) visitMemberInvocation(ctx *parser.MemberInvocationContext) (expr.Expr, error) {
-	return &expr.FieldExpression{
+	return &expr.FieldExpr{
 		Names: []string{ctx.GetText()},
 	}, nil
 }
@@ -127,21 +127,23 @@ func (v *Visitor) visitFunctionInvocation(ctx *parser.FunctionInvocationContext)
 
 func (v *Visitor) visitBracketParam(ctx parser.IBracketParamContext) (expr.Expr, error) {
 	switch ctx := ctx.(type) {
-	case *parser.BracketUnionNumberContext:
-		return v.visitBracketUnionNumber(ctx)
-	case *parser.BracketUnionStringContext:
-		return v.visitBracketUnionString(ctx)
-	case *parser.BracketWildcardContext:
-		return v.visitBracketWildcard(ctx)
-	case *parser.BracketSliceContext:
-		return v.visitBracketSlice(ctx)
-	case *parser.BracketFilterContext:
-		return v.visitBracketFilter(ctx)
+	case *parser.UnionNumberBracketContext:
+		return v.visitUnionNumberBracket(ctx)
+	case *parser.UnionStringBracketContext:
+		return v.visitUnionStringBracket(ctx)
+	case *parser.WildcardBracketContext:
+		return v.visitWildcardBracket(ctx)
+	case *parser.SliceBracketContext:
+		return v.visitSliceBracket(ctx)
+	case *parser.FilterBracketContext:
+		return v.visitFilterBracket(ctx)
+	case *parser.ScriptBracketContext:
+		return v.visitScriptBracket(ctx)
 	}
 	return nil, ErrInternalf(ctx, "unexpected bracket param type: %T", ctx)
 }
 
-func (v *Visitor) visitBracketUnionString(ctx *parser.BracketUnionStringContext) (expr.Expr, error) {
+func (v *Visitor) visitUnionStringBracket(ctx *parser.UnionStringBracketContext) (expr.Expr, error) {
 	var names []string
 	for _, str := range ctx.AllSTRING() {
 		name, err := strconv.Unquote(str.GetText())
@@ -150,12 +152,12 @@ func (v *Visitor) visitBracketUnionString(ctx *parser.BracketUnionStringContext)
 		}
 		names = append(names, name)
 	}
-	return &expr.FieldExpression{
+	return &expr.FieldExpr{
 		Names: names,
 	}, nil
 }
 
-func (v *Visitor) visitBracketUnionNumber(ctx *parser.BracketUnionNumberContext) (expr.Expr, error) {
+func (v *Visitor) visitUnionNumberBracket(ctx *parser.UnionNumberBracketContext) (expr.Expr, error) {
 	var indicies []int64
 	for _, num := range ctx.AllNUMBER() {
 		i, err := strconv.ParseInt(num.GetText(), 10, 64)
@@ -169,11 +171,11 @@ func (v *Visitor) visitBracketUnionNumber(ctx *parser.BracketUnionNumberContext)
 	}, nil
 }
 
-func (v *Visitor) visitBracketWildcard(_ *parser.BracketWildcardContext) (expr.Expr, error) {
+func (v *Visitor) visitWildcardBracket(_ *parser.WildcardBracketContext) (expr.Expr, error) {
 	return &expr.WildcardExpr{}, nil
 }
 
-func (v *Visitor) visitBracketSlice(ctx *parser.BracketSliceContext) (expr.Expr, error) {
+func (v *Visitor) visitSliceBracket(ctx *parser.SliceBracketContext) (expr.Expr, error) {
 	s, err := expr.ParseSlice(ctx.GetText())
 	if err != nil {
 		return nil, NewSemanticErrorf(ctx, "slice: %s", ctx.GetText())
@@ -183,12 +185,22 @@ func (v *Visitor) visitBracketSlice(ctx *parser.BracketSliceContext) (expr.Expr,
 	}, nil
 }
 
-func (v *Visitor) visitBracketFilter(ctx *parser.BracketFilterContext) (expr.Expr, error) {
+func (v *Visitor) visitFilterBracket(ctx *parser.FilterBracketContext) (expr.Expr, error) {
 	e, err := v.visitSubexpression(ctx.Subexpression())
 	if err != nil {
 		return nil, err
 	}
 	return &expr.FilterExpr{
+		Expr: e,
+	}, nil
+}
+
+func (v *Visitor) visitScriptBracket(ctx *parser.ScriptBracketContext) (expr.Expr, error) {
+	e, err := v.visitSubexpression(ctx.Subexpression())
+	if err != nil {
+		return nil, err
+	}
+	return &expr.ScriptExpr{
 		Expr: e,
 	}, nil
 }

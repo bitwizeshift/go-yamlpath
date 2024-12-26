@@ -14,11 +14,12 @@ expression
       ;
 
 bracketParam
-      : STRING (',' (STRING))*                            # bracketUnionString
-      | NUMBER (',' (NUMBER))*                            # bracketUnionNumber
-      | '*'                                               # bracketWildcard
-      | (NUMBER)? ':' (NUMBER)? (':' NUMBER)?             # bracketSlice
-      | '?' '(' subexpression ')'                         # bracketFilter
+      : STRING (',' (STRING))*                            # unionStringBracket
+      | NUMBER (',' (NUMBER))*                            # unionNumberBracket
+      | '*'                                               # wildcardBracket
+      | (NUMBER)? ':' (NUMBER)? (':' NUMBER)?             # sliceBracket
+      | '?' '(' subexpression ')'                         # filterBracket
+      | '(' subexpression ')'                             # scriptBracket
       ;
 
 subexpression

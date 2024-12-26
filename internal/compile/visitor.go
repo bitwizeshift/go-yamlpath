@@ -319,10 +319,23 @@ func (v *Visitor) visitMembershipSubexpression(ctx *parser.MembershipSubexpressi
 	op := v.visitOp(ctx.GetChild(1))
 	switch op {
 	case "in":
+		return &expr.InExpr{
+			Left:  lhs,
+			Right: rhs,
+		}, nil
 	case "nin":
+		return &expr.NegationExpr{
+			Expr: &expr.InExpr{
+				Left:  lhs,
+				Right: rhs,
+			},
+		}, nil
 	case "subsetof":
+		return &expr.SubsetOfExpr{
+			Left:  lhs,
+			Right: rhs,
+		}, nil
 	}
-	_, _ = lhs, rhs
 
 	return nil, ErrInternalf(ctx, "unknown binary operator %q", op)
 }

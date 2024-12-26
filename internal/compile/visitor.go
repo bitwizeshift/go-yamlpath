@@ -3,6 +3,7 @@ package compile
 import (
 	"strconv"
 
+	"github.com/antlr4-go/antlr/v4"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/parser"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
@@ -257,9 +258,21 @@ func (v *Visitor) visitEqualitySubexpression(ctx *parser.EqualitySubexpressionCo
 	if err != nil {
 		return nil, err
 	}
-	_, _ = lhs, rhs
+	op := v.visitOp(ctx.GetChild(1))
+	switch op {
+	case "==":
+		return &expr.EqualityExpr{
+			Left:  lhs,
+			Right: rhs,
+		}, nil
+	case "!=":
+		return &expr.InequalityExpr{
+			Left:  lhs,
+			Right: rhs,
+		}, nil
+	}
 
-	return nil, ErrInternalf(ctx, "unknown binary operator: %q", "")
+	return nil, ErrInternalf(ctx, "unknown binary operator: %q", op)
 }
 
 func (v *Visitor) visitMembershipSubexpression(ctx *parser.MembershipSubexpressionContext) (expr.Expr, error) {
@@ -368,4 +381,8 @@ func (v *Visitor) visitNullLiteral(_ *parser.NullLiteralContext) (expr.Expr, err
 	return &expr.ValueExpr{
 		Node: yamlutil.Null,
 	}, nil
+}
+
+func (v *Visitor) visitOp(tree antlr.Tree) string {
+	return tree.(interface{ GetText() string }).GetText()
 }

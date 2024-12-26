@@ -208,3 +208,113 @@ Feature: Filtering
         enable: true
         allow: true
         """
+
+  Rule: Equality operator evaluates equality of path values
+
+    The equality operator shall evaluate the equality of the left and right
+    sub-expressions. If the returned objects recursively compare "equal",
+    the expression shall evaluate to true and be included in the output set.
+
+    Scenario: Equality evaluates false
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: false
+        """
+      When the yamlpath `$.foo.bar[?(@.enable == true)]` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Equality evaluates true
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: false
+        """
+      When the yamlpath `$.foo.bar[?(@.enable == false)]` is evaluated
+      Then the evaluation result is:
+        """
+        enable: false
+        """
+
+    Scenario: Complex equality evaluates false
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: true
+        """
+      When the yamlpath `$.foo[?(@.bar == true)]` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Identity equality evaluates true
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: true
+        """
+      When the yamlpath `$.foo[?(@.bar == @.bar)]` is evaluated
+      Then the evaluation result is:
+        """
+        bar:
+          enable: true
+        """
+
+  Rule: Inequality operator evaluates inequality of path values
+
+    The inequality operator shall evaluate the inequality of the left and right
+    sub-expressions. If the returned objects recursively compare "not equal",
+    the expression shall evaluate to true and be included in the output set.
+
+    Scenario: Inequality evaluates false
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: false
+        """
+      When the yamlpath `$.foo.bar[?(@.enable != false)]` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Inequality evaluates true
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: false
+        """
+      When the yamlpath `$.foo.bar[?(@.enable != true)]` is evaluated
+      Then the evaluation result is:
+        """
+        enable: false
+        """
+
+    Scenario: Complex inequality evaluates false
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: true
+        """
+      When the yamlpath `$.foo.bar[?(@.enable != true)]` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Identity inequality evaluates false
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: true
+        """
+      When the yamlpath `$.foo[?(@.bar != @.bar)]` is evaluated
+      Then the evaluation result is empty

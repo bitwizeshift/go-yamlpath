@@ -229,6 +229,8 @@ func (v *Visitor) visitSubexpression(ctx parser.ISubexpressionContext) (expr.Exp
 		return v.visitNegationSubexpression(ctx)
 	case *parser.LiteralSubexpressionContext:
 		return v.visitLiteral(ctx.Literal())
+	case *parser.ParenthesisSubexpressionContext:
+		return v.visitSubexpression(ctx.Subexpression())
 	case *parser.RootSubexpressionContext:
 		return v.visitExpression(ctx.Expression())
 	}

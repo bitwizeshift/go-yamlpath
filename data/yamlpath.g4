@@ -32,6 +32,7 @@ subexpression
       | subexpression ('||' | 'or') subexpression               # orSubexpression
       | ('!' | 'not') subexpression                             # negationSubexpression
       | literal                                                 # literalSubexpression
+      | '(' subexpression ')'                                   # parenthesisSubexpression
       | expression                                              # rootSubexpression
       ;
 

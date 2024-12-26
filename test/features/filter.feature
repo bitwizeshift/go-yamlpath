@@ -86,3 +86,125 @@ Feature: Filtering
         """
         baz: "hello"
         """
+
+  Rule: Boolean "and" expressions evaluate combinations of filters
+
+    Boolean "and" expressions shall evaluate both left and right sub-expressions
+    and only return elements where both sub-expressions evaluate to true.
+
+    Scenario: Left sub-expression evaluates false
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: false
+            allow: true
+        """
+      When the yamlpath `$.foo.bar[?(@.enable && @.allow)]` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Right sub-expression evaluates false
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: true
+            allow: false
+        """
+      When the yamlpath `$.foo.bar[?(@.enable && @.allow)]` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Both sub-expressions evaluate false
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: false
+            allow: false
+        """
+      When the yamlpath `$.foo.bar[?(@.enable && @.allow)]` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Both sub-expressions evaluate true
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: true
+            allow: true
+        """
+      When the yamlpath `$.foo.bar[?(@.enable && @.allow)]` is evaluated
+      Then the evaluation result is:
+        """
+        enable: true
+        allow: true
+        """
+
+  Rule: Boolean "or" expressions evaluate combinations of filters
+
+    Boolean "or" expressions shall evaluate both left and right sub-expressions
+    and return elements where either sub-expression evaluates to true.
+
+    Scenario: Left sub-expression evaluates false
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: false
+            allow: true
+        """
+      When the yamlpath `$.foo.bar[?(@.enable || @.allow)]` is evaluated
+      Then the evaluation result is:
+        """
+        enable: false
+        allow: true
+        """
+
+    Scenario: Right sub-expression evaluates false
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: true
+            allow: false
+        """
+      When the yamlpath `$.foo.bar[?(@.enable || @.allow)]` is evaluated
+      Then the evaluation result is:
+        """
+        enable: true
+        allow: false
+        """
+
+    Scenario: Both sub-expressions evaluate false
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: false
+            allow: false
+        """
+      When the yamlpath `$.foo.bar[?(@.enable || @.allow)]` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Both sub-expressions evaluate true
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: true
+            allow: true
+        """
+      When the yamlpath `$.foo.bar[?(@.enable || @.allow)]` is evaluated
+      Then the evaluation result is:
+        """
+        enable: true
+        allow: true
+        """

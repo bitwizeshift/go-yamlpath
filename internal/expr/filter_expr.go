@@ -19,18 +19,8 @@ func (f *FilterExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node
 			return nil, err
 		}
 
-		if len(filtered) > 1 {
+		if yamlutil.IsTruthy(filtered...) {
 			result = append(result, node)
-		} else if len(filtered) == 1 {
-			b, err := yamlutil.ToBool(filtered[0])
-			if err == nil {
-				if b {
-					result = append(result, node)
-				}
-			} else {
-				// Anything that's not a boolean is considered included
-				result = append(result, node)
-			}
 		}
 	}
 	return result, nil

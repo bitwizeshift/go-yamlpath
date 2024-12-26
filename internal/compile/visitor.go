@@ -228,6 +228,11 @@ func (v *Visitor) visitAdditiveSubexpression(ctx *parser.AdditiveSubexpressionCo
 	if err != nil {
 		return nil, err
 	}
+	op := v.visitOp(ctx.GetChild(1))
+	switch op {
+	case "+":
+	case "-":
+	}
 	_, _ = lhs, rhs
 
 	return nil, ErrInternalf(ctx, "unknown binary operator: %q", "")
@@ -238,9 +243,14 @@ func (v *Visitor) visitMultiplicativeSubexpression(ctx *parser.MultiplicativeSub
 	if err != nil {
 		return nil, err
 	}
+	op := v.visitOp(ctx.GetChild(1))
+	switch op {
+	case "*":
+	case "/":
+	}
 	_, _ = lhs, rhs
 
-	return nil, ErrInternalf(ctx, "unknown binary operator: %q", "")
+	return nil, ErrInternalf(ctx, "unknown binary operator %q", op)
 }
 
 func (v *Visitor) visitInequalitySubexpression(ctx *parser.InequalitySubexpressionContext) (expr.Expr, error) {
@@ -248,9 +258,35 @@ func (v *Visitor) visitInequalitySubexpression(ctx *parser.InequalitySubexpressi
 	if err != nil {
 		return nil, err
 	}
-	_, _ = lhs, rhs
+	op := v.visitOp(ctx.GetChild(1))
+	switch op {
+	case "<":
+		return &expr.LessExpr{
+			Left:  lhs,
+			Right: rhs,
+		}, nil
+	case "<=":
+		return &expr.NegationExpr{
+			Expr: &expr.LessExpr{
+				Left:  rhs,
+				Right: lhs,
+			},
+		}, nil
+	case ">":
+		return &expr.LessExpr{
+			Left:  rhs,
+			Right: lhs,
+		}, nil
+	case ">=":
+		return &expr.NegationExpr{
+			Expr: &expr.LessExpr{
+				Left:  lhs,
+				Right: rhs,
+			},
+		}, nil
+	}
 
-	return nil, ErrInternalf(ctx, "unknown binary operator: %q", "")
+	return nil, ErrInternalf(ctx, "unknown binary operator %q", op)
 }
 
 func (v *Visitor) visitEqualitySubexpression(ctx *parser.EqualitySubexpressionContext) (expr.Expr, error) {
@@ -272,7 +308,7 @@ func (v *Visitor) visitEqualitySubexpression(ctx *parser.EqualitySubexpressionCo
 		}, nil
 	}
 
-	return nil, ErrInternalf(ctx, "unknown binary operator: %q", op)
+	return nil, ErrInternalf(ctx, "unknown binary operator %q", op)
 }
 
 func (v *Visitor) visitMembershipSubexpression(ctx *parser.MembershipSubexpressionContext) (expr.Expr, error) {
@@ -280,9 +316,15 @@ func (v *Visitor) visitMembershipSubexpression(ctx *parser.MembershipSubexpressi
 	if err != nil {
 		return nil, err
 	}
+	op := v.visitOp(ctx.GetChild(1))
+	switch op {
+	case "in":
+	case "nin":
+	case "subsetof":
+	}
 	_, _ = lhs, rhs
 
-	return nil, ErrInternalf(ctx, "unknown binary operator: %q", "")
+	return nil, ErrInternalf(ctx, "unknown binary operator %q", op)
 }
 
 func (v *Visitor) visitAndSubexpression(ctx *parser.AndSubexpressionContext) (expr.Expr, error) {
@@ -385,4 +427,16 @@ func (v *Visitor) visitNullLiteral(_ *parser.NullLiteralContext) (expr.Expr, err
 
 func (v *Visitor) visitOp(tree antlr.Tree) string {
 	return tree.(interface{ GetText() string }).GetText()
+}
+
+func (v *Visitor) visitParamList(ctx parser.IParamListContext) ([]expr.Expr, error) {
+	var params []expr.Expr
+	for _, sub := range ctx.AllSubexpression() {
+		e, err := v.visitSubexpression(sub)
+		if err != nil {
+			return nil, err
+		}
+		params = append(params, e)
+	}
+	return params, nil
 }

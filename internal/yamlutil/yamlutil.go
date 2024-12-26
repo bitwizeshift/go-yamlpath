@@ -7,7 +7,9 @@ package yamlutil
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
+	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v3"
 )
 
@@ -21,23 +23,6 @@ var (
 	// Null is a yaml node representing a null value
 	Null = &yaml.Node{Kind: yaml.ScalarNode, Value: "", Tag: "!!null"}
 )
-
-// Number returns a yaml node representing an integer.
-// The input is assumed to be a valid integer string.
-func Number(s string) *yaml.Node {
-	return &yaml.Node{Kind: yaml.ScalarNode, Value: s, Tag: "!!int"}
-}
-
-// String returns a yaml node representing a string.
-func String(s string) *yaml.Node {
-	return &yaml.Node{Kind: yaml.ScalarNode, Value: s, Tag: "!!str"}
-}
-
-// Boolean returns a yaml node representing a boolean.
-// The input is assumed to be a valid boolean string.
-func Boolean(s string) *yaml.Node {
-	return &yaml.Node{Kind: yaml.ScalarNode, Value: s, Tag: "!!bool"}
-}
 
 // IsTruthy returns true if any of the nodes are truthy.
 func IsTruthy(nodes ...*yaml.Node) bool {
@@ -54,6 +39,12 @@ func IsTruthy(nodes ...*yaml.Node) bool {
 	return b
 }
 
+// Boolean returns a yaml node representing a boolean.
+// The input is assumed to be a valid boolean string.
+func Boolean(s string) *yaml.Node {
+	return &yaml.Node{Kind: yaml.ScalarNode, Value: s, Tag: "!!bool"}
+}
+
 func FromBool(b bool) *yaml.Node {
 	if b {
 		return True
@@ -68,6 +59,15 @@ func ToBool(node *yaml.Node) (bool, error) {
 	return node.Value == "true", nil
 }
 
+// String returns a yaml node representing a string.
+func String(s string) *yaml.Node {
+	return &yaml.Node{Kind: yaml.ScalarNode, Value: s, Tag: "!!str"}
+}
+
+func FromString(s string) *yaml.Node {
+	return String(s)
+}
+
 func ToString(node *yaml.Node) (string, error) {
 	if node.Kind != yaml.ScalarNode || node.Tag != "!!str" {
 		return "", fmt.Errorf("expected string node, but got %s", node.Tag)
@@ -75,11 +75,35 @@ func ToString(node *yaml.Node) (string, error) {
 	return node.Value, nil
 }
 
+// Number returns a yaml node representing an integer.
+// The input is assumed to be a valid integer string.
+func Number(s string) *yaml.Node {
+	if strings.Contains(s, ".") {
+		return &yaml.Node{Kind: yaml.ScalarNode, Value: s, Tag: "!!float"}
+	}
+	return &yaml.Node{Kind: yaml.ScalarNode, Value: s, Tag: "!!int"}
+}
+
+func FromInt(i int) *yaml.Node {
+	return Number(strconv.Itoa(i))
+}
+
 func ToInt(node *yaml.Node) (int, error) {
 	if node.Kind != yaml.ScalarNode || node.Tag != "!!int" {
 		return 0, fmt.Errorf("expected integer node, but got %s", node.Tag)
 	}
 	return strconv.Atoi(node.Value)
+}
+
+func FromFloat(f decimal.Decimal) *yaml.Node {
+	return Number(f.String())
+}
+
+func ToFloat(node *yaml.Node) (decimal.Decimal, error) {
+	if node.Kind != yaml.ScalarNode || node.Tag != "!!float" {
+		return decimal.Zero, fmt.Errorf("expected float node, but got %s", node.Tag)
+	}
+	return decimal.NewFromString(node.Value)
 }
 
 // Normalize normalizes a list of yaml nodes by flattening any document nodes
@@ -94,44 +118,4 @@ func Normalize(node ...*yaml.Node) []*yaml.Node {
 		}
 	}
 	return result
-}
-
-// EqualRange compares two ranges of yaml nodes for equality.
-// Documents, source locations, and comments are ignored.
-func EqualRange(got, want []*yaml.Node) bool {
-	got, want = Normalize(got...), Normalize(want...)
-
-	if len(got) != len(want) {
-		return false
-	}
-	for i := range got {
-		if !Equal(got[i], want[i]) {
-			return false
-		}
-	}
-	return true
-}
-
-// Equal compares two yaml nodes for equality.
-func Equal(got, want *yaml.Node) bool {
-	got, want = Normalize(got)[0], Normalize(want)[0]
-
-	if got.Kind != want.Kind {
-		return false
-	}
-	if got.Tag != want.Tag {
-		return false
-	}
-	if got.Value != want.Value {
-		return false
-	}
-	if len(got.Content) != len(want.Content) {
-		return false
-	}
-	for i := range got.Content {
-		if !Equal(got.Content[i], want.Content[i]) {
-			return false
-		}
-	}
-	return true
 }

@@ -318,3 +318,159 @@ Feature: Filtering
         """
       When the yamlpath `$.foo[?(@.bar != @.bar)]` is evaluated
       Then the evaluation result is empty
+
+  Rule: Less-than operator evaluates less-than of path values
+
+    The less-than operator shall evaluate the less-than relationship of the left
+    and right sub-expressions. If the returned objects recursively compare as
+    "less-than", the expression shall evaluate to true and be included in the
+    output set.
+
+    Scenario: Scalar left value is greater than scaler right value
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            value: 10
+        """
+      When the yamlpath `$.foo.bar[?(@.value < 0)]` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Scalar left value is less than scalar right value
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            value: 10
+        """
+      When the yamlpath `$.foo.bar[?(@.value < 100)]` is evaluated
+      Then the evaluation result is:
+        """
+        value: 10
+        """
+
+  Rule: Less-than-or-equal operator evaluates less-than-or-equal of path values
+
+    The less-than-or-equal operator shall evaluate the less-than-or-equal
+    relationship of the left and right sub-expressions. If the returned objects
+    recursively compare as "less-than-or-equal", the expression shall evaluate
+    to true and be included in the output set.
+
+    Scenario: Scalar left value is greater than scalar right value
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            value: 10
+        """
+      When the yamlpath `$.foo.bar[?(@.value <= 0)]` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Scalar left value is less than scalar right value
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            value: 10
+        """
+      When the yamlpath `$.foo.bar[?(@.value <= 100)]` is evaluated
+      Then the evaluation result is:
+        """
+        value: 10
+        """
+
+    Scenario: Scalar left value is equal to scalar right value
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            value: 10
+        """
+      When the yamlpath `$.foo.bar[?(@.value <= 10)]` is evaluated
+      Then the evaluation result is:
+        """
+        value: 10
+        """
+
+  Rule: Greater-than operator evaluates greater-than of path values
+
+    The greater-than operator shall evaluate the greater-than relationship of
+    the left and right sub-expressions. If the returned objects recursively
+    compare as "greater-than", the expression shall evaluate to true and be
+    included in the output set.
+
+    Scenario: Scalar left value is less than scalar right value
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            value: 10
+        """
+      When the yamlpath `$.foo.bar[?(@.value > 100)]` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Scalar left value is greater than scalar right value
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            value: 10
+        """
+      When the yamlpath `$.foo.bar[?(@.value > 0)]` is evaluated
+      Then the evaluation result is:
+        """
+        value: 10
+        """
+
+  Rule: Greater-than-or-equal operator evaluates greater-than-or-equal of path values
+
+    The greater-than-or-equal operator shall evaluate the greater-than-or-equal
+    relationship of the left and right sub-expressions. If the returned objects
+    recursively compare as "greater-than-or-equal", the expression shall evaluate
+    to true and be included in the output set.
+
+    Scenario: Scalar left value is less than scalar right value
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            value: 10
+        """
+      When the yamlpath `$.foo.bar[?(@.value >= 100)]` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Scalar left value is greater than scalar right value
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            value: 10
+        """
+      When the yamlpath `$.foo.bar[?(@.value >= 0)]` is evaluated
+      Then the evaluation result is:
+        """
+        value: 10
+        """
+
+    Scenario: Scalar left value is equal to scalar right value
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            value: 10
+        """
+      When the yamlpath `$.foo.bar[?(@.value >= 10)]` is evaluated
+      Then the evaluation result is:
+        """
+        value: 10
+        """

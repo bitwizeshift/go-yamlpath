@@ -1,7 +1,10 @@
 package compile
 
 import (
+	"fmt"
+	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/antlr4-go/antlr/v4"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
@@ -219,6 +222,8 @@ func (v *Visitor) visitSubexpression(ctx parser.ISubexpressionContext) (expr.Exp
 		return v.visitInequalitySubexpression(ctx)
 	case *parser.EqualitySubexpressionContext:
 		return v.visitEqualitySubexpression(ctx)
+	case *parser.MatchSubexpressionContext:
+		return v.visitMatchSubexpression(ctx)
 	case *parser.MembershipSubexpressionContext:
 		return v.visitMembershipSubexpression(ctx)
 	case *parser.AndSubexpressionContext:
@@ -242,7 +247,7 @@ func (v *Visitor) visitAdditiveSubexpression(ctx *parser.AdditiveSubexpressionCo
 	if err != nil {
 		return nil, err
 	}
-	op := v.visitOp(ctx.GetChild(1))
+	op := v.getTreeText(ctx.GetChild(1))
 	switch op {
 	case "+":
 	case "-":
@@ -257,7 +262,7 @@ func (v *Visitor) visitMultiplicativeSubexpression(ctx *parser.MultiplicativeSub
 	if err != nil {
 		return nil, err
 	}
-	op := v.visitOp(ctx.GetChild(1))
+	op := v.getTreeText(ctx.GetChild(1))
 	switch op {
 	case "*":
 	case "/":
@@ -272,7 +277,7 @@ func (v *Visitor) visitInequalitySubexpression(ctx *parser.InequalitySubexpressi
 	if err != nil {
 		return nil, err
 	}
-	op := v.visitOp(ctx.GetChild(1))
+	op := v.getTreeText(ctx.GetChild(1))
 	switch op {
 	case "<":
 		return &expr.LessExpr{
@@ -308,7 +313,7 @@ func (v *Visitor) visitEqualitySubexpression(ctx *parser.EqualitySubexpressionCo
 	if err != nil {
 		return nil, err
 	}
-	op := v.visitOp(ctx.GetChild(1))
+	op := v.getTreeText(ctx.GetChild(1))
 	switch op {
 	case "==":
 		return &expr.EqualityExpr{
@@ -325,12 +330,28 @@ func (v *Visitor) visitEqualitySubexpression(ctx *parser.EqualitySubexpressionCo
 	return nil, ErrInternalf(ctx, "unknown binary operator %q", op)
 }
 
+func (v *Visitor) visitMatchSubexpression(ctx *parser.MatchSubexpressionContext) (expr.Expr, error) {
+	e, err := v.visitSubexpression(ctx.Subexpression())
+	if err != nil {
+		return nil, err
+	}
+	r, err := v.visitRegex(ctx.Regex())
+	if err != nil {
+		return nil, err
+	}
+
+	return &expr.MatchExpr{
+		Expr:  e,
+		Regex: r,
+	}, nil
+}
+
 func (v *Visitor) visitMembershipSubexpression(ctx *parser.MembershipSubexpressionContext) (expr.Expr, error) {
 	lhs, rhs, err := v.visitBinaryExpression(ctx)
 	if err != nil {
 		return nil, err
 	}
-	op := v.visitOp(ctx.GetChild(1))
+	op := v.getTreeText(ctx.GetChild(1))
 	switch op {
 	case "in":
 		return &expr.InExpr{
@@ -452,7 +473,7 @@ func (v *Visitor) visitNullLiteral(_ *parser.NullLiteralContext) (expr.Expr, err
 	}, nil
 }
 
-func (v *Visitor) visitOp(tree antlr.Tree) string {
+func (v *Visitor) getTreeText(tree antlr.Tree) string {
 	return tree.(interface{ GetText() string }).GetText()
 }
 
@@ -466,4 +487,27 @@ func (v *Visitor) visitParamList(ctx parser.IParamListContext) ([]expr.Expr, err
 		params = append(params, e)
 	}
 	return params, nil
+}
+
+func (v *Visitor) visitRegex(ctx parser.IRegexContext) (*regexp.Regexp, error) {
+	r := ctx.REGEX().GetText()
+	r = r[1 : len(r)-1] // trim off outside '/' characters
+
+	flags := ""
+	if len(ctx.GetChildren()) == 2 {
+		flags = v.getTreeText(ctx.GetChild(1))
+	}
+
+	var sb strings.Builder
+	for _, flag := range flags {
+		fmt.Fprintf(&sb, "(?%s)", string(flag))
+	}
+	sb.WriteString(r)
+
+	regex, err := regexp.Compile(sb.String())
+	if err != nil {
+		return nil, NewSemanticErrorf(ctx, "regex: %s", r)
+	}
+
+	return regex, nil
 }

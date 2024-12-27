@@ -27,6 +27,7 @@ subexpression
       | subexpression ('*' | '/') subexpression                 # multiplicativeSubexpression
       | subexpression ('<=' | '<' | '>' | '>=') subexpression   # inequalitySubexpression
       | subexpression ('==' | '!=') subexpression               # equalitySubexpression
+      | subexpression '=~' regex                                # matchSubexpression
       | subexpression ('in' | 'nin' | 'subsetof') subexpression # membershipSubexpression
       | subexpression ('&&' | 'and') subexpression              # andSubexpression
       | subexpression ('||' | 'or') subexpression               # orSubexpression
@@ -57,6 +58,10 @@ identifier
       : IDENTIFIER
       ;
 
+regex
+      : REGEX ('i' | 'm' | 's')*?
+      ;
+
 /*****************************************************************************
   Lexer rules
 ******************************************************************************/
@@ -64,6 +69,7 @@ identifier
 IDENTIFIER     : [a-zA-Z_][a-zA-Z0-9_]* ;
 NUMBER         : '-'? [0-9]+ ('.' [0-9]+)? ([eE] [+-]? [0-9]+)? ;
 STRING         : '"' (ESC | .)*? '"' ;
+REGEX          : '/' (ESC | .)*? '/' ;
 
 // Pipe whitespace to the HIDDEN channel to support retrieving source text through the parser.
 WS             : [ \t\r\n]+ -> channel(HIDDEN) ;

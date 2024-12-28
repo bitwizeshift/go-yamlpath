@@ -1,6 +1,9 @@
 package yamlutil
 
-import "gopkg.in/yaml.v3"
+import (
+	"github.com/shopspring/decimal"
+	"gopkg.in/yaml.v3"
+)
 
 // EqualRange compares two ranges of yaml nodes for equality.
 // Documents, source locations, and comments are ignored.
@@ -27,6 +30,14 @@ func Equal(got, want *yaml.Node) bool {
 	}
 	if got.Tag != want.Tag {
 		return false
+	}
+	if got.Tag == "!!int" || got.Tag == "!!float" {
+		lhs, err1 := decimal.NewFromString(got.Value)
+		rhs, err2 := decimal.NewFromString(want.Value)
+		if err1 != nil || err2 != nil {
+			return got.Value == want.Value
+		}
+		return lhs.Equal(rhs) && lhs.NumDigits() == rhs.NumDigits()
 	}
 	if got.Value != want.Value {
 		return false

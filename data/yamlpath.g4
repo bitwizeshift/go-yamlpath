@@ -23,18 +23,19 @@ bracketParam
       ;
 
 subexpression
-      : subexpression ('+' | '-') subexpression                 # additiveSubexpression
-      | subexpression ('*' | '/') subexpression                 # multiplicativeSubexpression
+      : expression                                              # rootSubexpression
+      | literal                                                 # literalSubexpression
+      | '(' subexpression ')'                                   # parenthesisSubexpression
+      | ('!' | 'not') subexpression                             # negationSubexpression
+      | ('+' | '-') expression                                  # polaritySubexpression
+      | subexpression ('*' | '/' | '%') subexpression           # multiplicativeSubexpression
+      | subexpression ('+' | '-') subexpression                 # additiveSubexpression
       | subexpression ('<=' | '<' | '>' | '>=') subexpression   # inequalitySubexpression
       | subexpression ('==' | '!=') subexpression               # equalitySubexpression
       | subexpression '=~' regex                                # matchSubexpression
       | subexpression ('in' | 'nin' | 'subsetof') subexpression # membershipSubexpression
       | subexpression ('&&' | 'and') subexpression              # andSubexpression
       | subexpression ('||' | 'or') subexpression               # orSubexpression
-      | ('!' | 'not') subexpression                             # negationSubexpression
-      | literal                                                 # literalSubexpression
-      | '(' subexpression ')'                                   # parenthesisSubexpression
-      | expression                                              # rootSubexpression
       ;
 
 literal

@@ -238,8 +238,29 @@ func (v *Visitor) visitSubexpression(ctx parser.ISubexpressionContext) (expr.Exp
 		return v.visitSubexpression(ctx.Subexpression())
 	case *parser.RootSubexpressionContext:
 		return v.visitExpression(ctx.Expression())
+	case *parser.PolaritySubexpressionContext:
+		return v.visitPolaritySubexpression(ctx)
 	}
 	return nil, ErrInternalf(ctx, "unexpected expression: %q", ctx.GetText())
+}
+
+func (v *Visitor) visitPolaritySubexpression(ctx *parser.PolaritySubexpressionContext) (expr.Expr, error) {
+	e, err := v.visitExpression(ctx.Expression())
+	if err != nil {
+		return nil, err
+	}
+	op := v.getTreeText(ctx.GetChild(0))
+	switch op {
+	case "+":
+		return &expr.PrefixPlusExpr{
+			Expr: e,
+		}, nil
+	case "-":
+		return &expr.PrefixMinusExpr{
+			Expr: e,
+		}, nil
+	}
+	return nil, ErrInternalf(ctx, "unknown polarity operator: %q", op)
 }
 
 func (v *Visitor) visitAdditiveSubexpression(ctx *parser.AdditiveSubexpressionContext) (expr.Expr, error) {

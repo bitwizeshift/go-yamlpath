@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/antlr4-go/antlr/v4"
+	"github.com/shopspring/decimal"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/parser"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
@@ -286,7 +287,29 @@ func (v *Visitor) visitMultiplicativeSubexpression(ctx *parser.MultiplicativeSub
 	op := v.getTreeText(ctx.GetChild(1))
 	switch op {
 	case "*":
+		return &expr.MultiplicativeExpr{
+			Left:  lhs,
+			Right: rhs,
+			Operation: func(lhs, rhs decimal.Decimal) decimal.Decimal {
+				return lhs.Mul(rhs)
+			},
+		}, nil
 	case "/":
+		return &expr.MultiplicativeExpr{
+			Left:  lhs,
+			Right: rhs,
+			Operation: func(lhs, rhs decimal.Decimal) decimal.Decimal {
+				return lhs.Div(rhs)
+			},
+		}, nil
+	case "%":
+		return &expr.MultiplicativeExpr{
+			Left:  lhs,
+			Right: rhs,
+			Operation: func(lhs, rhs decimal.Decimal) decimal.Decimal {
+				return lhs.Mod(rhs)
+			},
+		}, nil
 	}
 	_, _ = lhs, rhs
 

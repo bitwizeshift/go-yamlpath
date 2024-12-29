@@ -523,7 +523,7 @@ func (v *Visitor) visitBooleanLiteral(ctx *parser.BooleanLiteralContext) (expr.E
 
 func (v *Visitor) visitNullLiteral(_ *parser.NullLiteralContext) (expr.Expr, error) {
 	return &expr.ValueExpr{
-		Node: yamlutil.Null,
+		Node: yamlutil.Null(),
 	}, nil
 }
 

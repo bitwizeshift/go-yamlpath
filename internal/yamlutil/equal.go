@@ -7,14 +7,14 @@ import (
 
 // EqualRange compares two ranges of yaml nodes for equality.
 // Documents, source locations, and comments are ignored.
-func EqualRange(got, want []*yaml.Node) bool {
-	got, want = Normalize(got...), Normalize(want...)
+func EqualRange(lhs, rhs []*yaml.Node) bool {
+	lhs, rhs = Normalize(lhs...), Normalize(rhs...)
 
-	if len(got) != len(want) {
+	if len(lhs) != len(rhs) {
 		return false
 	}
-	for i := range got {
-		if !Equal(got[i], want[i]) {
+	for i := range lhs {
+		if !Equal(lhs[i], rhs[i]) {
 			return false
 		}
 	}
@@ -22,31 +22,34 @@ func EqualRange(got, want []*yaml.Node) bool {
 }
 
 // Equal compares two yaml nodes for equality.
-func Equal(got, want *yaml.Node) bool {
-	got, want = Normalize(got)[0], Normalize(want)[0]
+func Equal(lhs, rhs *yaml.Node) bool {
+	if lhs == nil && rhs == nil {
+		return true
+	}
+	if lhs == nil || rhs == nil {
+		return false
+	}
+	lhs, rhs = Normalize(lhs)[0], Normalize(rhs)[0]
 
-	if got.Kind != want.Kind {
+	if lhs.Kind != rhs.Kind {
 		return false
 	}
-	if got.Tag != want.Tag {
-		return false
-	}
-	if got.Tag == "!!int" || got.Tag == "!!float" {
-		lhs, err1 := decimal.NewFromString(got.Value)
-		rhs, err2 := decimal.NewFromString(want.Value)
+	if (lhs.Tag == "!!int" || lhs.Tag == "!!float") && (rhs.Tag == "!!int" || rhs.Tag == "!!float") {
+		left, err1 := decimal.NewFromString(lhs.Value)
+		right, err2 := decimal.NewFromString(rhs.Value)
 		if err1 != nil || err2 != nil {
-			return got.Value == want.Value
+			return lhs.Value == rhs.Value
 		}
-		return lhs.Equal(rhs) && lhs.NumDigits() == rhs.NumDigits()
+		return left.Equal(right) && left.NumDigits() == right.NumDigits()
 	}
-	if got.Value != want.Value {
+	if lhs.Tag != rhs.Tag || lhs.Value != rhs.Value {
 		return false
 	}
-	if len(got.Content) != len(want.Content) {
+	if len(lhs.Content) != len(rhs.Content) {
 		return false
 	}
-	for i := range got.Content {
-		if !Equal(got.Content[i], want.Content[i]) {
+	for i := range lhs.Content {
+		if !Equal(lhs.Content[i], rhs.Content[i]) {
 			return false
 		}
 	}

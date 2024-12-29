@@ -27,5 +27,8 @@ func (e *NegationExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.No
 	if err != nil {
 		return []*yaml.Node{yamlutil.False}, nil
 	}
-	return []*yaml.Node{yamlutil.FromBool(!b)}, nil
+	if b {
+		return []*yaml.Node{yamlutil.False}, nil
+	}
+	return []*yaml.Node{yamlutil.True}, nil
 }

@@ -25,5 +25,8 @@ func (e *LessExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, 
 	if err != nil {
 		return nil, err
 	}
-	return []*yaml.Node{yamlutil.FromBool(less)}, nil
+	if less {
+		return []*yaml.Node{yamlutil.True}, nil
+	}
+	return []*yaml.Node{yamlutil.False}, nil
 }

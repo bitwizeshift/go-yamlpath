@@ -9,12 +9,12 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
-type MultiplicativeExpr struct {
+type ArithmeticExpr struct {
 	Left, Right Expr
 	Operation   func(lhs, rhs decimal.Decimal) decimal.Decimal
 }
 
-func (e *MultiplicativeExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (e *ArithmeticExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
 	left, right, err := e.eval(ctx, nodes)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (e *MultiplicativeExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*y
 	return []*yaml.Node{yamlutil.Number(prod.String())}, nil
 }
 
-func (e *MultiplicativeExpr) eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, []*yaml.Node, error) {
+func (e *ArithmeticExpr) eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, []*yaml.Node, error) {
 	left, err := e.Left.Eval(ctx, nodes)
 	if err != nil {
 		return nil, nil, err

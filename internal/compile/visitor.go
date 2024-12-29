@@ -272,9 +272,19 @@ func (v *Visitor) visitAdditiveSubexpression(ctx *parser.AdditiveSubexpressionCo
 	op := v.getTreeText(ctx.GetChild(1))
 	switch op {
 	case "+":
+		return &expr.ConcatExpr{
+			Left:  lhs,
+			Right: rhs,
+		}, nil
 	case "-":
+		return &expr.ArithmeticExpr{
+			Left:  lhs,
+			Right: rhs,
+			Operation: func(lhs, rhs decimal.Decimal) decimal.Decimal {
+				return lhs.Sub(rhs)
+			},
+		}, nil
 	}
-	_, _ = lhs, rhs
 
 	return nil, ErrInternalf(ctx, "unknown binary operator: %q", "")
 }
@@ -287,7 +297,7 @@ func (v *Visitor) visitMultiplicativeSubexpression(ctx *parser.MultiplicativeSub
 	op := v.getTreeText(ctx.GetChild(1))
 	switch op {
 	case "*":
-		return &expr.MultiplicativeExpr{
+		return &expr.ArithmeticExpr{
 			Left:  lhs,
 			Right: rhs,
 			Operation: func(lhs, rhs decimal.Decimal) decimal.Decimal {
@@ -295,7 +305,7 @@ func (v *Visitor) visitMultiplicativeSubexpression(ctx *parser.MultiplicativeSub
 			},
 		}, nil
 	case "/":
-		return &expr.MultiplicativeExpr{
+		return &expr.ArithmeticExpr{
 			Left:  lhs,
 			Right: rhs,
 			Operation: func(lhs, rhs decimal.Decimal) decimal.Decimal {
@@ -303,7 +313,7 @@ func (v *Visitor) visitMultiplicativeSubexpression(ctx *parser.MultiplicativeSub
 			},
 		}, nil
 	case "%":
-		return &expr.MultiplicativeExpr{
+		return &expr.ArithmeticExpr{
 			Left:  lhs,
 			Right: rhs,
 			Operation: func(lhs, rhs decimal.Decimal) decimal.Decimal {

@@ -45,13 +45,13 @@ The following features of JSONPath are supported and thoroughly tested.
   * [x] Existence and field filters (`[?(@.key)]`)
   * [x] Comparison filters `==`, `!=`, `<`, `>`, `<=`, `>=` (e.g. `[?(@.key == "value")]`)
   * [x] Containment filters `in`, `nin`, `subsetof` (e.g. `[?(@.entry in $.keys]`)
-  * [ ] Regular expression filters (e.g. `[?(@.key =~ /pattern/)]`)
+  * [x] Regular expression filters (e.g. `[?(@.key =~ /pattern/)]`)
   * [x] Logical expressions `&&`, `||` (`[?(@.key && @.key2)]`)
   * [ ] Function filters (`[?(@.key.function() == "value")]`)
 * [ ] Script selection (`[<expression>]`) (**partial**)
   * [x] Field access (`[(@.key)]`)
-  * [ ] Arithmetic expressions (`[(@.key + 1)]`)
-  * [ ] String concatenation (`[(@.key + "string")]`)
+  * [x] Arithmetic expressions (`[(@.key + 1)]`)
+  * [x] String concatenation (`[(@.key + "string")]`)
   * [ ] Function calls (`[(@.key.function())`)
 
 ## Example Use

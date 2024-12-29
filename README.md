@@ -1,4 +1,4 @@
-# YAMLPath (Go)
+# YAMLPath
 
 [![GoDoc](https://godoc.org/rodusek.dev/pkg/yamlpath?status.svg)](https://godoc.org/rodusek.dev/pkg/yamlpath)
 [![Go Report Card](https://goreportcard.com/badge/rodusek.dev/pkg/yamlpath)](https://goreportcard.com/report/rodusek.dev/pkg/yamlpath)

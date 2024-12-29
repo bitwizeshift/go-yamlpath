@@ -6,6 +6,7 @@ package yamlpath
 
 import (
 	"context"
+	"encoding"
 	"fmt"
 
 	"gopkg.in/yaml.v3"
@@ -65,7 +66,7 @@ var _ fmt.Stringer = (*YAMLPath)(nil)
 
 // Eval evaluates the YAMLPath expression against the given YAML node.
 func (yp *YAMLPath) Eval(node *yaml.Node) ([]*yaml.Node, error) {
-	if yp == nil {
+	if yp == nil || yp.expression == nil {
 		return nil, nil
 	}
 	var input []*yaml.Node
@@ -196,6 +197,29 @@ func (yp *YAMLPath) MustEval(node *yaml.Node) []*yaml.Node {
 	}
 	return nodes
 }
+
+// UnmarshalText unmarshals the YAMLPath expression from text.
+//
+// This enables YAMLPath to be used as a field in structs that may be unmarshaled
+// in configs like YAML or JSON.
+func (yp *YAMLPath) UnmarshalText(text []byte) error {
+	ypath, err := Compile(string(text))
+	if err != nil {
+		return err
+	}
+	yp.path = ypath.path
+	yp.expression = ypath.expression
+	return nil
+}
+
+var _ encoding.TextUnmarshaler = (*YAMLPath)(nil)
+
+// MarshalText marshals the YAMLPath expression to text.
+func (yp *YAMLPath) MarshalText() ([]byte, error) {
+	return []byte(yp.path), nil
+}
+
+var _ encoding.TextMarshaler = (*YAMLPath)(nil)
 
 // Eval evaluates the YAMLPath expression against the given YAML node.
 func Eval(path string, node *yaml.Node) ([]*yaml.Node, error) {

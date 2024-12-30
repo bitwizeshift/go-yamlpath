@@ -375,9 +375,11 @@ func (v *Visitor) visitEqualitySubexpression(ctx *parser.EqualitySubexpressionCo
 			Right: rhs,
 		}, nil
 	case "!=":
-		return &expr.InequalityExpr{
-			Left:  lhs,
-			Right: rhs,
+		return &expr.NegationExpr{
+			Expr: &expr.EqualityExpr{
+				Left:  lhs,
+				Right: rhs,
+			},
 		}, nil
 	}
 

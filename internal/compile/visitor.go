@@ -8,6 +8,7 @@ import (
 
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/shopspring/decimal"
+	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/parser"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
@@ -235,6 +236,8 @@ func (v *Visitor) visitSubexpression(ctx parser.ISubexpressionContext) (expr.Exp
 		return v.visitNegationSubexpression(ctx)
 	case *parser.LiteralSubexpressionContext:
 		return v.visitLiteral(ctx.Literal())
+	case *parser.AggregationSubexpressionContext:
+		return v.visitAggregation(ctx.Aggregation())
 	case *parser.ParenthesisSubexpressionContext:
 		return v.visitSubexpression(ctx.Subexpression())
 	case *parser.RootSubexpressionContext:
@@ -507,26 +510,72 @@ func (v *Visitor) visitStringLiteral(ctx *parser.StringLiteralContext) (expr.Exp
 		return nil, NewSemanticErrorf(ctx, "string: %s", ctx.GetText())
 	}
 	return &expr.ValueExpr{
-		Node: yamlutil.String(s),
+		Nodes: []*yaml.Node{yamlutil.String(s)},
 	}, nil
 }
 
 func (v *Visitor) visitNumberLiteral(ctx *parser.NumberLiteralContext) (expr.Expr, error) {
 	return &expr.ValueExpr{
-		Node: yamlutil.Number(ctx.GetText()),
+		Nodes: []*yaml.Node{yamlutil.Number(ctx.GetText())},
 	}, nil
 }
 
 func (v *Visitor) visitBooleanLiteral(ctx *parser.BooleanLiteralContext) (expr.Expr, error) {
 	return &expr.ValueExpr{
-		Node: yamlutil.Boolean(ctx.GetText()),
+		Nodes: []*yaml.Node{yamlutil.Boolean(ctx.GetText())},
 	}, nil
 }
 
 func (v *Visitor) visitNullLiteral(_ *parser.NullLiteralContext) (expr.Expr, error) {
 	return &expr.ValueExpr{
-		Node: yamlutil.Null(),
+		Nodes: []*yaml.Node{yamlutil.Null()},
 	}, nil
+}
+
+//------------------------------------------------------------------------------
+// Aggregations
+//------------------------------------------------------------------------------
+
+func (v *Visitor) visitAggregation(ctx parser.IAggregationContext) (expr.Expr, error) {
+	switch ctx := ctx.(type) {
+	case *parser.ListAggregationContext:
+		return v.visitListAggregation(ctx)
+	case *parser.MapAggregationContext:
+		return v.visitMapAggregation(ctx)
+	case *parser.LiteralAggregationContext:
+		return v.visitLiteral(ctx.Literal())
+	}
+	return nil, ErrInternalf(ctx, "unexpected aggregation type: %T", ctx)
+}
+
+func (v *Visitor) visitListAggregation(ctx *parser.ListAggregationContext) (expr.Expr, error) {
+	nodes, err := v.visitYAMLText(ctx.GetText())
+	if err != nil {
+		return nil, err
+	}
+	return &expr.ValueExpr{
+		Nodes: nodes,
+	}, nil
+}
+
+func (v *Visitor) visitMapAggregation(ctx *parser.MapAggregationContext) (expr.Expr, error) {
+	nodes, err := v.visitYAMLText(ctx.GetText())
+	if err != nil {
+		return nil, err
+	}
+	return &expr.ValueExpr{
+		Nodes: nodes,
+	}, nil
+}
+
+func (v *Visitor) visitYAMLText(str string) ([]*yaml.Node, error) {
+	decoder := yaml.NewDecoder(strings.NewReader(str))
+
+	var node yaml.Node
+	if err := decoder.Decode(&node); err != nil {
+		return nil, err
+	}
+	return yamlutil.Normalize(&node), nil
 }
 
 func (v *Visitor) getTreeText(tree antlr.Tree) string {

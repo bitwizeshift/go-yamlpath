@@ -2,7 +2,6 @@ package expr
 
 import (
 	"context"
-	"fmt"
 
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
@@ -20,14 +19,16 @@ func (e *InExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, er
 	if err != nil {
 		return nil, err
 	}
+	if len(left) != 1 {
+		return nil, NewSingletonError("operator 'in'", len(left))
+	}
+
 	right, err := e.Right.Eval(ctx, nodes)
 	if err != nil {
 		return nil, err
 	}
+	right = e.unwrap(right)
 
-	if len(left) != 1 {
-		return nil, fmt.Errorf("in operator requires exactly one left-hand value")
-	}
 	l := left[0]
 	for _, r := range right {
 		if yamlutil.Equal(l, r) {
@@ -35,4 +36,14 @@ func (e *InExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, er
 		}
 	}
 	return []*yaml.Node{yamlutil.False}, nil
+}
+
+// unwrap nodes by examining whether the result is a single sequence node and,
+// if it is, unwrapping it so that the "in" operator may compare against the
+// individual elements of the sequence.
+func (e *InExpr) unwrap(nodes []*yaml.Node) []*yaml.Node {
+	if len(nodes) == 1 && nodes[0].Kind == yaml.SequenceNode {
+		return nodes[0].Content
+	}
+	return nodes
 }

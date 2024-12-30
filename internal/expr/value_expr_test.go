@@ -39,7 +39,7 @@ func TestValueExpr(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			sut := &expr.ValueExpr{Node: tc.value}
+			sut := &expr.ValueExpr{Nodes: []*yaml.Node{tc.value}}
 			got, err := sut.Eval(context.Background(), tc.input)
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {

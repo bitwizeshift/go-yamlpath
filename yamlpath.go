@@ -12,7 +12,6 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/compile"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 var (
@@ -26,13 +25,21 @@ var (
 // CompileError represents an error that occurs during compilation.
 type CompileError = compile.CompileError
 
-// YAMLPath represents a compiled YAMLPath expression.
+// YAMLPath is the representation of a compiled YAMLPath expression.
+//
+// A YAMLPath is safe for concurrent use by multiple goroutines,
+// except for if custom functions have been provided that are themselves unsuafe
+// for concurrent use.
 type YAMLPath struct {
 	path       string
 	expression expr.Expr
 }
 
-// Compile compiles a YAMLPath expression.
+// Compile parses a YAMLPath expressions and returns, if successful, a
+// [YAMLPath] object that can be used to match against [yaml.Node]s.
+//
+// On error, this will return a [CompileError] that can be used to determine
+// the cause of the error, and the location where the error occurs.
 func Compile(path string) (*YAMLPath, error) {
 	expr, err := compile.NewTree(path)
 	if err != nil {
@@ -46,6 +53,8 @@ func Compile(path string) (*YAMLPath, error) {
 }
 
 // MustCompile compiles a YAMLPath expression. It panics if an error occurs.
+//
+// This is a convenience wrapper around [Compile].
 func MustCompile(str string) *YAMLPath {
 	yp, err := Compile(str)
 	if err != nil {
@@ -64,8 +73,10 @@ func (yp *YAMLPath) String() string {
 
 var _ fmt.Stringer = (*YAMLPath)(nil)
 
-// Eval evaluates the YAMLPath expression against the given YAML node.
-func (yp *YAMLPath) Eval(node *yaml.Node) ([]*yaml.Node, error) {
+// Match evaluates the YAMLPath expression against the given YAML node,
+// returning all matching subnodes found. If an evaluation error occurs
+// during the matching process, it is returned and the collection will be nil.
+func (yp *YAMLPath) Match(node *yaml.Node) (Collection, error) {
 	if yp == nil || yp.expression == nil {
 		return nil, nil
 	}
@@ -78,120 +89,10 @@ func (yp *YAMLPath) Eval(node *yaml.Node) ([]*yaml.Node, error) {
 	return yp.expression.Eval(ctx, input)
 }
 
-// EvalBool evaluates the YAMLPath expression against the given YAML node and
-// returns the result as a boolean. If the path returns more than one node, or
-// if the node is not a boolean, an error is returned.
-func (yp *YAMLPath) EvalBool(node *yaml.Node) (bool, error) {
-	nodes, err := yp.Eval(node)
-	if err != nil {
-		return false, err
-	}
-	if len(nodes) == 0 {
-		return false, nil
-	}
-	if len(nodes) > 1 {
-		return false, fmt.Errorf("expected single node, but got %d", len(nodes))
-	}
-	b, err := yamlutil.ToBool(node)
-	if err != nil {
-		return false, err
-	}
-	return b, nil
-}
-
-// EvalBools evaluates the YAMLPath expression against the given YAML node and
-// returns the result as a slice of booleans. If any node is not a boolean, an
-// error is returned.
-func (yp *YAMLPath) EvalBools(node *yaml.Node) ([]bool, error) {
-	nodes, err := yp.Eval(node)
-	if err != nil {
-		return nil, err
-	}
-	var result []bool
-	for _, node := range nodes {
-		b, err := yamlutil.ToBool(node)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, b)
-	}
-	return result, nil
-}
-
-// EvalString evaluates the YAMLPath expression against the given YAML node and
-// returns the result as a string. If the path returns more than one node, an
-// error is returned.
-func (yp *YAMLPath) EvalString(node *yaml.Node) (string, error) {
-	nodes, err := yp.Eval(node)
-	if err != nil {
-		return "", err
-	}
-	if len(nodes) == 0 {
-		return "", nil
-	}
-	if len(nodes) > 1 {
-		return "", fmt.Errorf("expected single node, but got %d", len(nodes))
-	}
-	return yamlutil.ToString(nodes[0])
-}
-
-// EvalStrings evaluates the YAMLPath expression against the given YAML node and
-// returns the result as a slice of strings.
-func (yp *YAMLPath) EvalStrings(node *yaml.Node) ([]string, error) {
-	nodes, err := yp.Eval(node)
-	if err != nil {
-		return nil, err
-	}
-	var result []string
-	for _, node := range nodes {
-		s, err := yamlutil.ToString(node)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, s)
-	}
-	return result, nil
-}
-
-// EvalInt evaluates the YAMLPath expression against the given YAML node and
-// returns the result as an integer. If the path returns more than one node, an
-// error is returned.
-func (yp *YAMLPath) EvalInt(node *yaml.Node) (int, error) {
-	nodes, err := yp.Eval(node)
-	if err != nil {
-		return 0, err
-	}
-	if len(nodes) == 0 {
-		return 0, nil
-	}
-	if len(nodes) > 1 {
-		return 0, fmt.Errorf("expected single node, but got %d", len(nodes))
-	}
-	return yamlutil.ToInt(nodes[0])
-}
-
-// EvalInts evaluates the YAMLPath expression against the given YAML node and
-// returns the result as a slice of integers.
-func (yp *YAMLPath) EvalInts(node *yaml.Node) ([]int, error) {
-	nodes, err := yp.Eval(node)
-	if err != nil {
-		return nil, err
-	}
-	var result []int
-	for _, node := range nodes {
-		i, err := yamlutil.ToInt(node)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, i)
-	}
-	return result, nil
-}
-
-// MustEval evaluates the YAMLPath expression against the given YAML node. It
-// panics if an error occurs.
-func (yp *YAMLPath) MustEval(node *yaml.Node) []*yaml.Node {
-	nodes, err := yp.Eval(node)
+// MustMatch evaluates the YAMLPath expression against the given YAML node,
+// returning all matches. It panics if an error occurs.
+func (yp *YAMLPath) MustMatch(node *yaml.Node) Collection {
+	nodes, err := yp.Match(node)
 	if err != nil {
 		panic(err)
 	}
@@ -216,24 +117,41 @@ var _ encoding.TextUnmarshaler = (*YAMLPath)(nil)
 
 // MarshalText marshals the YAMLPath expression to text.
 func (yp *YAMLPath) MarshalText() ([]byte, error) {
+	if yp == nil {
+		return nil, nil
+	}
 	return []byte(yp.path), nil
+}
+
+// Equal returns true if the two YAMLPath expressions are equal.
+//
+// Equality is determined by evaluating whether the two paths are equal. This
+// makes nil YAMLPath equivalent to zero value YAMLPath objects.
+func (yp *YAMLPath) Equal(other *YAMLPath) bool {
+	if yp == nil && other == nil {
+		return true
+	}
+	if yp == nil && other.path == "" || yp.path == "" && other == nil {
+		return true
+	}
+	return yp.path == other.path
 }
 
 var _ encoding.TextMarshaler = (*YAMLPath)(nil)
 
-// Eval evaluates the YAMLPath expression against the given YAML node.
-func Eval(path string, node *yaml.Node) ([]*yaml.Node, error) {
+// Match evaluates the YAMLPath expression against the given YAML node.
+func Match(path string, node *yaml.Node) (Collection, error) {
 	yp, err := Compile(path)
 	if err != nil {
 		return nil, err
 	}
-	return yp.Eval(node)
+	return yp.Match(node)
 }
 
-// MustEval evaluates the YAMLPath expression against the given YAML node. It
+// MustMatch evaluates the YAMLPath expression against the given YAML node. It
 // panics if an error occurs.
-func MustEval(path string, node *yaml.Node) []*yaml.Node {
-	nodes, err := Eval(path, node)
+func MustMatch(path string, node *yaml.Node) Collection {
+	nodes, err := Match(path, node)
 	if err != nil {
 		panic(err)
 	}

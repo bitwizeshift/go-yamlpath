@@ -86,7 +86,7 @@ func EvaluateYAMLPath(ctx context.Context, path string) (context.Context, error)
 	if err != nil {
 		return ctx, err
 	}
-	got, err := yp.Eval(node)
+	got, err := yp.Match(node)
 	if err != nil {
 		ctx = context.WithValue(ctx, ctxKeyErrResult, err)
 	} else {
@@ -95,12 +95,12 @@ func EvaluateYAMLPath(ctx context.Context, path string) (context.Context, error)
 	return ctx, nil
 }
 
-func GetResult(ctx context.Context) ([]*yaml.Node, bool) {
+func GetResult(ctx context.Context) (yamlpath.Collection, bool) {
 	result := ctx.Value(ctxKetResult)
 	if result == nil {
 		return nil, false
 	}
-	return result.([]*yaml.Node), true
+	return result.(yamlpath.Collection), true
 }
 
 func GetError(ctx context.Context) error {

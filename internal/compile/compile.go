@@ -2,6 +2,8 @@ package compile
 
 import (
 	"errors"
+	"io"
+	"strings"
 
 	antlr "github.com/antlr4-go/antlr/v4"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
@@ -11,7 +13,13 @@ import (
 // NewTree converts a string FHIRPath expression into the proper Expression
 // tree.
 func NewTree(str string) (expr.Expr, error) {
-	input := antlr.NewInputStream(str)
+	return NewTreeFromReader(strings.NewReader(str))
+}
+
+// NewTreeFromReader converts a FHIRPath expression from an io.Reader into the
+// proper Expression tree.
+func NewTreeFromReader(r io.Reader) (expr.Expr, error) {
+	input := antlr.NewIoStream(r)
 
 	lexerErrors := &ErrorListener{}
 	lexer := parser.NewyamlpathLexer(input)

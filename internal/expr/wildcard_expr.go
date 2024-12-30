@@ -7,9 +7,13 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
+// WildcardExpr is a representation of the `.*` and `[*]` expressions in
+// YAMLPath, which will select all fields or sequence elements from the
+// current node.
 type WildcardExpr struct{}
 
-func (*WildcardExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+// Eval evaluates the wildcard expression against the provided nodes.
+func (*WildcardExpr) Eval(_ context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes = yamlutil.Normalize(nodes...)

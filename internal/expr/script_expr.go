@@ -23,34 +23,32 @@ func (e *ScriptExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node
 	}
 
 	if len(scriptNodes) != 1 {
-		return nil, fmt.Errorf("script expression must evaluate to a single value")
+		return nil, NewSingletonError("script operator '(...)'", len(scriptNodes))
+	}
+	node := scriptNodes[0]
+
+	if node.Kind != yaml.ScalarNode {
+		return nil, NewKindError("script operator '(...)'", yaml.ScalarNode, node.Kind)
 	}
 
-	key, err := e.toKey(scriptNodes[0])
+	expr, err := e.createExpr(scriptNodes[0])
 	if err != nil {
 		return nil, err
 	}
-
-	switch key := key.(type) {
-	case int:
-		expr := &IndexExpr{Indices: []int64{int64(key)}}
-		return expr.Eval(ctx, nodes)
-	case string:
-		expr := &FieldExpr{Names: []string{key}}
-		return expr.Eval(ctx, nodes)
-	}
-	return nil, fmt.Errorf("script expression must evaluate to an integer or string")
+	return expr.Eval(ctx, nodes)
 }
 
-func (e *ScriptExpr) toKey(node *yaml.Node) (any, error) {
-	if node.Kind != yaml.ScalarNode {
-		return nil, fmt.Errorf("script expression must evaluate to a scalar")
+func (e *ScriptExpr) createExpr(node *yaml.Node) (Expr, error) {
+	switch node.Tag {
+	case "!!int":
+		key, err := yamlutil.ToInt(node)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %w", ErrEval, err)
+		}
+		return &IndexExpr{Indices: []int64{int64(key)}}, nil
+
+	case "!!str":
+		return &FieldExpr{Names: []string{node.Value}}, nil
 	}
-	if node.Tag == "!!int" {
-		return yamlutil.ToInt(node)
-	}
-	if node.Tag == "!!str" {
-		return yamlutil.ToString(node)
-	}
-	return nil, fmt.Errorf("script expression must evaluate to an integer or string")
+	return nil, NewTagError("script operator '(...)'", "!!str or !!int", node.Tag)
 }

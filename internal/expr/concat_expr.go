@@ -19,7 +19,7 @@ func (e *ConcatExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node
 		return nil, err
 	}
 	if len(left) > 1 || len(right) > 1 {
-		return nil, fmt.Errorf("multiplicative expressions must have exactly one left and right value")
+		return nil, fmt.Errorf("concat expressions must have exactly one left and right value")
 	}
 	if len(left) == 0 || len(right) == 0 {
 		return nil, nil
@@ -28,7 +28,7 @@ func (e *ConcatExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node
 	if lhs.Kind != yaml.ScalarNode || rhs.Kind != yaml.ScalarNode {
 		return nil, fmt.Errorf("multiplicative expressions must have scalar nodes")
 	}
-	if (lhs.Tag == "!!int" || lhs.Tag == "!!float") && (rhs.Tag != "!!float" || rhs.Tag != "!!int") {
+	if (lhs.Tag == "!!int" || lhs.Tag == "!!float") && (rhs.Tag == "!!float" || rhs.Tag == "!!int") {
 		lv, err := decimal.NewFromString(lhs.Value)
 		if err != nil {
 			return nil, err

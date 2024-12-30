@@ -6,9 +6,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// RecursiveDescentExpr is a representation of the recursive descent operator in
+// YAMLPath expressions.
 type RecursiveDescentExpr struct{}
 
-func (r *RecursiveDescentExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+// Eval evaluates the recursive descent operator against the provided nodes.
+func (r *RecursiveDescentExpr) Eval(_ context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 	for _, node := range nodes {
 		result = append(result, r.flatten(node)...)

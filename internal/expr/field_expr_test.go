@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -27,7 +28,7 @@ func TestFieldExpr(t *testing.T) {
 			name:   "field matches one node",
 			fields: []string{"foo"},
 			input: []*yaml.Node{
-				YAML(t, `{"foo": 1, "bar": 2}`),
+				yamltest.MustParseNode(`{"foo": 1, "bar": 2}`),
 			},
 			want: []*yaml.Node{
 				yamlutil.Number("1"),
@@ -36,8 +37,8 @@ func TestFieldExpr(t *testing.T) {
 			name:   "field matches multiple nodes",
 			fields: []string{"foo"},
 			input: []*yaml.Node{
-				YAML(t, `{"foo": 1, "bar": 2}`),
-				YAML(t, `{"foo": 3, "bar": 4}`),
+				yamltest.MustParseNode(`{"foo": 1, "bar": 2}`),
+				yamltest.MustParseNode(`{"foo": 3, "bar": 4}`),
 			},
 			want: []*yaml.Node{
 				yamlutil.Number("1"),
@@ -47,7 +48,7 @@ func TestFieldExpr(t *testing.T) {
 			name:   "multiple fields match node",
 			fields: []string{"foo", "bar"},
 			input: []*yaml.Node{
-				YAML(t, `{"foo": 1, "bar": 2}`),
+				yamltest.MustParseNode(`{"foo": 1, "bar": 2}`),
 			},
 			want: []*yaml.Node{
 				yamlutil.Number("1"),

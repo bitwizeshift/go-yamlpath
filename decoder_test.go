@@ -6,18 +6,10 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
-
-func newYAML(t *testing.T, s string) *yaml.Node {
-	var n yaml.Node
-	if err := yaml.Unmarshal([]byte(s), &n); err != nil {
-		t.Fatal(err)
-	}
-	return yamlutil.Normalize(&n)[0]
-}
 
 func TestDecoder_Decode_DecodesSequenceAndReturnsEOF(t *testing.T) {
 	type object struct {
@@ -25,8 +17,8 @@ func TestDecoder_Decode_DecodesSequenceAndReturnsEOF(t *testing.T) {
 		Age  int    `yaml:"age"`
 	}
 	collection := yamlpath.Collection{
-		newYAML(t, `{"name": "Alice", "age": 30}`),
-		newYAML(t, `{"name": "Bob", "age": 25}`),
+		yamltest.MustParseNode(`{"name": "Alice", "age": 30}`),
+		yamltest.MustParseNode(`{"name": "Bob", "age": 25}`),
 	}
 
 	sut := collection.Decoder()

@@ -8,6 +8,8 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -22,33 +24,33 @@ func TestScriptExpr(t *testing.T) {
 	}{
 		{
 			name:    "Expr returns error",
-			expr:    ExprReturnsError(testErr),
+			expr:    exprtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:    "Expr returns multiple nodes",
-			expr:    ExprReturnsNodes(yamlutil.String("hello"), yamlutil.String("world")),
+			expr:    exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
 			wantErr: expr.ErrEval,
 		}, {
 			name:    "Expr returns single non-scalar node",
-			expr:    ExprReturnsNodes(YAML(t, `{"name": "Alice", "age": 30}`)),
+			expr:    exprtest.Return(yamltest.MustParseNode(`{"name": "Alice", "age": 30}`)),
 			wantErr: expr.ErrEval,
 		}, {
 			name:  "Expr returns single scalar int node",
-			expr:  ExprReturnsNodes(yamlutil.Number("1")),
-			input: []*yaml.Node{YAML(t, `[1, 2, 3]`)},
+			expr:  exprtest.Return(yamlutil.Number("1")),
+			input: []*yaml.Node{yamltest.MustParseNode(`[1, 2, 3]`)},
 			want:  []*yaml.Node{yamlutil.Number("2")},
 		}, {
 			name:  "Expr returns single scalar string node",
-			expr:  ExprReturnsNodes(yamlutil.String("key")),
-			input: []*yaml.Node{YAML(t, `{"key": "value"}`)},
+			expr:  exprtest.Return(yamlutil.String("key")),
+			input: []*yaml.Node{yamltest.MustParseNode(`{"key": "value"}`)},
 			want:  []*yaml.Node{yamlutil.String("value")},
 		}, {
 			name:    "Expr returns invalid integer node",
-			expr:    ExprReturnsNodes(yamlutil.Number("foo")),
+			expr:    exprtest.Return(yamlutil.Number("foo")),
 			wantErr: expr.ErrEval,
 		}, {
 			name:    "Expr returns scalar boolean node",
-			expr:    ExprReturnsNodes(yamlutil.True),
+			expr:    exprtest.Return(yamlutil.True),
 			wantErr: expr.ErrEval,
 		},
 	}

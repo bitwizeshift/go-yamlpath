@@ -8,6 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -21,28 +22,28 @@ func TestEqualityExpr(t *testing.T) {
 	}{
 		{
 			name:  "empty left and right expression returns true",
-			left:  ExprReturnsNodes(),
-			right: ExprReturnsNodes(),
+			left:  exprtest.Return(),
+			right: exprtest.Return(),
 			want:  []*yaml.Node{yamlutil.True},
 		}, {
 			name:  "left and right are the same",
-			left:  ExprReturnsNodes(yamlutil.String("hello")),
-			right: ExprReturnsNodes(yamlutil.String("hello")),
+			left:  exprtest.Return(yamlutil.String("hello")),
+			right: exprtest.Return(yamlutil.String("hello")),
 			want:  []*yaml.Node{yamlutil.True},
 		}, {
 			name:  "left and right are different",
-			left:  ExprReturnsNodes(yamlutil.String("hello")),
-			right: ExprReturnsNodes(yamlutil.String("world")),
+			left:  exprtest.Return(yamlutil.String("hello")),
+			right: exprtest.Return(yamlutil.String("world")),
 			want:  []*yaml.Node{yamlutil.False},
 		}, {
 			name:    "left expression returns error",
-			left:    ExprReturnsError(testErr),
-			right:   ExprReturnsNodes(yamlutil.String("hello")),
+			left:    exprtest.Error(testErr),
+			right:   exprtest.Return(yamlutil.String("hello")),
 			wantErr: testErr,
 		}, {
 			name:    "right expression returns error",
-			left:    ExprReturnsNodes(yamlutil.String("hello")),
-			right:   ExprReturnsError(testErr),
+			left:    exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Error(testErr),
 			wantErr: testErr,
 		},
 	}

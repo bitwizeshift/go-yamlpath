@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -22,10 +23,10 @@ func TestRecursiveDescentExpr(t *testing.T) {
 		}, {
 			name: "Input is sequence",
 			input: []*yaml.Node{
-				YAML(t, `["Alice", "Bob", "Charlie"]`),
+				yamltest.MustParseNode(`["Alice", "Bob", "Charlie"]`),
 			},
 			want: []*yaml.Node{
-				YAML(t, `["Alice", "Bob", "Charlie"]`),
+				yamltest.MustParseNode(`["Alice", "Bob", "Charlie"]`),
 				yamlutil.String("Alice"),
 				yamlutil.String("Bob"),
 				yamlutil.String("Charlie"),
@@ -33,20 +34,20 @@ func TestRecursiveDescentExpr(t *testing.T) {
 		}, {
 			name: "Input is mapping",
 			input: []*yaml.Node{
-				YAML(t, `{"name": "Alice", "age": 30}`),
+				yamltest.MustParseNode(`{"name": "Alice", "age": 30}`),
 			},
 			want: []*yaml.Node{
-				YAML(t, `{"name": "Alice", "age": 30}`),
+				yamltest.MustParseNode(`{"name": "Alice", "age": 30}`),
 				yamlutil.String("Alice"),
 				yamlutil.Number("30"),
 			},
 		}, {
 			name: "Input is document",
 			input: []*yaml.Node{
-				Document(t, `{"name": "Alice", "age": 30}`),
+				yamltest.MustParseDocument(`{"name": "Alice", "age": 30}`),
 			},
 			want: []*yaml.Node{
-				Document(t, `{"name": "Alice", "age": 30}`),
+				yamltest.MustParseDocument(`{"name": "Alice", "age": 30}`),
 				yamlutil.String("Alice"),
 				yamlutil.Number("30"),
 			},

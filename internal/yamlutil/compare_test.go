@@ -6,6 +6,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -166,18 +167,18 @@ func TestCompare(t *testing.T) {
 		// Sequence Values
 		{
 			name: "Sequences are different length",
-			lhs:  newYAML(t, `[1, 2, 3]`),
-			rhs:  newYAML(t, `[1, 2]`),
+			lhs:  yamltest.MustParseNode(`[1, 2, 3]`),
+			rhs:  yamltest.MustParseNode(`[1, 2]`),
 			want: 1,
 		}, {
 			name: "Sequences have different values",
-			lhs:  newYAML(t, `[1, 2, 3]`),
-			rhs:  newYAML(t, `[1, 2, 4]`),
+			lhs:  yamltest.MustParseNode(`[1, 2, 3]`),
+			rhs:  yamltest.MustParseNode(`[1, 2, 4]`),
 			want: -1,
 		}, {
 			name: "Sequences are equal",
-			lhs:  newYAML(t, `[1, 2, 3]`),
-			rhs:  newYAML(t, `[1, 2, 3]`),
+			lhs:  yamltest.MustParseNode(`[1, 2, 3]`),
+			rhs:  yamltest.MustParseNode(`[1, 2, 3]`),
 			want: 0,
 		},
 		// Errors
@@ -231,8 +232,8 @@ func TestCompare(t *testing.T) {
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Sequences contain different node types",
-			lhs:     newYAML(t, `[1, 2, 3]`),
-			rhs:     newYAML(t, `["1", "2", "3"]`),
+			lhs:     yamltest.MustParseNode(`[1, 2, 3]`),
+			rhs:     yamltest.MustParseNode(`["1", "2", "3"]`),
 			wantErr: cmpopts.AnyError,
 		},
 	}

@@ -8,6 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -22,17 +23,17 @@ func TestFilterExpr(t *testing.T) {
 	}{
 		{
 			name:  "Empty input evalutes to empty output",
-			expr:  ExprReturnsNodes(),
+			expr:  exprtest.Return(),
 			input: []*yaml.Node{},
 			want:  []*yaml.Node{},
 		}, {
 			name:    "Subexpr returns error",
-			expr:    ExprReturnsError(testErr),
+			expr:    exprtest.Error(testErr),
 			input:   []*yaml.Node{yamlutil.String("hello")},
 			wantErr: testErr,
 		}, {
 			name: "Includs only filtered values",
-			expr: ExprFunc(func(ctx *expr.Context) ([]*yaml.Node, error) {
+			expr: exprtest.Func(func(ctx *expr.Context) ([]*yaml.Node, error) {
 				nodes := ctx.Current()
 				if nodes[0].Value == "hello" {
 					return []*yaml.Node{yamlutil.True}, nil

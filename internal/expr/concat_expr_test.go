@@ -8,6 +8,8 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -21,78 +23,78 @@ func TestConcatExpr(t *testing.T) {
 	}{
 		{
 			name:  "empty left and right expression returns empty expression",
-			left:  ExprReturnsNodes(),
-			right: ExprReturnsNodes(),
+			left:  exprtest.Return(),
+			right: exprtest.Return(),
 			want:  []*yaml.Node{},
 		}, {
 			name:    "Left returns multiple elements",
-			left:    ExprReturnsNodes(yamlutil.String("hello"), yamlutil.String("world")),
-			right:   ExprReturnsNodes(yamlutil.String("foo")),
+			left:    exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
+			right:   exprtest.Return(yamlutil.String("foo")),
 			wantErr: expr.ErrEval,
 		}, {
 			name:    "Right returns multiple elements",
-			left:    ExprReturnsNodes(yamlutil.String("hello")),
-			right:   ExprReturnsNodes(yamlutil.String("foo"), yamlutil.String("bar")),
+			left:    exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Return(yamlutil.String("foo"), yamlutil.String("bar")),
 			wantErr: expr.ErrEval,
 		}, {
 			name:    "Left returns error",
-			left:    ExprReturnsError(testErr),
-			right:   ExprReturnsNodes(yamlutil.String("foo")),
+			left:    exprtest.Error(testErr),
+			right:   exprtest.Return(yamlutil.String("foo")),
 			wantErr: testErr,
 		}, {
 			name:    "Right returns error",
-			left:    ExprReturnsNodes(yamlutil.String("foo")),
-			right:   ExprReturnsError(testErr),
+			left:    exprtest.Return(yamlutil.String("foo")),
+			right:   exprtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:    "Left value is single but not scalar",
-			left:    ExprReturnsNodes(YAML(t, `{"foo": "bar"}`)),
-			right:   ExprReturnsNodes(yamlutil.String("foo")),
+			left:    exprtest.Return(yamltest.MustParseNode(`{"foo": "bar"}`)),
+			right:   exprtest.Return(yamlutil.String("foo")),
 			wantErr: expr.ErrEval,
 		}, {
 			name:    "Right value is single but not scalar",
-			left:    ExprReturnsNodes(yamlutil.String("foo")),
-			right:   ExprReturnsNodes(YAML(t, `{"foo": "bar"}`)),
+			left:    exprtest.Return(yamlutil.String("foo")),
+			right:   exprtest.Return(yamltest.MustParseNode(`{"foo": "bar"}`)),
 			wantErr: expr.ErrEval,
 		}, {
 			name:  "Left value is scalar int, right is scalar int",
-			left:  ExprReturnsNodes(yamlutil.Number("42")),
-			right: ExprReturnsNodes(yamlutil.Number("42")),
+			left:  exprtest.Return(yamlutil.Number("42")),
+			right: exprtest.Return(yamlutil.Number("42")),
 			want:  []*yaml.Node{yamlutil.Number("84")},
 		}, {
 			name:  "Left value is scalar int, right is scalar float",
-			left:  ExprReturnsNodes(yamlutil.Number("42")),
-			right: ExprReturnsNodes(yamlutil.Number("42.0")),
+			left:  exprtest.Return(yamlutil.Number("42")),
+			right: exprtest.Return(yamlutil.Number("42.0")),
 			want:  []*yaml.Node{yamlutil.Number("84")},
 		}, {
 			name:  "Left value is scalar float, right is scalar int",
-			left:  ExprReturnsNodes(yamlutil.Number("42.0")),
-			right: ExprReturnsNodes(yamlutil.Number("42")),
+			left:  exprtest.Return(yamlutil.Number("42.0")),
+			right: exprtest.Return(yamlutil.Number("42")),
 			want:  []*yaml.Node{yamlutil.Number("84")},
 		}, {
 			name:  "Left value is scalar float, right is scalar float",
-			left:  ExprReturnsNodes(yamlutil.Number("42.0")),
-			right: ExprReturnsNodes(yamlutil.Number("42.0")),
+			left:  exprtest.Return(yamlutil.Number("42.0")),
+			right: exprtest.Return(yamlutil.Number("42.0")),
 			want:  []*yaml.Node{yamlutil.Number("84")},
 		}, {
 			name:    "Left and right are scalar ints, left has bad representation",
-			left:    ExprReturnsNodes(yamlutil.Number("hello")),
-			right:   ExprReturnsNodes(yamlutil.Number("42")),
+			left:    exprtest.Return(yamlutil.Number("hello")),
+			right:   exprtest.Return(yamlutil.Number("42")),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Left and right are scalar ints, right has bad representation",
-			left:    ExprReturnsNodes(yamlutil.Number("42")),
-			right:   ExprReturnsNodes(yamlutil.Number("hello")),
+			left:    exprtest.Return(yamlutil.Number("42")),
+			right:   exprtest.Return(yamlutil.Number("hello")),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:  "left and right are scalar string types",
-			left:  ExprReturnsNodes(yamlutil.String("hello")),
-			right: ExprReturnsNodes(yamlutil.String("world")),
+			left:  exprtest.Return(yamlutil.String("hello")),
+			right: exprtest.Return(yamlutil.String("world")),
 			want:  []*yaml.Node{yamlutil.String("helloworld")},
 		}, {
 			name:    "left and right are incompatible types",
-			left:    ExprReturnsNodes(yamlutil.String("hello")),
-			right:   ExprReturnsNodes(yamlutil.Number("42")),
+			left:    exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Return(yamlutil.Number("42")),
 			wantErr: expr.ErrEval,
 		},
 	}

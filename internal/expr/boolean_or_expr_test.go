@@ -8,6 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -21,38 +22,38 @@ func TestBinaryOrExpr(t *testing.T) {
 	}{
 		{
 			name:    "Left returns error",
-			left:    ExprReturnsError(testErr),
-			right:   ExprReturnsNodes(yamlutil.String("hello")),
+			left:    exprtest.Error(testErr),
+			right:   exprtest.Return(yamlutil.String("hello")),
 			wantErr: testErr,
 		}, {
 			name:    "Right returns error",
-			left:    ExprReturnsNodes(),
-			right:   ExprReturnsError(testErr),
+			left:    exprtest.Return(),
+			right:   exprtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:  "Short-circuits on left true",
-			left:  ExprReturnsNodes(yamlutil.True),
-			right: ExprReturnsError(testErr),
+			left:  exprtest.Return(yamlutil.True),
+			right: exprtest.Error(testErr),
 			want:  []*yaml.Node{yamlutil.True},
 		}, {
 			name:  "Left and right evaluate to true",
-			left:  ExprReturnsNodes(yamlutil.True),
-			right: ExprReturnsNodes(yamlutil.True),
+			left:  exprtest.Return(yamlutil.True),
+			right: exprtest.Return(yamlutil.True),
 			want:  []*yaml.Node{yamlutil.True},
 		}, {
 			name:  "Left evaluates to true",
-			left:  ExprReturnsNodes(yamlutil.True),
-			right: ExprReturnsNodes(yamlutil.False),
+			left:  exprtest.Return(yamlutil.True),
+			right: exprtest.Return(yamlutil.False),
 			want:  []*yaml.Node{yamlutil.True},
 		}, {
 			name:  "Right evaluates to true",
-			left:  ExprReturnsNodes(yamlutil.False),
-			right: ExprReturnsNodes(yamlutil.True),
+			left:  exprtest.Return(yamlutil.False),
+			right: exprtest.Return(yamlutil.True),
 			want:  []*yaml.Node{yamlutil.True},
 		}, {
 			name:  "Left and right evaluate to false",
-			left:  ExprReturnsNodes(yamlutil.False),
-			right: ExprReturnsNodes(yamlutil.False),
+			left:  exprtest.Return(yamlutil.False),
+			right: exprtest.Return(yamlutil.False),
 			want:  []*yaml.Node{yamlutil.False},
 		},
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -126,7 +127,7 @@ func TestYAMLPath_Match(t *testing.T) {
 		}, {
 			name:  "Valid path returns matching collection",
 			path:  yamlpath.MustCompile("$[*].name"),
-			input: newYAML(t, `[{"name": "Alice"}, {"name": "Bob"}]`),
+			input: yamltest.MustParseNode(`[{"name": "Alice"}, {"name": "Bob"}]`),
 			want: yamlpath.Collection{
 				yamlutil.String("Alice"),
 				yamlutil.String("Bob"),
@@ -134,7 +135,7 @@ func TestYAMLPath_Match(t *testing.T) {
 		}, {
 			name:    "Evaluation error surfaces error",
 			path:    yamlpath.MustCompile("$[?(@.age > 32)]"),
-			input:   newYAML(t, `{"age": "foo"}`),
+			input:   yamltest.MustParseNode(`{"age": "foo"}`),
 			wantErr: cmpopts.AnyError,
 		},
 	}
@@ -155,7 +156,7 @@ func TestYAMLPath_Match(t *testing.T) {
 
 func TestYAMLPath_MustMatch(t *testing.T) {
 	sut := yamlpath.MustCompile("$[*].name")
-	input := newYAML(t, `[{"name": "Alice"}, {"name": "Bob"}]`)
+	input := yamltest.MustParseNode(`[{"name": "Alice"}, {"name": "Bob"}]`)
 	got := sut.MustMatch(input)
 
 	want := yamlpath.Collection{
@@ -176,7 +177,7 @@ func TestYAMLPath_MustMatch_PanicsIfErrorOccurs(t *testing.T) {
 	}()
 
 	sut := yamlpath.MustCompile("$[?(@.age > 32)]")
-	input := newYAML(t, `{"age": "foo"}`)
+	input := yamltest.MustParseNode(`{"age": "foo"}`)
 	_ = sut.MustMatch(input)
 }
 

@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -24,7 +25,7 @@ func TestWildcardExpr(t *testing.T) {
 		}, {
 			name: "Mapping node returns all fields",
 			input: []*yaml.Node{
-				YAML(t, `{"name": "Alice", "age": 30}`),
+				yamltest.MustParseNode(`{"name": "Alice", "age": 30}`),
 			},
 			want: []*yaml.Node{
 				yamlutil.String("Alice"),
@@ -33,7 +34,7 @@ func TestWildcardExpr(t *testing.T) {
 		}, {
 			name: "Sequence node returns all elements",
 			input: []*yaml.Node{
-				YAML(t, `["Alice", "Bob"]`),
+				yamltest.MustParseNode(`["Alice", "Bob"]`),
 			},
 			want: []*yaml.Node{
 				yamlutil.String("Alice"),

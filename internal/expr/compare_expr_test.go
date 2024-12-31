@@ -8,6 +8,8 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -22,78 +24,78 @@ func TestCompareExpr(t *testing.T) {
 	}{
 		{
 			name:    "Left expression returns error",
-			left:    ExprReturnsError(testErr),
-			right:   ExprReturnsNodes(yamlutil.String("hello")),
+			left:    exprtest.Error(testErr),
+			right:   exprtest.Return(yamlutil.String("hello")),
 			wantErr: testErr,
 		}, {
 			name:    "Right expression returns error",
-			left:    ExprReturnsNodes(yamlutil.String("hello")),
-			right:   ExprReturnsError(testErr),
+			left:    exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:    "operator '<' where left is less than right",
 			compare: expr.CompareLess,
-			left:    ExprReturnsNodes(yamlutil.String("hello")),
-			right:   ExprReturnsNodes(yamlutil.String("world")),
+			left:    exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Return(yamlutil.String("world")),
 			want:    []*yaml.Node{yamlutil.True},
 		}, {
 			name:    "operator '<' where left is greater than right",
 			compare: expr.CompareLess,
-			left:    ExprReturnsNodes(yamlutil.String("world")),
-			right:   ExprReturnsNodes(yamlutil.String("hello")),
+			left:    exprtest.Return(yamlutil.String("world")),
+			right:   exprtest.Return(yamlutil.String("hello")),
 			want:    []*yaml.Node{yamlutil.False},
 		}, {
 			name:    "operator '<=' where left is less than right",
 			compare: expr.CompareLessEqual,
-			left:    ExprReturnsNodes(yamlutil.String("hello")),
-			right:   ExprReturnsNodes(yamlutil.String("world")),
+			left:    exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Return(yamlutil.String("world")),
 			want:    []*yaml.Node{yamlutil.True},
 		}, {
 			name:    "operator '<=' where left is equal to right",
 			compare: expr.CompareLessEqual,
-			left:    ExprReturnsNodes(yamlutil.String("hello")),
-			right:   ExprReturnsNodes(yamlutil.String("hello")),
+			left:    exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Return(yamlutil.String("hello")),
 			want:    []*yaml.Node{yamlutil.True},
 		}, {
 			name:    "operator '<=' where left is greater than right",
 			compare: expr.CompareLessEqual,
-			left:    ExprReturnsNodes(yamlutil.String("world")),
-			right:   ExprReturnsNodes(yamlutil.String("hello")),
+			left:    exprtest.Return(yamlutil.String("world")),
+			right:   exprtest.Return(yamlutil.String("hello")),
 			want:    []*yaml.Node{yamlutil.False},
 		}, {
 			name:    "operator '>' where left is greater than right",
 			compare: expr.CompareGreater,
-			left:    ExprReturnsNodes(yamlutil.String("world")),
-			right:   ExprReturnsNodes(yamlutil.String("hello")),
+			left:    exprtest.Return(yamlutil.String("world")),
+			right:   exprtest.Return(yamlutil.String("hello")),
 			want:    []*yaml.Node{yamlutil.True},
 		}, {
 			name:    "operator '>' where left is less than right",
 			compare: expr.CompareGreater,
-			left:    ExprReturnsNodes(yamlutil.String("hello")),
-			right:   ExprReturnsNodes(yamlutil.String("world")),
+			left:    exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Return(yamlutil.String("world")),
 			want:    []*yaml.Node{yamlutil.False},
 		}, {
 			name:    "operator '>=' where left is greater than right",
 			compare: expr.CompareGreaterEqual,
-			left:    ExprReturnsNodes(yamlutil.String("world")),
-			right:   ExprReturnsNodes(yamlutil.String("hello")),
+			left:    exprtest.Return(yamlutil.String("world")),
+			right:   exprtest.Return(yamlutil.String("hello")),
 			want:    []*yaml.Node{yamlutil.True},
 		}, {
 			name:    "operator '>=' where left is equal to right",
 			compare: expr.CompareGreaterEqual,
-			left:    ExprReturnsNodes(yamlutil.String("hello")),
-			right:   ExprReturnsNodes(yamlutil.String("hello")),
+			left:    exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Return(yamlutil.String("hello")),
 			want:    []*yaml.Node{yamlutil.True},
 		}, {
 			name:    "operator '>=' where left is less than right",
 			compare: expr.CompareGreaterEqual,
-			left:    ExprReturnsNodes(yamlutil.String("hello")),
-			right:   ExprReturnsNodes(yamlutil.String("world")),
+			left:    exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Return(yamlutil.String("world")),
 			want:    []*yaml.Node{yamlutil.False},
 		}, {
 			name:    "Left and right are incomparable",
-			left:    ExprReturnsNodes(yamlutil.String("hello")),
-			right:   ExprReturnsNodes(YAML(t, `{"foo": "bar"}`)),
+			left:    exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Return(yamltest.MustParseNode(`{"foo": "bar"}`)),
 			wantErr: cmpopts.AnyError,
 		},
 	}

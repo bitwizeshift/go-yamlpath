@@ -8,6 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -22,28 +23,28 @@ func TestSubsetOfExpr(t *testing.T) {
 	}{
 		{
 			name:  "Empty ranges compare equal",
-			left:  ExprReturnsNodes(),
-			right: ExprReturnsNodes(),
+			left:  exprtest.Return(),
+			right: exprtest.Return(),
 			want:  []*yaml.Node{yamlutil.True},
 		}, {
 			name:    "Left returns error",
-			left:    ExprReturnsError(testErr),
-			right:   ExprReturnsNodes(),
+			left:    exprtest.Error(testErr),
+			right:   exprtest.Return(),
 			wantErr: testErr,
 		}, {
 			name:    "Right returns error",
-			left:    ExprReturnsNodes(),
-			right:   ExprReturnsError(testErr),
+			left:    exprtest.Return(),
+			right:   exprtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:  "Left is subset of right",
-			left:  ExprReturnsNodes(yamlutil.String("hello")),
-			right: ExprReturnsNodes(yamlutil.String("hello"), yamlutil.String("world")),
+			left:  exprtest.Return(yamlutil.String("hello")),
+			right: exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
 			want:  []*yaml.Node{yamlutil.True},
 		}, {
 			name:  "Left is not subset of right",
-			left:  ExprReturnsNodes(yamlutil.String("hello"), yamlutil.String("world")),
-			right: ExprReturnsNodes(yamlutil.String("hello")),
+			left:  exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
+			right: exprtest.Return(yamlutil.String("hello")),
 			want:  []*yaml.Node{yamlutil.False},
 		},
 	}

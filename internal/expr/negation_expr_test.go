@@ -8,6 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -22,19 +23,19 @@ func TestNegationExpr(t *testing.T) {
 	}{
 		{
 			name: "Empty node evaluates to true",
-			expr: ExprReturnsNodes(),
+			expr: exprtest.Return(),
 			want: []*yaml.Node{yamlutil.True},
 		}, {
 			name:    "Subexpr evaluates error",
-			expr:    ExprReturnsError(testErr),
+			expr:    exprtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name: "Subexpr returns scalar non-bool value",
-			expr: ExprReturnsNodes(yamlutil.String("hello")),
+			expr: exprtest.Return(yamlutil.String("hello")),
 			want: []*yaml.Node{yamlutil.False},
 		}, {
 			name: "Subexpr returns scalar bool value",
-			expr: ExprReturnsNodes(yamlutil.True),
+			expr: exprtest.Return(yamlutil.True),
 			want: []*yaml.Node{yamlutil.False},
 		},
 	}

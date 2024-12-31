@@ -8,6 +8,8 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -22,38 +24,38 @@ func TestPrefixMinusExpr(t *testing.T) {
 	}{
 		{
 			name:    "subexpr returns error",
-			expr:    ExprReturnsError(testErr),
+			expr:    exprtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name: "subexpr returns empty",
-			expr: ExprReturnsNodes(),
+			expr: exprtest.Return(),
 		}, {
 			name:    "subexpr returns multiple values",
-			expr:    ExprReturnsNodes(yamlutil.String("hello"), yamlutil.String("world")),
+			expr:    exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
 			wantErr: expr.ErrEval,
 		}, {
 			name:    "subexpr returns single non-scalar value",
-			expr:    ExprReturnsNodes(YAML(t, `{"name": "Alice", "age": 30}`)),
+			expr:    exprtest.Return(yamltest.MustParseNode(`{"name": "Alice", "age": 30}`)),
 			wantErr: expr.ErrEval,
 		}, {
 			name:    "subexpr returns scalar non-numeric value",
-			expr:    ExprReturnsNodes(yamlutil.String("hello")),
+			expr:    exprtest.Return(yamlutil.String("hello")),
 			wantErr: expr.ErrEval,
 		}, {
 			name: "subexpr returns positive scalar integer value",
-			expr: ExprReturnsNodes(yamlutil.Number("42")),
+			expr: exprtest.Return(yamlutil.Number("42")),
 			want: []*yaml.Node{yamlutil.Number("-42")},
 		}, {
 			name: "subexpr returns positive scalar float value",
-			expr: ExprReturnsNodes(yamlutil.Number("42.5")),
+			expr: exprtest.Return(yamlutil.Number("42.5")),
 			want: []*yaml.Node{yamlutil.Number("-42.5")},
 		}, {
 			name: "subexpr returns negative scalar integer value",
-			expr: ExprReturnsNodes(yamlutil.Number("-42")),
+			expr: exprtest.Return(yamlutil.Number("-42")),
 			want: []*yaml.Node{yamlutil.Number("42")},
 		}, {
 			name: "subexpr returns negative scalar float value",
-			expr: ExprReturnsNodes(yamlutil.Number("-42.5")),
+			expr: exprtest.Return(yamlutil.Number("-42.5")),
 			want: []*yaml.Node{yamlutil.Number("42.5")},
 		},
 	}

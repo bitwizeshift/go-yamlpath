@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -22,7 +23,7 @@ func TestValueExpr(t *testing.T) {
 			name:  "Input node does not affect output",
 			value: yamlutil.String("Hello world"),
 			input: []*yaml.Node{
-				YAML(t, `{"name": "Alice", "age": 30}`),
+				yamltest.MustParseNode(`{"name": "Alice", "age": 30}`),
 			},
 			want: []*yaml.Node{
 				yamlutil.String("Hello world"),

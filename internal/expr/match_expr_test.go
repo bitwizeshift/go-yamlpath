@@ -9,6 +9,8 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -25,37 +27,37 @@ func TestMatchExpr(t *testing.T) {
 		{
 			name:  "Empty node evaluates to false",
 			regex: ".*",
-			expr:  ExprReturnsNodes(),
+			expr:  exprtest.Return(),
 			want:  []*yaml.Node{yamlutil.False},
 		}, {
 			name:    "Subexpr evaluates error",
 			regex:   ".*",
-			expr:    ExprReturnsError(testErr),
+			expr:    exprtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:  "Subexpr returns multiple nodes",
 			regex: ".*",
-			expr:  ExprReturnsNodes(yamlutil.String("hello"), yamlutil.String("world")),
+			expr:  exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
 			want:  []*yaml.Node{yamlutil.False},
 		}, {
 			name:  "Subexpr returns scalar non-string node",
 			regex: ".*",
-			expr:  ExprReturnsNodes(yamlutil.Number("42")),
+			expr:  exprtest.Return(yamlutil.Number("42")),
 			want:  []*yaml.Node{yamlutil.False},
 		}, {
 			name:  "Subexpr returns non-scalar node",
 			regex: ".*",
-			expr:  ExprReturnsNodes(YAML(t, `{"foo": "bar"}`)),
+			expr:  exprtest.Return(yamltest.MustParseNode(`{"foo": "bar"}`)),
 			want:  []*yaml.Node{yamlutil.False},
 		}, {
 			name:  "Subexpr returns scalar string node that matches",
 			regex: ".*",
-			expr:  ExprReturnsNodes(yamlutil.String("hello")),
+			expr:  exprtest.Return(yamlutil.String("hello")),
 			want:  []*yaml.Node{yamlutil.True},
 		}, {
 			name:  "Subexpr returns scalar string node that does not match",
 			regex: "world",
-			expr:  ExprReturnsNodes(yamlutil.String("hello")),
+			expr:  exprtest.Return(yamlutil.String("hello")),
 			want:  []*yaml.Node{yamlutil.False},
 		},
 	}

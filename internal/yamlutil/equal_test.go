@@ -4,19 +4,12 @@ import (
 	"testing"
 
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func nodes(nodes ...*yaml.Node) []*yaml.Node {
 	return nodes
-}
-
-func newYAML(t *testing.T, s string) *yaml.Node {
-	var n yaml.Node
-	if err := yaml.Unmarshal([]byte(s), &n); err != nil {
-		t.Fatal(err)
-	}
-	return yamlutil.Normalize(&n)[0]
 }
 
 func TestEqual(t *testing.T) {
@@ -64,38 +57,38 @@ func TestEqual(t *testing.T) {
 			want: false,
 		}, {
 			name: "List nodes have different number of children",
-			lhs:  newYAML(t, `[1, 2, 3]`),
-			rhs:  newYAML(t, `[1, 2]`),
+			lhs:  yamltest.MustParseNode(`[1, 2, 3]`),
+			rhs:  yamltest.MustParseNode(`[1, 2]`),
 			want: false,
 		}, {
 			name: "List nodes same number of children but different values",
-			lhs:  newYAML(t, `[1, 2, 3]`),
-			rhs:  newYAML(t, `[1, 2, 4]`),
+			lhs:  yamltest.MustParseNode(`[1, 2, 3]`),
+			rhs:  yamltest.MustParseNode(`[1, 2, 4]`),
 			want: false,
 		}, {
 			name: "List nodes same number of children and values",
-			lhs:  newYAML(t, `[1, 2, 3]`),
-			rhs:  newYAML(t, `[1, 2, 3]`),
+			lhs:  yamltest.MustParseNode(`[1, 2, 3]`),
+			rhs:  yamltest.MustParseNode(`[1, 2, 3]`),
 			want: true,
 		}, {
 			name: "Map nodes have different number of children",
-			lhs:  newYAML(t, `{"a": 1, "b": 2}`),
-			rhs:  newYAML(t, `{"a": 1}`),
+			lhs:  yamltest.MustParseNode(`{"a": 1, "b": 2}`),
+			rhs:  yamltest.MustParseNode(`{"a": 1}`),
 			want: false,
 		}, {
 			name: "Map nodes same number of children but different values",
-			lhs:  newYAML(t, `{"a": 1, "b": 2}`),
-			rhs:  newYAML(t, `{"a": 1, "b": 3}`),
+			lhs:  yamltest.MustParseNode(`{"a": 1, "b": 2}`),
+			rhs:  yamltest.MustParseNode(`{"a": 1, "b": 3}`),
 			want: false,
 		}, {
 			name: "Map nodes same number of children but different keys",
-			lhs:  newYAML(t, `{"a": 1, "b": 2}`),
-			rhs:  newYAML(t, `{"a": 1, "c": 2}`),
+			lhs:  yamltest.MustParseNode(`{"a": 1, "b": 2}`),
+			rhs:  yamltest.MustParseNode(`{"a": 1, "c": 2}`),
 			want: false,
 		}, {
 			name: "Map nodes same number of children and values",
-			lhs:  newYAML(t, `{"a": 1, "b": 2}`),
-			rhs:  newYAML(t, `{"a": 1, "b": 2}`),
+			lhs:  yamltest.MustParseNode(`{"a": 1, "b": 2}`),
+			rhs:  yamltest.MustParseNode(`{"a": 1, "b": 2}`),
 			want: true,
 		}, {
 			name: "Equivalent but invalid number fields return true",

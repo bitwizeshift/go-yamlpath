@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -26,17 +27,17 @@ func TestIndexExpr(t *testing.T) {
 		}, {
 			name:    "negative index selects from end of the sequence",
 			indices: []int64{-1},
-			input:   []*yaml.Node{YAML(t, `["hello", "world"]`)},
+			input:   []*yaml.Node{yamltest.MustParseNode(`["hello", "world"]`)},
 			want:    []*yaml.Node{yamlutil.String("world")},
 		}, {
 			name:    "index out of range returns empty",
 			indices: []int64{2},
-			input:   []*yaml.Node{YAML(t, `["hello", "world"]`)},
+			input:   []*yaml.Node{yamltest.MustParseNode(`["hello", "world"]`)},
 			want:    []*yaml.Node{},
 		}, {
 			name:    "multiple indices select multiple nodes",
 			indices: []int64{1, 2},
-			input:   []*yaml.Node{YAML(t, `["foo", "bar", "baz", "buz"]`)},
+			input:   []*yaml.Node{yamltest.MustParseNode(`["foo", "bar", "baz", "buz"]`)},
 			want:    []*yaml.Node{yamlutil.String("bar"), yamlutil.String("baz")},
 		}, {
 			name:    "Non-sequence nodes are ignored",

@@ -1,8 +1,6 @@
 package expr
 
 import (
-	"context"
-
 	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
@@ -45,8 +43,8 @@ type ArithmeticExpr struct {
 }
 
 // Eval evaluates the arithmetic expression against the given context.
-func (e *ArithmeticExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
-	left, right, err := e.eval(ctx, nodes)
+func (e *ArithmeticExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+	left, right, err := e.eval(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -86,14 +84,16 @@ func (e *ArithmeticExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.
 	return []*yaml.Node{yamlutil.Number(result.String())}, nil
 }
 
-func (e *ArithmeticExpr) eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, []*yaml.Node, error) {
-	left, err := e.Left.Eval(ctx, nodes)
+func (e *ArithmeticExpr) eval(ctx *Context) ([]*yaml.Node, []*yaml.Node, error) {
+	left, err := e.Left.Eval(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
-	right, err := e.Right.Eval(ctx, nodes)
+	right, err := e.Right.Eval(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
 	return left, right, nil
 }
+
+var _ Expr = (*ArithmeticExpr)(nil)

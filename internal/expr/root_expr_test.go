@@ -1,14 +1,12 @@
 package expr_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
-	"rodusek.dev/pkg/yamlpath/internal/yamlpathctx"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -41,11 +39,9 @@ func TestRootExpr(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			sut := &expr.RootExpr{Root: tc.root}
 
-			ctx := context.Background()
-			ctx = yamlpathctx.SetRoot(ctx, root)
-			ctx = yamlpathctx.SetCurrent(ctx, current)
+			ctx := expr.NewContext(root).SubContext(current)
 
-			got, err := sut.Eval(ctx, nil)
+			got, err := sut.Eval(ctx)
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("RootExpr.Eval() error = %v, want %v", got, want)

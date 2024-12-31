@@ -1,7 +1,6 @@
 package expr_test
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -55,7 +54,7 @@ func TestEqualityExpr(t *testing.T) {
 				Right: tc.right,
 			}
 
-			got, err := sut.Eval(context.Background(), nil)
+			got, err := sut.Eval(expr.NewContext(nil))
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("EqualityExpr.Eval() error = %v, wantErr %v", err, tc.wantErr)

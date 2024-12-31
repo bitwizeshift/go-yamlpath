@@ -5,7 +5,6 @@ YAML, leveraging the go-yaml library.
 package yamlpath
 
 import (
-	"context"
 	"encoding"
 	"fmt"
 
@@ -85,8 +84,8 @@ func (yp *YAMLPath) Match(node *yaml.Node) (Collection, error) {
 		input = []*yaml.Node{node}
 	}
 
-	ctx := context.Background()
-	return yp.expression.Eval(ctx, input)
+	ctx := expr.NewContext(input)
+	return yp.expression.Eval(ctx)
 }
 
 // MustMatch evaluates the YAMLPath expression against the given YAML node,

@@ -1,10 +1,7 @@
 package expr
 
 import (
-	"context"
-
 	"gopkg.in/yaml.v3"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 // SliceExpr is a representation of the `[start:end:step]` slice expression in
@@ -16,10 +13,10 @@ type SliceExpr struct {
 
 // Eval evaluates the slice expression against the provided nodes
 // and returns the resulting nodes that match the slice expression.
-func (s *SliceExpr) Eval(_ context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (s *SliceExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
-	nodes = yamlutil.Normalize(nodes...)
+	nodes := ctx.Current()
 	for _, n := range nodes {
 		if n.Kind != yaml.SequenceNode {
 			continue
@@ -36,3 +33,5 @@ func (s *SliceExpr) Eval(_ context.Context, nodes []*yaml.Node) ([]*yaml.Node, e
 	}
 	return result, nil
 }
+
+var _ Expr = (*SliceExpr)(nil)

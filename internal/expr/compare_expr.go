@@ -1,8 +1,6 @@
 package expr
 
 import (
-	"context"
-
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
@@ -29,12 +27,12 @@ type CompareExpr struct {
 	Compare     Comparator
 }
 
-func (e *CompareExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
-	left, err := e.Left.Eval(ctx, nodes)
+func (e *CompareExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+	left, err := e.Left.Eval(ctx)
 	if err != nil {
 		return nil, err
 	}
-	right, err := e.Right.Eval(ctx, nodes)
+	right, err := e.Right.Eval(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -48,3 +46,5 @@ func (e *CompareExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Nod
 	}
 	return []*yaml.Node{yamlutil.False}, nil
 }
+
+var _ Expr = (*CompareExpr)(nil)

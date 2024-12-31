@@ -1,8 +1,6 @@
 package expr
 
 import (
-	"context"
-
 	"gopkg.in/yaml.v3"
 )
 
@@ -11,8 +9,10 @@ import (
 type RecursiveDescentExpr struct{}
 
 // Eval evaluates the recursive descent operator against the provided nodes.
-func (r *RecursiveDescentExpr) Eval(_ context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (r *RecursiveDescentExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
 	var result []*yaml.Node
+
+	nodes := ctx.Current()
 	for _, node := range nodes {
 		result = append(result, r.flatten(node)...)
 	}
@@ -39,3 +39,5 @@ func (r *RecursiveDescentExpr) flatten(node *yaml.Node) []*yaml.Node {
 	}
 	return result
 }
+
+var _ Expr = (*RecursiveDescentExpr)(nil)

@@ -1,8 +1,6 @@
 package expr
 
 import (
-	"context"
-
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
@@ -14,8 +12,8 @@ type NegationExpr struct {
 }
 
 // Eval evaluates the '!' operator against the provided nodes.
-func (e *NegationExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
-	result, err := e.Expr.Eval(ctx, nodes)
+func (e *NegationExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+	result, err := e.Expr.Eval(ctx)
 	if err != nil {
 		return nil, err
 	}

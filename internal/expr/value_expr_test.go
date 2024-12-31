@@ -1,7 +1,6 @@
 package expr_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -40,7 +39,7 @@ func TestValueExpr(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			sut := &expr.ValueExpr{Nodes: []*yaml.Node{tc.value}}
-			got, err := sut.Eval(context.Background(), tc.input)
+			got, err := sut.Eval(expr.NewContext(tc.input))
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Errorf("ValueExpr.Eval() error = %v, want %v", got, want)

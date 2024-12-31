@@ -1,23 +1,24 @@
 package expr
 
 import (
-	"context"
-
 	"gopkg.in/yaml.v3"
-	"rodusek.dev/pkg/yamlpath/internal/yamlpathctx"
 )
 
+// SequenceExpr is a representation of a sequence of expressions in YAMLPath.
+//
+// Almost every path is composed of sequence expressions that build up the
+// path. For example, the path `$.foo.bar` is composed of three sequence
+// expressions: `$`, `.foo`, and `.bar`.
 type SequenceExpr []Expr
 
-func (s SequenceExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
-	ctx = yamlpathctx.SetRoot(ctx, nodes)
-
-	var err error
+// Eval evaluates the sequence of expressions.
+func (s SequenceExpr) Eval(ctx *Context) (nodes []*yaml.Node, err error) {
 	for _, expr := range s {
-		nodes, err = expr.Eval(yamlpathctx.SetCurrent(ctx, nodes), nodes)
+		nodes, err = expr.Eval(ctx)
 		if err != nil {
 			return nil, err
 		}
+		ctx = ctx.SubContext(nodes)
 	}
 	return nodes, nil
 }

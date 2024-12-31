@@ -1,8 +1,6 @@
 package expr
 
 import (
-	"context"
-
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
@@ -13,8 +11,8 @@ type BooleanAndExpr struct {
 }
 
 // Eval evaluates the boolean AND expression against the given context.
-func (e *BooleanAndExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
-	left, err := e.Left.Eval(ctx, nodes)
+func (e *BooleanAndExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+	left, err := e.Left.Eval(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +20,7 @@ func (e *BooleanAndExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.
 		return []*yaml.Node{yamlutil.False}, nil
 	}
 
-	right, err := e.Right.Eval(ctx, nodes)
+	right, err := e.Right.Eval(ctx)
 	if err != nil {
 		return nil, err
 	}

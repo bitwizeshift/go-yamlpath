@@ -1,7 +1,6 @@
 package expr_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -70,7 +69,7 @@ func TestFieldExpr(t *testing.T) {
 				Fields: tc.fields,
 			}
 
-			got, err := sut.Eval(context.Background(), tc.input)
+			got, err := sut.Eval(expr.NewContext(tc.input))
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("FieldExpr.Eval() error = %v, want %v", got, want)

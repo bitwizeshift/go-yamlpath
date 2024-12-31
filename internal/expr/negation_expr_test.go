@@ -1,7 +1,6 @@
 package expr_test
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -44,7 +43,7 @@ func TestNegationExpr(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			sut := &expr.NegationExpr{Expr: tc.expr}
 
-			got, err := sut.Eval(context.Background(), tc.input)
+			got, err := sut.Eval(expr.NewContext(tc.input))
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Errorf("NegationExpr.Eval() error = %v, want %v", got, want)

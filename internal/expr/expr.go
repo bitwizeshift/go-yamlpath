@@ -1,8 +1,6 @@
 package expr
 
 import (
-	"context"
-
 	"gopkg.in/yaml.v3"
 )
 
@@ -10,5 +8,5 @@ import (
 // node.
 type Expr interface {
 	// Eval evaluates the expression against the given context.
-	Eval(ctx context.Context, node []*yaml.Node) ([]*yaml.Node, error)
+	Eval(ctx *Context) ([]*yaml.Node, error)
 }

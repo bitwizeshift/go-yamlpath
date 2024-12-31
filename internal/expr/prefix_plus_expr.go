@@ -1,8 +1,6 @@
 package expr
 
 import (
-	"context"
-
 	"gopkg.in/yaml.v3"
 )
 
@@ -16,8 +14,8 @@ type PrefixPlusExpr struct {
 }
 
 // Eval evaluates the unary '+' operator against the provided nodes.
-func (e *PrefixPlusExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
-	result, err := e.Expr.Eval(ctx, nodes)
+func (e *PrefixPlusExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+	result, err := e.Expr.Eval(ctx)
 	if err != nil {
 		return nil, err
 	}

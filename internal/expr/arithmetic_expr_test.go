@@ -168,7 +168,7 @@ func TestArithmeticExpr(t *testing.T) {
 				Operation: operation,
 			}
 
-			got, err := sut.Eval(nil, nil)
+			got, err := sut.Eval(expr.NewContext(nil))
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("ArithmeticExpr.Eval() error = %v, wantErr %v", err, tc.wantErr)

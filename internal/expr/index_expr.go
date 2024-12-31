@@ -1,10 +1,7 @@
 package expr
 
 import (
-	"context"
-
 	"gopkg.in/yaml.v3"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 // IndexExpr is a representation of the indexing operator `[...]` in YAMLPath
@@ -20,10 +17,10 @@ type IndexExpr struct {
 }
 
 // Eval evaluates the index expression against the given nodes.
-func (i *IndexExpr) Eval(_ context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (i *IndexExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
-	nodes = yamlutil.Normalize(nodes...)
+	nodes := ctx.Current()
 	for _, n := range nodes {
 		if n.Kind != yaml.SequenceNode {
 			continue
@@ -40,3 +37,5 @@ func (i *IndexExpr) Eval(_ context.Context, nodes []*yaml.Node) ([]*yaml.Node, e
 	}
 	return result, nil
 }
+
+var _ Expr = (*IndexExpr)(nil)

@@ -1,7 +1,6 @@
 package expr
 
 import (
-	"context"
 	"fmt"
 
 	"gopkg.in/yaml.v3"
@@ -16,8 +15,8 @@ type ScriptExpr struct {
 
 // Eval evaluates the script expression by evaluating the expression and
 // using the result as a key to extract a value from the input nodes.
-func (e *ScriptExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
-	scriptNodes, err := e.Expr.Eval(ctx, nodes)
+func (e *ScriptExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+	scriptNodes, err := e.Expr.Eval(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +34,7 @@ func (e *ScriptExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node
 	if err != nil {
 		return nil, err
 	}
-	return expr.Eval(ctx, nodes)
+	return expr.Eval(ctx)
 }
 
 func (e *ScriptExpr) createExpr(node *yaml.Node) (Expr, error) {
@@ -52,3 +51,5 @@ func (e *ScriptExpr) createExpr(node *yaml.Node) (Expr, error) {
 	}
 	return nil, NewTagError("script operator '(...)'", "!!str or !!int", node.Tag)
 }
+
+var _ Expr = (*ScriptExpr)(nil)

@@ -110,7 +110,7 @@ func TestCompareExpr(t *testing.T) {
 				Compare: compare,
 			}
 
-			got, err := sut.Eval(nil, nil)
+			got, err := sut.Eval(expr.NewContext(nil))
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("CompareExpr.Eval() error = %v, wantErr %v", err, tc.wantErr)

@@ -1,7 +1,6 @@
 package expr_test
 
 import (
-	"context"
 	"math"
 	"testing"
 
@@ -61,7 +60,7 @@ func TestSliceExpr(t *testing.T) {
 				Slice: tc.slice,
 			}
 
-			got, err := sut.Eval(context.Background(), tc.input)
+			got, err := sut.Eval(expr.NewContext(tc.input))
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Errorf("SliceExpr.Eval() error = %v, want %v", got, want)

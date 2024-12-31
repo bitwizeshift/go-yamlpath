@@ -1,7 +1,6 @@
 package expr_test
 
 import (
-	"context"
 	"errors"
 	"regexp"
 	"testing"
@@ -68,7 +67,7 @@ func TestMatchExpr(t *testing.T) {
 				Regex: regexp.MustCompile(tc.regex),
 			}
 
-			got, err := sut.Eval(context.Background(), nil)
+			got, err := sut.Eval(expr.NewContext(nil))
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Errorf("MatchExpr.Eval() error = %v, want %v", got, want)

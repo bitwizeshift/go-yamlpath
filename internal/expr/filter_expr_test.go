@@ -1,7 +1,6 @@
 package expr_test
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -33,7 +32,8 @@ func TestFilterExpr(t *testing.T) {
 			wantErr: testErr,
 		}, {
 			name: "Includs only filtered values",
-			expr: ExprFunc(func(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+			expr: ExprFunc(func(ctx *expr.Context) ([]*yaml.Node, error) {
+				nodes := ctx.Current()
 				if nodes[0].Value == "hello" {
 					return []*yaml.Node{yamlutil.True}, nil
 				}
@@ -50,7 +50,7 @@ func TestFilterExpr(t *testing.T) {
 				Expr: tc.expr,
 			}
 
-			got, err := sut.Eval(context.Background(), tc.input)
+			got, err := sut.Eval(expr.NewContext(tc.input))
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("FilterExpr.Eval() error = %v, want %v", got, want)

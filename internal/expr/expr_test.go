@@ -1,7 +1,6 @@
 package expr_test
 
 import (
-	"context"
 	"testing"
 
 	"gopkg.in/yaml.v3"
@@ -10,25 +9,25 @@ import (
 )
 
 // ExprFunc is a function that implements the Expr interface
-type ExprFunc func(ctx context.Context, node []*yaml.Node) ([]*yaml.Node, error)
+type ExprFunc func(ctx *expr.Context) ([]*yaml.Node, error)
 
 // Eval calls the function
-func (f ExprFunc) Eval(ctx context.Context, node []*yaml.Node) ([]*yaml.Node, error) {
-	return f(ctx, node)
+func (f ExprFunc) Eval(ctx *expr.Context) ([]*yaml.Node, error) {
+	return f(ctx)
 }
 
 var _ expr.Expr = (*ExprFunc)(nil)
 
 // ExprReturnsError returns an Expr that returns an error.
 func ExprReturnsError(err error) expr.Expr {
-	return ExprFunc(func(ctx context.Context, node []*yaml.Node) ([]*yaml.Node, error) {
+	return ExprFunc(func(*expr.Context) ([]*yaml.Node, error) {
 		return nil, err
 	})
 }
 
 // ExprReturnsNodes returns an Expr that returns the given nodes.
 func ExprReturnsNodes(nodes ...*yaml.Node) expr.Expr {
-	return ExprFunc(func(ctx context.Context, node []*yaml.Node) ([]*yaml.Node, error) {
+	return ExprFunc(func(*expr.Context) ([]*yaml.Node, error) {
 		return nodes, nil
 	})
 }

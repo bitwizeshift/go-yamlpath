@@ -1,7 +1,6 @@
 package expr
 
 import (
-	"context"
 	"regexp"
 
 	"gopkg.in/yaml.v3"
@@ -15,8 +14,8 @@ type MatchExpr struct {
 }
 
 // Eval evaluates the match expression against the given nodes.
-func (e *MatchExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
-	left, err := e.Expr.Eval(ctx, nodes)
+func (e *MatchExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+	left, err := e.Expr.Eval(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -64,7 +64,7 @@ func TestBinaryOrExpr(t *testing.T) {
 				Right: tc.right,
 			}
 
-			got, err := sut.Eval(nil, nil)
+			got, err := sut.Eval(expr.NewContext(nil))
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("BooleanOrExpr.Eval() error = %v, wantErr %v", err, tc.wantErr)

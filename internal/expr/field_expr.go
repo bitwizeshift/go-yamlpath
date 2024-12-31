@@ -1,10 +1,7 @@
 package expr
 
 import (
-	"context"
-
 	"gopkg.in/yaml.v3"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 // FieldExpr extracts the fields from the nodes that match the named fields.
@@ -14,10 +11,10 @@ type FieldExpr struct {
 
 // Eval evaluates the field expression by extracting the fields from the nodes
 // that match the named fields.
-func (e *FieldExpr) Eval(_ context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (e *FieldExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
-	nodes = yamlutil.Normalize(nodes...)
+	nodes := ctx.Current()
 	for _, n := range nodes {
 		if n.Kind != yaml.MappingNode {
 			continue
@@ -32,3 +29,5 @@ func (e *FieldExpr) Eval(_ context.Context, nodes []*yaml.Node) ([]*yaml.Node, e
 	}
 	return result, nil
 }
+
+var _ Expr = (*FieldExpr)(nil)

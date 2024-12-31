@@ -1,8 +1,6 @@
 package expr
 
 import (
-	"context"
-
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
@@ -14,8 +12,8 @@ type InExpr struct {
 
 // Eval evaluates the in expression by checking if the left-hand side is in the
 // right-hand side.
-func (e *InExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
-	left, err := e.Left.Eval(ctx, nodes)
+func (e *InExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+	left, err := e.Left.Eval(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +24,7 @@ func (e *InExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, er
 		return nil, NewSingletonError("operator 'in'", len(left))
 	}
 
-	right, err := e.Right.Eval(ctx, nodes)
+	right, err := e.Right.Eval(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -54,3 +52,5 @@ func (e *InExpr) unwrap(nodes []*yaml.Node) []*yaml.Node {
 	}
 	return nodes
 }
+
+var _ Expr = (*InExpr)(nil)

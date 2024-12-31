@@ -1,10 +1,7 @@
 package expr
 
 import (
-	"context"
-
 	"gopkg.in/yaml.v3"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 // WildcardExpr is a representation of the `.*` and `[*]` expressions in
@@ -13,10 +10,10 @@ import (
 type WildcardExpr struct{}
 
 // Eval evaluates the wildcard expression against the provided nodes.
-func (*WildcardExpr) Eval(_ context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (*WildcardExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
-	nodes = yamlutil.Normalize(nodes...)
+	nodes := ctx.Current()
 	for _, n := range nodes {
 		switch n.Kind {
 		case yaml.MappingNode:
@@ -29,3 +26,5 @@ func (*WildcardExpr) Eval(_ context.Context, nodes []*yaml.Node) ([]*yaml.Node, 
 	}
 	return result, nil
 }
+
+var _ Expr = (*WildcardExpr)(nil)

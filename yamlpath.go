@@ -40,7 +40,10 @@ type YAMLPath struct {
 // On error, this will return a [CompileError] that can be used to determine
 // the cause of the error, and the location where the error occurs.
 func Compile(path string) (*YAMLPath, error) {
-	expr, err := compile.NewTree(path)
+	cfg := &compile.Config{
+		Table: tableV1,
+	}
+	expr, err := compile.NewTree(path, cfg)
 	if err != nil {
 		return nil, err
 	}

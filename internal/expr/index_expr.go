@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
 // IndexExpr is a representation of the indexing operator `[...]` in YAMLPath
@@ -17,7 +18,7 @@ type IndexExpr struct {
 }
 
 // Eval evaluates the index expression against the given nodes.
-func (i *IndexExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (i *IndexExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes := ctx.Current()

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
 // RootExpr represents a root expression, either '$' or '@' in the path.
@@ -12,7 +13,7 @@ type RootExpr struct {
 }
 
 // Eval evaluates the root expression.
-func (e *RootExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (e *RootExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	if e.Root == "$" {
 		return ctx.Root(), nil
 	}

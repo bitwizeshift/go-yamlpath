@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
 // PrefixPlusExpr is a representation of the unary '+' operator in YAMLPath.
@@ -14,7 +15,7 @@ type PrefixPlusExpr struct {
 }
 
 // Eval evaluates the unary '+' operator against the provided nodes.
-func (e *PrefixPlusExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (e *PrefixPlusExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	result, err := e.Expr.Eval(ctx)
 	if err != nil {
 		return nil, err

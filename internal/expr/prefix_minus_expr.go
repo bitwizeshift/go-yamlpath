@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -9,7 +10,7 @@ type PrefixMinusExpr struct {
 	Expr Expr
 }
 
-func (e *PrefixMinusExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (e *PrefixMinusExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	rest, err := e.Expr.Eval(ctx)
 	if err != nil {
 		return nil, err

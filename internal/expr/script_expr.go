@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -15,7 +16,7 @@ type ScriptExpr struct {
 
 // Eval evaluates the script expression by evaluating the expression and
 // using the result as a key to extract a value from the input nodes.
-func (e *ScriptExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (e *ScriptExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	scriptNodes, err := e.Expr.Eval(ctx)
 	if err != nil {
 		return nil, err

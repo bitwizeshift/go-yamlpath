@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -12,7 +13,7 @@ type EqualityExpr struct {
 }
 
 // Eval evaluates the equality expression against the given nodes.
-func (e *EqualityExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (e *EqualityExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	left, err := e.Left.Eval(ctx)
 	if err != nil {
 		return nil, err

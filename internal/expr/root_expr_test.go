@@ -39,7 +39,7 @@ func TestRootExpr(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			sut := &expr.RootExpr{Root: tc.root}
 
-			ctx := expr.NewContext(root).SubContext(current)
+			ctx := expr.NewContext(root).NewContext(current)
 
 			got, err := sut.Eval(ctx)
 

@@ -4,6 +4,7 @@ import (
 	"regexp"
 
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -14,7 +15,7 @@ type MatchExpr struct {
 }
 
 // Eval evaluates the match expression against the given nodes.
-func (e *MatchExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (e *MatchExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	left, err := e.Expr.Eval(ctx)
 	if err != nil {
 		return nil, err

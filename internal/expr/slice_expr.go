@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
 // SliceExpr is a representation of the `[start:end:step]` slice expression in
@@ -13,7 +14,7 @@ type SliceExpr struct {
 
 // Eval evaluates the slice expression against the provided nodes
 // and returns the resulting nodes that match the slice expression.
-func (s *SliceExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (s *SliceExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes := ctx.Current()

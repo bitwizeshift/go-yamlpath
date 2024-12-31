@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
 // RecursiveDescentExpr is a representation of the recursive descent operator in
@@ -9,7 +10,7 @@ import (
 type RecursiveDescentExpr struct{}
 
 // Eval evaluates the recursive descent operator against the provided nodes.
-func (r *RecursiveDescentExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (r *RecursiveDescentExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes := ctx.Current()

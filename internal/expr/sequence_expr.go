@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
 // SequenceExpr is a representation of a sequence of expressions in YAMLPath.
@@ -12,13 +13,13 @@ import (
 type SequenceExpr []Expr
 
 // Eval evaluates the sequence of expressions.
-func (s SequenceExpr) Eval(ctx *Context) (nodes []*yaml.Node, err error) {
+func (s SequenceExpr) Eval(ctx invocation.Context) (nodes []*yaml.Node, err error) {
 	for _, expr := range s {
 		nodes, err = expr.Eval(ctx)
 		if err != nil {
 			return nil, err
 		}
-		ctx = ctx.SubContext(nodes)
+		ctx = ctx.NewContext(nodes)
 	}
 	return nodes, nil
 }

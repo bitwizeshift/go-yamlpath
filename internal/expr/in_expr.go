@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -12,7 +13,7 @@ type InExpr struct {
 
 // Eval evaluates the in expression by checking if the left-hand side is in the
 // right-hand side.
-func (e *InExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (e *InExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	left, err := e.Left.Eval(ctx)
 	if err != nil {
 		return nil, err

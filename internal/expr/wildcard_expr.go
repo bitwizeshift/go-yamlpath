@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
 // WildcardExpr is a representation of the `.*` and `[*]` expressions in
@@ -10,7 +11,7 @@ import (
 type WildcardExpr struct{}
 
 // Eval evaluates the wildcard expression against the provided nodes.
-func (*WildcardExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (*WildcardExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes := ctx.Current()

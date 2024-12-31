@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -13,7 +14,7 @@ type SubsetOfExpr struct {
 
 // Eval evaluates the subset-of expression by checking if the left-hand side
 // is a subset of the right-hand side.
-func (e *SubsetOfExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (e *SubsetOfExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	left, err := e.Left.Eval(ctx)
 	if err != nil {
 		return nil, err

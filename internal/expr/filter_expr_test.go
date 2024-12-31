@@ -9,6 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -33,7 +34,7 @@ func TestFilterExpr(t *testing.T) {
 			wantErr: testErr,
 		}, {
 			name: "Includs only filtered values",
-			expr: exprtest.Func(func(ctx *expr.Context) ([]*yaml.Node, error) {
+			expr: exprtest.Func(func(ctx invocation.Context) ([]*yaml.Node, error) {
 				nodes := ctx.Current()
 				if nodes[0].Value == "hello" {
 					return []*yaml.Node{yamlutil.True}, nil

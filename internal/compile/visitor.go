@@ -9,12 +9,15 @@ import (
 	"github.com/antlr4-go/antlr/v4"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/parser"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 // Visitor is a visitor that walks the parse tree to generate an expression
-type Visitor struct{}
+type Visitor struct {
+	FuncTable *invocation.Table
+}
 
 // VisitRoot visits the root of the parse tree
 func (v *Visitor) VisitRoot(ctx parser.IPathContext) (expr.Expr, error) {
@@ -122,8 +125,31 @@ func (v *Visitor) visitWildcardInvocation(_ *parser.WildcardInvocationContext) (
 }
 
 func (v *Visitor) visitFunctionInvocation(ctx *parser.FunctionInvocationContext) (expr.Expr, error) {
-	return nil, ErrInternalf(ctx, "function invocation not yet implemented")
+	params, err := v.visitParamList(ctx.ParamList())
+	if err != nil {
+		return nil, err
+	}
+	identifier := ctx.Identifier().GetText()
+	entry, ok := v.FuncTable.Lookup(identifier)
+	if !ok {
+		return nil, NewSemanticErrorf(ctx, "unknown function: %s", identifier)
+	}
+	if err := entry.TestArity(len(params)); err != nil {
+		return nil, NewSemanticErrorf(ctx, "%w", err)
+	}
+	return &expr.FuncExpr{
+		Func:       entry,
+		Parameters: params,
+	}, nil
 }
+
+type parameter struct{ expr.Expr }
+
+func (p parameter) GetArg(ctx invocation.Context) ([]*yaml.Node, error) {
+	return p.Eval(ctx)
+}
+
+var _ invocation.Parameter = (*parameter)(nil)
 
 //------------------------------------------------------------------------------
 // BracketParams
@@ -556,14 +582,17 @@ func (v *Visitor) getTreeText(tree antlr.Tree) string {
 	return tree.(interface{ GetText() string }).GetText()
 }
 
-func (v *Visitor) visitParamList(ctx parser.IParamListContext) ([]expr.Expr, error) {
-	var params []expr.Expr
+func (v *Visitor) visitParamList(ctx parser.IParamListContext) ([]invocation.Parameter, error) {
+	if ctx == nil {
+		return nil, nil
+	}
+	var params []invocation.Parameter
 	for _, sub := range ctx.AllSubexpression() {
 		e, err := v.visitSubexpression(sub)
 		if err != nil {
 			return nil, err
 		}
-		params = append(params, e)
+		params = append(params, parameter{e})
 	}
 	return params, nil
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -12,7 +13,7 @@ type ConcatExpr struct {
 	Left, Right Expr
 }
 
-func (e *ConcatExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (e *ConcatExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	left, right, err := e.eval(ctx)
 	if err != nil {
 		return nil, err
@@ -51,7 +52,7 @@ func (e *ConcatExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
 	return nil, fmt.Errorf("%w: %s and %s are not compatible for '+' operator", ErrEval, lhs.Tag, rhs.Tag)
 }
 
-func (e *ConcatExpr) eval(ctx *Context) ([]*yaml.Node, []*yaml.Node, error) {
+func (e *ConcatExpr) eval(ctx invocation.Context) ([]*yaml.Node, []*yaml.Node, error) {
 	left, err := e.Left.Eval(ctx)
 	if err != nil {
 		return nil, nil, err

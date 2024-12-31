@@ -6,6 +6,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"rodusek.dev/pkg/yamlpath/internal/compile"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
 // Note: This test is not evaluating that the expression tree returned from
@@ -174,7 +175,10 @@ func TestNewTree(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := compile.NewTree(tc.input)
+			table := invocation.NewTable()
+			got, err := compile.NewTree(tc.input, &compile.Config{
+				Table: table,
+			})
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("NewTree(%q) error = %v, want %v", tc.input, got, want)

@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
 // FieldExpr extracts the fields from the nodes that match the named fields.
@@ -11,7 +12,7 @@ type FieldExpr struct {
 
 // Eval evaluates the field expression by extracting the fields from the nodes
 // that match the named fields.
-func (e *FieldExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (e *FieldExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes := ctx.Current()

@@ -3,6 +3,7 @@ package expr
 import (
 	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -43,7 +44,7 @@ type ArithmeticExpr struct {
 }
 
 // Eval evaluates the arithmetic expression against the given context.
-func (e *ArithmeticExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
+func (e *ArithmeticExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	left, right, err := e.eval(ctx)
 	if err != nil {
 		return nil, err
@@ -84,7 +85,7 @@ func (e *ArithmeticExpr) Eval(ctx *Context) ([]*yaml.Node, error) {
 	return []*yaml.Node{yamlutil.Number(result.String())}, nil
 }
 
-func (e *ArithmeticExpr) eval(ctx *Context) ([]*yaml.Node, []*yaml.Node, error) {
+func (e *ArithmeticExpr) eval(ctx invocation.Context) ([]*yaml.Node, []*yaml.Node, error) {
 	left, err := e.Left.Eval(ctx)
 	if err != nil {
 		return nil, nil, err

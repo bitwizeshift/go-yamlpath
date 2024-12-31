@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
 // ValueExpr is an expression that always returns the specified value.
@@ -12,7 +13,7 @@ type ValueExpr struct {
 }
 
 // Eval evaluates the expression and returns the specified value.
-func (e *ValueExpr) Eval(*Context) ([]*yaml.Node, error) {
+func (e *ValueExpr) Eval(invocation.Context) ([]*yaml.Node, error) {
 	return e.Nodes, nil
 }
 

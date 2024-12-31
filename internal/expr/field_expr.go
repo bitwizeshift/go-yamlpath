@@ -9,12 +9,12 @@ import (
 
 // FieldExpr extracts the fields from the nodes that match the named fields.
 type FieldExpr struct {
-	Names []string
+	Fields []string
 }
 
 // Eval evaluates the field expression by extracting the fields from the nodes
 // that match the named fields.
-func (e *FieldExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+func (e *FieldExpr) Eval(_ context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes = yamlutil.Normalize(nodes...)
@@ -22,7 +22,7 @@ func (e *FieldExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node,
 		if n.Kind != yaml.MappingNode {
 			continue
 		}
-		for _, name := range e.Names {
+		for _, name := range e.Fields {
 			for i := 0; (i + 1) < len(n.Content); i += 2 {
 				if n.Content[i].Value == name {
 					result = append(result, n.Content[i+1])

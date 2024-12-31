@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/antlr4-go/antlr/v4"
-	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/parser"
@@ -114,7 +113,7 @@ func (v *Visitor) visitInvocation(ctx parser.IInvocationContext) (expr.Expr, err
 
 func (v *Visitor) visitMemberInvocation(ctx *parser.MemberInvocationContext) (expr.Expr, error) {
 	return &expr.FieldExpr{
-		Names: []string{ctx.GetText()},
+		Fields: []string{ctx.GetText()},
 	}, nil
 }
 
@@ -158,7 +157,7 @@ func (v *Visitor) visitUnionStringBracket(ctx *parser.UnionStringBracketContext)
 		names = append(names, name)
 	}
 	return &expr.FieldExpr{
-		Names: names,
+		Fields: names,
 	}, nil
 }
 
@@ -281,15 +280,13 @@ func (v *Visitor) visitAdditiveSubexpression(ctx *parser.AdditiveSubexpressionCo
 		}, nil
 	case "-":
 		return &expr.ArithmeticExpr{
-			Left:  lhs,
-			Right: rhs,
-			Operation: func(lhs, rhs decimal.Decimal) decimal.Decimal {
-				return lhs.Sub(rhs)
-			},
+			Left:      lhs,
+			Right:     rhs,
+			Operation: expr.Subtraction,
 		}, nil
 	}
 
-	return nil, ErrInternalf(ctx, "unknown binary operator: %q", "")
+	return nil, ErrInternalf(ctx, "unhandled binary operator: %q", "")
 }
 
 func (v *Visitor) visitMultiplicativeSubexpression(ctx *parser.MultiplicativeSubexpressionContext) (expr.Expr, error) {
@@ -298,35 +295,22 @@ func (v *Visitor) visitMultiplicativeSubexpression(ctx *parser.MultiplicativeSub
 		return nil, err
 	}
 	op := v.getTreeText(ctx.GetChild(1))
+	var operation expr.ArithmeticOp
 	switch op {
 	case "*":
-		return &expr.ArithmeticExpr{
-			Left:  lhs,
-			Right: rhs,
-			Operation: func(lhs, rhs decimal.Decimal) decimal.Decimal {
-				return lhs.Mul(rhs)
-			},
-		}, nil
+		operation = expr.Multiplication
 	case "/":
-		return &expr.ArithmeticExpr{
-			Left:  lhs,
-			Right: rhs,
-			Operation: func(lhs, rhs decimal.Decimal) decimal.Decimal {
-				return lhs.Div(rhs)
-			},
-		}, nil
+		operation = expr.Division
 	case "%":
-		return &expr.ArithmeticExpr{
-			Left:  lhs,
-			Right: rhs,
-			Operation: func(lhs, rhs decimal.Decimal) decimal.Decimal {
-				return lhs.Mod(rhs)
-			},
-		}, nil
+		operation = expr.Modulus
+	default:
+		return nil, ErrInternalf(ctx, "unhandled binary operator %q", op)
 	}
-	_, _ = lhs, rhs
-
-	return nil, ErrInternalf(ctx, "unknown binary operator %q", op)
+	return &expr.ArithmeticExpr{
+		Left:      lhs,
+		Right:     rhs,
+		Operation: operation,
+	}, nil
 }
 
 func (v *Visitor) visitInequalitySubexpression(ctx *parser.InequalitySubexpressionContext) (expr.Expr, error) {
@@ -335,34 +319,24 @@ func (v *Visitor) visitInequalitySubexpression(ctx *parser.InequalitySubexpressi
 		return nil, err
 	}
 	op := v.getTreeText(ctx.GetChild(1))
+	var compare expr.Comparator
 	switch op {
 	case "<":
-		return &expr.LessExpr{
-			Left:  lhs,
-			Right: rhs,
-		}, nil
+		compare = expr.CompareLess
 	case "<=":
-		return &expr.NegationExpr{
-			Expr: &expr.LessExpr{
-				Left:  rhs,
-				Right: lhs,
-			},
-		}, nil
+		compare = expr.CompareLessEqual
 	case ">":
-		return &expr.LessExpr{
-			Left:  rhs,
-			Right: lhs,
-		}, nil
+		compare = expr.CompareGreater
 	case ">=":
-		return &expr.NegationExpr{
-			Expr: &expr.LessExpr{
-				Left:  lhs,
-				Right: rhs,
-			},
-		}, nil
+		compare = expr.CompareGreaterEqual
+	default:
+		return nil, ErrInternalf(ctx, "unhandled operator %q", op)
 	}
-
-	return nil, ErrInternalf(ctx, "unknown binary operator %q", op)
+	return &expr.CompareExpr{
+		Left:    lhs,
+		Right:   rhs,
+		Compare: compare,
+	}, nil
 }
 
 func (v *Visitor) visitEqualitySubexpression(ctx *parser.EqualitySubexpressionContext) (expr.Expr, error) {

@@ -19,6 +19,9 @@ func (e *InExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, er
 	if err != nil {
 		return nil, err
 	}
+	if len(left) == 0 {
+		return nil, nil
+	}
 	if len(left) != 1 {
 		return nil, NewSingletonError("operator 'in'", len(left))
 	}
@@ -26,6 +29,10 @@ func (e *InExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, er
 	right, err := e.Right.Eval(ctx, nodes)
 	if err != nil {
 		return nil, err
+	}
+	// All non-empty sets contain the empty set
+	if len(right) == 0 {
+		return nil, nil
 	}
 	right = e.unwrap(right)
 

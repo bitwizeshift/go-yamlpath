@@ -8,7 +8,7 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
-// MatchExpr represents a regular expression match expression in the AST.
+// MatchExpr represents a regular expression match expression in YAMLPath.
 type MatchExpr struct {
 	Regex *regexp.Regexp
 	Expr  Expr

@@ -48,7 +48,7 @@ func (e *ScriptExpr) createExpr(node *yaml.Node) (Expr, error) {
 		return &IndexExpr{Indices: []int64{int64(key)}}, nil
 
 	case "!!str":
-		return &FieldExpr{Names: []string{node.Value}}, nil
+		return &FieldExpr{Fields: []string{node.Value}}, nil
 	}
 	return nil, NewTagError("script operator '(...)'", "!!str or !!int", node.Tag)
 }

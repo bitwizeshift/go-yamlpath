@@ -18,15 +18,21 @@ func (e *ConcatExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node
 	if err != nil {
 		return nil, err
 	}
-	if len(left) > 1 || len(right) > 1 {
-		return nil, fmt.Errorf("concat expressions must have exactly one left and right value")
+	if len(left) > 1 {
+		return nil, NewSingletonError("concatenation", len(left))
+	}
+	if len(right) > 1 {
+		return nil, NewSingletonError("concatenation", len(right))
 	}
 	if len(left) == 0 || len(right) == 0 {
 		return nil, nil
 	}
 	lhs, rhs := left[0], right[0]
-	if lhs.Kind != yaml.ScalarNode || rhs.Kind != yaml.ScalarNode {
-		return nil, fmt.Errorf("multiplicative expressions must have scalar nodes")
+	if lhs.Kind != yaml.ScalarNode {
+		return nil, NewKindError("concatenation", lhs.Kind, yaml.ScalarNode)
+	}
+	if rhs.Kind != yaml.ScalarNode {
+		return nil, NewKindError("concatenation", rhs.Kind, yaml.ScalarNode)
 	}
 	if (lhs.Tag == "!!int" || lhs.Tag == "!!float") && (rhs.Tag == "!!float" || rhs.Tag == "!!int") {
 		lv, err := decimal.NewFromString(lhs.Value)
@@ -43,7 +49,7 @@ func (e *ConcatExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node
 		concat := lhs.Value + rhs.Value
 		return []*yaml.Node{yamlutil.String(concat)}, nil
 	}
-	return nil, fmt.Errorf("add/concat expressions must have scalar nodes of type int, float, or string")
+	return nil, fmt.Errorf("%w: %s and %s are not compatible for '+' operator", ErrEval, lhs.Tag, rhs.Tag)
 }
 
 func (e *ConcatExpr) eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, []*yaml.Node, error) {

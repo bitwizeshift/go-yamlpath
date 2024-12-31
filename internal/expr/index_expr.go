@@ -7,11 +7,20 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
+// IndexExpr is a representation of the indexing operator `[...]` in YAMLPath
+// for numeric indexing of sequences.
+//
+// This implements both union-indexing, which allows multiple selection, as well
+// as just individual indexing. If an index is out-of-bounds, it is not selected
+// -- no error is returned.
+//
+// Negative indices allow selecting from the reverse side.
 type IndexExpr struct {
 	Indices []int64
 }
 
-func (i *IndexExpr) Eval(ctx context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
+// Eval evaluates the index expression against the given nodes.
+func (i *IndexExpr) Eval(_ context.Context, nodes []*yaml.Node) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes = yamlutil.Normalize(nodes...)

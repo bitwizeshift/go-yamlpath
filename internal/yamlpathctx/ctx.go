@@ -29,12 +29,12 @@ func GetRoot(ctx context.Context) []*yaml.Node {
 
 // SetCurrent sets the current node in the context.
 func SetCurrent(ctx context.Context, current []*yaml.Node) context.Context {
-	return context.WithValue(ctx, ctxKeyRoot, current)
+	return context.WithValue(ctx, ctxKeyCurrent, current)
 }
 
 // GetCurrent returns the current node from the context.
 func GetCurrent(ctx context.Context) []*yaml.Node {
-	current := ctx.Value(ctxKeyRoot)
+	current := ctx.Value(ctxKeyCurrent)
 	if current == nil {
 		return nil
 	}

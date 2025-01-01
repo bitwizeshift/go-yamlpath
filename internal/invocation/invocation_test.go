@@ -11,8 +11,6 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
-type exampleFunc = func(invocation.Context, ...invocation.Parameter) ([]*yaml.Node, error)
-
 func TestTable_Lookup(t *testing.T) {
 	testCases := []struct {
 		name   string

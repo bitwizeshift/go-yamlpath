@@ -1,0 +1,157 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Build
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build-and-test:
+    name: Test ${{ matrix.os.name }}
+    runs-on: ${{ matrix.os.image }}
+    strategy:
+      matrix:
+        os:
+          - name: Ubuntu
+            image: ubuntu-24.04
+          - name: Windows
+            image: windows-2025
+          - name: macOS
+            image: macos-15
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Vet
+        run: go vet -unreachable=false ./...
+
+      - name: Lint
+        if: (success() || failure())
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
+      - name: Build
+        if: (success() || failure())
+        run: go build -v ./...
+
+      - name: Test
+        if: (success() || failure())
+        id: test
+        shell: bash
+        run: |
+          # Compute the *nix path to the temporary directory, since 'runner.temp'
+          # is in a OS-specific format.
+          temp_dir="$(cd '${{ runner.temp }}'; pwd)"
+          out_dir="${temp_dir}/coverage"
+          mkdir -p "${out_dir}"
+
+          # Windows paths need to be handled in backslash notation for piping
+          # into upload-artifact.
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            echo 'coverage-dir=${{ runner.temp }}\coverage' >> "${GITHUB_OUTPUT}"
+          else
+            echo "coverage-dir=${out_dir}" >> "${GITHUB_OUTPUT}"
+          fi
+
+          go test -cover -v ./... -args -test.gocoverdir="${out_dir}"
+
+      - name: Compliance Test
+        if: (success() || failure())
+        run: go test -v ./test/...
+
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          path: "${{ steps.test.outputs.coverage-dir }}"
+          name: ${{ matrix.os.image }}-raw-coverage
+          retention-days: 1
+
+  report:
+    name: Generate Coverage Report
+    runs-on: ubuntu-24.04
+    needs: build-and-test
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Download Coverage
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-raw-coverage"
+          path: "${{ runner.temp }}"
+
+      - name: Merge Coverage
+        id: merge
+        run: |
+          coverage_dirs=($(find "${{ runner.temp }}" -type d -depth -maxdepth 1))
+          input_arg=""
+          delim=""
+          # This hack is because go tool covdata merge is documented to only use
+          # a comma-separated list of directories instead of any more common-sense
+          # approaches like repeating -i flags.
+          for dir in "${coverage_dirs[@]}"; do
+            input_arg="${input_arg}${delim}${dir}"
+            delim=","
+          done
+
+          echo "${input_arg}"
+
+          out_dir="$(mktemp -d)"
+
+          go tool covdata merge                                                \
+            -i "${input_arg}"                                                  \
+            -o "${out_dir}"
+
+          echo "coverage-dir=${out_dir}" >> "${GITHUB_OUTPUT}"
+
+      - name: Compute Coverage Percent
+        id: coverage
+        run: |
+          coverage=$(go tool covdata func -i="${{ steps.merge.outputs.coverage-dir }}" | fgrep total | awk '{print $3}')
+          echo "percent=${coverage}" >> "${GITHUB_OUTPUT}"
+          echo "::notice title=Coverage::Test-coverage is ${coverage}%"
+
+      - name: Generate Report
+        id: report
+        run: |
+          coverage_dir="${{ steps.merge.outputs.coverage-dir }}"
+          text_file="$(pwd)/coverage.txt"
+          html_file="$(pwd)/coverage.html"
+          go tool covdata textfmt -i="${coverage_dir}" -o "${text_file}"
+          go tool cover -html "${text_file}" -o "${html_file}"
+
+          echo "text-coverage=${text_file}" >> "${GITHUB_OUTPUT}"
+          echo "html-coverage=${html_file}" >> "${GITHUB_OUTPUT}"
+
+      - name: Upload Text Report
+        uses: actions/upload-artifact@v4
+        with:
+          path: "${{ steps.report.outputs.text-coverage }}"
+          name: text-coverage
+          retention-days: 7
+
+      - name: Upload HTML Report
+        uses: actions/upload-artifact@v4
+        with:
+          path: "${{ steps.report.outputs.html-coverage }}"
+          name: html-coverage
+          retention-days: 7

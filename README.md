@@ -1,5 +1,6 @@
 # YAMLPath
 
+[![Build](https://github.com/bitwizeshift/go-yamlpath/actions/workflows/build-and-test.yaml/badge.svg)](https://github.com/bitwizeshift/go-yamlpath/actions/workflows/build-and-test.yaml)
 [![GoDoc](https://godoc.org/rodusek.dev/pkg/yamlpath?status.svg)](https://godoc.org/rodusek.dev/pkg/yamlpath)
 [![Go Report Card](https://goreportcard.com/badge/rodusek.dev/pkg/yamlpath)](https://goreportcard.com/report/rodusek.dev/pkg/yamlpath)
 

@@ -41,18 +41,18 @@ The following features of JSONPath are supported and thoroughly tested.
 * [x] Array index selection (`[<number>]`)
 * [x] Array slice selection (`[<start>:<end>:<step>]`)
 * [x] Union selection (`<path>,<path>`)
-* [ ] Filter selection (`[?(<sub-expression>)]`) (**partial**)
+* [x] Filter selection (`[?(<sub-expression>)]`)
   * [x] Existence and field filters (`[?(@.key)]`)
   * [x] Comparison filters `==`, `!=`, `<`, `>`, `<=`, `>=` (e.g. `[?(@.key == "value")]`)
   * [x] Containment filters `in`, `nin`, `subsetof` (e.g. `[?(@.entry in $.keys]`)
   * [x] Regular expression filters (e.g. `[?(@.key =~ /pattern/)]`)
   * [x] Logical expressions `&&`, `||` (`[?(@.key && @.key2)]`)
-  * [ ] Function filters (`[?(@.key.function() == "value")]`)
-* [ ] Script selection (`[<expression>]`) (**partial**)
+  * [x] Function filters (`[?(@.key.function() == "value")]`)
+* [x] Script selection (`[<expression>]`)
   * [x] Field access (`[(@.key)]`)
   * [x] Arithmetic expressions (`[(@.key + 1)]`)
   * [x] String concatenation (`[(@.key + "string")]`)
-  * [ ] Function calls (`[(@.key.function())`)
+  * [x] Function calls (`[(@.key.function())`)
 
 ## Example Use
 

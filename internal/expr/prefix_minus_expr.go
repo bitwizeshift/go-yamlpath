@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
@@ -19,11 +20,11 @@ func (e *PrefixMinusExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 		return nil, nil
 	}
 	if len(rest) != 1 {
-		return nil, NewSingletonError("operator prefix '-'", len(rest))
+		return nil, errs.NewSingletonError("operator prefix '-'", rest)
 	}
 	node := rest[0]
 	if node.Kind != yaml.ScalarNode {
-		return nil, NewKindError("operator prefix '-'", yaml.ScalarNode, node.Kind)
+		return nil, errs.NewKindError("operator prefix '-'", node, yaml.ScalarNode)
 	}
 
 	var result []*yaml.Node
@@ -35,7 +36,7 @@ func (e *PrefixMinusExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 			result = append(result, yamlutil.Number("-"+node.Value))
 		}
 	default:
-		return nil, NewTagError("operator prefix '-'", "numeric", node.Tag)
+		return nil, errs.NewTagError("operator prefix '-'", node, "!!int", "!!float")
 	}
 	return result, nil
 }

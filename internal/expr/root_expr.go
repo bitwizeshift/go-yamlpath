@@ -1,9 +1,8 @@
 package expr
 
 import (
-	"fmt"
-
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
@@ -20,7 +19,7 @@ func (e *RootExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	if e.Root == "@" {
 		return ctx.Current(), nil
 	}
-	return nil, fmt.Errorf("%w: unsupported root expression: %s", ErrEval, e.Root)
+	return nil, errs.NewUnsupportedErrorf("unhandled root expression %q", e.Root)
 }
 
 var _ Expr = (*RootExpr)(nil)

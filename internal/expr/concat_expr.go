@@ -1,14 +1,19 @@
 package expr
 
 import (
-	"fmt"
-
 	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
+// ConcatExpr represents an expression that concatenates two expressions
+// together using the '+' operator.
+//
+// For strings, this produces a true concatenation of the strings. For
+// integers, this is the addition operator. If either side of the operator
+// is not compatible, this will return an error.
 type ConcatExpr struct {
 	Left, Right Expr
 }
@@ -19,20 +24,20 @@ func (e *ConcatExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 		return nil, err
 	}
 	if len(left) > 1 {
-		return nil, NewSingletonError("concatenation", len(left))
+		return nil, errs.NewSingletonError("operator + lhs", left)
 	}
 	if len(right) > 1 {
-		return nil, NewSingletonError("concatenation", len(right))
+		return nil, errs.NewSingletonError("operator + rhs", right)
 	}
 	if len(left) == 0 || len(right) == 0 {
 		return nil, nil
 	}
 	lhs, rhs := left[0], right[0]
 	if lhs.Kind != yaml.ScalarNode {
-		return nil, NewKindError("concatenation", lhs.Kind, yaml.ScalarNode)
+		return nil, errs.NewKindError("operator + lhs", lhs, yaml.ScalarNode)
 	}
 	if rhs.Kind != yaml.ScalarNode {
-		return nil, NewKindError("concatenation", rhs.Kind, yaml.ScalarNode)
+		return nil, errs.NewKindError("operator + rhs", rhs, yaml.ScalarNode)
 	}
 	if (lhs.Tag == "!!int" || lhs.Tag == "!!float") && (rhs.Tag == "!!float" || rhs.Tag == "!!int") {
 		lv, err := decimal.NewFromString(lhs.Value)
@@ -49,7 +54,7 @@ func (e *ConcatExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 		concat := lhs.Value + rhs.Value
 		return []*yaml.Node{yamlutil.String(concat)}, nil
 	}
-	return nil, fmt.Errorf("%w: %s and %s are not compatible for '+' operator", ErrEval, lhs.Tag, rhs.Tag)
+	return nil, errs.NewIncompatibleError("operator +", lhs, rhs)
 }
 
 func (e *ConcatExpr) eval(ctx invocation.Context) ([]*yaml.Node, []*yaml.Node, error) {

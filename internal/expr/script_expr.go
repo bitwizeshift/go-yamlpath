@@ -1,9 +1,8 @@
 package expr
 
 import (
-	"fmt"
-
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
@@ -23,12 +22,12 @@ func (e *ScriptExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	}
 
 	if len(scriptNodes) != 1 {
-		return nil, NewSingletonError("script operator '(...)'", len(scriptNodes))
+		return nil, errs.NewSingletonError("script operator '(...)'", scriptNodes)
 	}
 	node := scriptNodes[0]
 
 	if node.Kind != yaml.ScalarNode {
-		return nil, NewKindError("script operator '(...)'", yaml.ScalarNode, node.Kind)
+		return nil, errs.NewKindError("script operator '(...)'", node, yaml.ScalarNode)
 	}
 
 	expr, err := e.createExpr(scriptNodes[0])
@@ -43,14 +42,14 @@ func (e *ScriptExpr) createExpr(node *yaml.Node) (Expr, error) {
 	case "!!int":
 		key, err := yamlutil.ToInt(node)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %w", ErrEval, err)
+			return nil, errs.NewEvalError(err)
 		}
 		return &IndexExpr{Indices: []int64{int64(key)}}, nil
 
 	case "!!str":
 		return &FieldExpr{Fields: []string{node.Value}}, nil
 	}
-	return nil, NewTagError("script operator '(...)'", "!!str or !!int", node.Tag)
+	return nil, errs.NewTagError("script operator '(...)'", node, "!!str", "!!int")
 }
 
 var _ Expr = (*ScriptExpr)(nil)

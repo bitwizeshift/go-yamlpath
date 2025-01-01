@@ -3,6 +3,7 @@ package expr
 import (
 	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
@@ -50,26 +51,26 @@ func (e *ArithmeticExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 		return nil, err
 	}
 	if len(left) > 1 {
-		return nil, NewSingletonError("arithmetic", len(left))
+		return nil, errs.NewSingletonError("arithmetic op lhs", left)
 	}
 	if len(right) > 1 {
-		return nil, NewSingletonError("arithmetic", len(right))
+		return nil, errs.NewSingletonError("arithmetic op rhs", right)
 	}
 	if len(left) == 0 || len(right) == 0 {
 		return nil, nil
 	}
 	lhs, rhs := left[0], right[0]
 	if lhs.Kind != yaml.ScalarNode {
-		return nil, NewKindError("arithmetic", lhs.Kind, yaml.ScalarNode)
+		return nil, errs.NewKindError("arithmetic op lhs", lhs, yaml.ScalarNode)
 	}
 	if rhs.Kind != yaml.ScalarNode {
-		return nil, NewKindError("arithmetic", rhs.Kind, yaml.ScalarNode)
+		return nil, errs.NewKindError("arithmetic", rhs, yaml.ScalarNode)
 	}
 	if lhs.Tag != "!!int" && lhs.Tag != "!!float" {
-		return nil, NewTagError("arithmetic", lhs.Tag, "'!!int' or '!!float'")
+		return nil, errs.NewTagError("arithmetic", lhs, "!!int", "!!float")
 	}
 	if rhs.Tag != "!!int" && rhs.Tag != "!!float" {
-		return nil, NewTagError("arithmetic", rhs.Tag, "'!!int' or '!!float'")
+		return nil, errs.NewTagError("arithmetic", rhs, "!!int", "!!float")
 	}
 
 	lv, err := decimal.NewFromString(lhs.Value)

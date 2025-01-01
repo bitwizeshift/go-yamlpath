@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
@@ -24,14 +25,14 @@ func (e *PrefixPlusExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 		return nil, nil
 	}
 	if len(result) != 1 {
-		return nil, NewSingletonError("operator prefix '+'", len(result))
+		return nil, errs.NewSingletonError("operator prefix '+'", result)
 	}
 	node := result[0]
 	if node.Kind != yaml.ScalarNode {
-		return nil, NewKindError("operator prefix '+'", yaml.ScalarNode, node.Kind)
+		return nil, errs.NewKindError("operator prefix '+'", node, yaml.ScalarNode)
 	}
 	if node.Tag != "!!int" && node.Tag != "!!float" {
-		return nil, NewTagError("operator prefix '+'", "numeric", node.Tag)
+		return nil, errs.NewTagError("operator prefix '+'", node, "!!int", "!!float")
 	}
 	return []*yaml.Node{node}, nil
 }

@@ -28,6 +28,7 @@ type CompareExpr struct {
 	Compare     Comparator
 }
 
+// Eval evaluates the comparison expression against the given nodes.
 func (e *CompareExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	left, err := e.Left.Eval(ctx)
 	if err != nil {

@@ -2,6 +2,7 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
@@ -22,7 +23,7 @@ func (e *InExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 		return nil, nil
 	}
 	if len(left) != 1 {
-		return nil, NewSingletonError("operator 'in'", len(left))
+		return nil, errs.NewSingletonError("operator 'in'", left)
 	}
 
 	right, err := e.Right.Eval(ctx)

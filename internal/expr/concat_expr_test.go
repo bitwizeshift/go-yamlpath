@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
@@ -30,12 +31,12 @@ func TestConcatExpr(t *testing.T) {
 			name:    "Left returns multiple elements",
 			left:    exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
 			right:   exprtest.Return(yamlutil.String("foo")),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:    "Right returns multiple elements",
 			left:    exprtest.Return(yamlutil.String("hello")),
 			right:   exprtest.Return(yamlutil.String("foo"), yamlutil.String("bar")),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:    "Left returns error",
 			left:    exprtest.Error(testErr),
@@ -50,12 +51,12 @@ func TestConcatExpr(t *testing.T) {
 			name:    "Left value is single but not scalar",
 			left:    exprtest.Return(yamltest.MustParseNode(`{"foo": "bar"}`)),
 			right:   exprtest.Return(yamlutil.String("foo")),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:    "Right value is single but not scalar",
 			left:    exprtest.Return(yamlutil.String("foo")),
 			right:   exprtest.Return(yamltest.MustParseNode(`{"foo": "bar"}`)),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:  "Left value is scalar int, right is scalar int",
 			left:  exprtest.Return(yamlutil.Number("42")),
@@ -95,7 +96,7 @@ func TestConcatExpr(t *testing.T) {
 			name:    "left and right are incompatible types",
 			left:    exprtest.Return(yamlutil.String("hello")),
 			right:   exprtest.Return(yamlutil.Number("42")),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		},
 	}
 

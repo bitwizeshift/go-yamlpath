@@ -8,12 +8,6 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
-var (
-	// ErrNotSingleton is returned when a collection is expected to contain
-	// only a single node, but contains more or less than one node.
-	ErrNotSingleton = fmt.Errorf("collection is not a singleton")
-)
-
 // Collection represents a collection of YAML nodes that can be retrieved from
 // a YAMLPath evaluation result.
 type Collection []*yaml.Node

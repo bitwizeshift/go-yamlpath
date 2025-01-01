@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
@@ -32,15 +33,15 @@ func TestPrefixMinusExpr(t *testing.T) {
 		}, {
 			name:    "subexpr returns multiple values",
 			expr:    exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:    "subexpr returns single non-scalar value",
 			expr:    exprtest.Return(yamltest.MustParseNode(`{"name": "Alice", "age": 30}`)),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:    "subexpr returns scalar non-numeric value",
 			expr:    exprtest.Return(yamlutil.String("hello")),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name: "subexpr returns positive scalar integer value",
 			expr: exprtest.Return(yamlutil.Number("42")),

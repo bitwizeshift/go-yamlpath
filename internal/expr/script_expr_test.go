@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
@@ -29,11 +30,11 @@ func TestScriptExpr(t *testing.T) {
 		}, {
 			name:    "Expr returns multiple nodes",
 			expr:    exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:    "Expr returns single non-scalar node",
 			expr:    exprtest.Return(yamltest.MustParseNode(`{"name": "Alice", "age": 30}`)),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:  "Expr returns single scalar int node",
 			expr:  exprtest.Return(yamlutil.Number("1")),
@@ -47,11 +48,11 @@ func TestScriptExpr(t *testing.T) {
 		}, {
 			name:    "Expr returns invalid integer node",
 			expr:    exprtest.Return(yamlutil.Number("foo")),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:    "Expr returns scalar boolean node",
 			expr:    exprtest.Return(yamlutil.True),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		},
 	}
 

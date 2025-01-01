@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
@@ -41,32 +42,32 @@ func TestArithmeticExpr(t *testing.T) {
 			name:    "Left returns multiple elements",
 			left:    exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
 			right:   exprtest.Return(yamlutil.String("foo")),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:    "Right returns multiple elements",
 			left:    exprtest.Return(yamlutil.String("hello")),
 			right:   exprtest.Return(yamlutil.String("foo"), yamlutil.String("bar")),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:    "Left returns non-scalar value",
 			left:    exprtest.Return(yamltest.MustParseNode(`{"foo": "bar"}`)),
 			right:   exprtest.Return(yamlutil.String("foo")),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:    "Right returns non-scalar value",
 			left:    exprtest.Return(yamlutil.String("foo")),
 			right:   exprtest.Return(yamltest.MustParseNode(`{"foo": "bar"}`)),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:    "Left returns scalar non-numeric value",
 			left:    exprtest.Return(yamlutil.String("foo")),
 			right:   exprtest.Return(yamlutil.Number("42")),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:    "Right returns scalar non-numeric value",
 			left:    exprtest.Return(yamlutil.Number("42")),
 			right:   exprtest.Return(yamlutil.String("foo")),
-			wantErr: expr.ErrEval,
+			wantErr: errs.ErrEval,
 		}, {
 			name:    "Left value is invalid number",
 			left:    exprtest.Return(yamlutil.Number("foo")),

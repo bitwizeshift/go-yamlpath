@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"rodusek.dev/pkg/yamlpath/internal/compile"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
+	"rodusek.dev/pkg/yamlpath/internal/invocation/arity"
 )
 
 // Note: This test is not evaluating that the expression tree returned from
@@ -170,12 +171,24 @@ func TestNewTree(t *testing.T) {
 		}, {
 			name:  "bracket script expression with field",
 			input: `$[(@.foo)]`,
+		}, {
+			name:  "function expression with correct amount of args",
+			input: `$.foo(1,2)`,
+		}, {
+			name:    "function expression with too few args",
+			input:   `$.foo(1)`,
+			wantErr: arity.ErrBadArity,
+		}, {
+			name:    "function expression with too many args",
+			input:   `$.foo(1,2,3)`,
+			wantErr: arity.ErrBadArity,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			table := invocation.NewTable()
+			table.Add("foo", nil).SetArity(arity.Exactly(2))
 			got, err := compile.NewTree(tc.input, &compile.Config{
 				Table: table,
 			})

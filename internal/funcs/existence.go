@@ -1,6 +1,8 @@
 package funcs
 
 import (
+	"fmt"
+
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
@@ -31,6 +33,178 @@ func Exists(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Nod
 
 	if len(next) > 0 {
 		return []*yaml.Node{yamlutil.True}, nil
+	}
+	return []*yaml.Node{yamlutil.False}, nil
+}
+
+// Count returns the number of elements in the current collection. If the
+// current collection is empty, it returns 0.
+func Count(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	current := ctx.Current()
+	return []*yaml.Node{yamlutil.Number(fmt.Sprintf("%v", len(current)))}, nil
+}
+
+// Distinct returns a collection with all duplicate elements removed.
+func Distinct(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	current := ctx.Current()
+	if len(current) == 0 {
+		return nil, nil
+	}
+
+	// seen is a map of hash -> nodes with that hash.
+	// It is extremely unlikely to find a sha1 hash collision in practice, but
+	// it's still accounted for by storing a slice of nodes with the same hash.
+	seen := make(map[string][]*yaml.Node, len(current))
+	var result []*yaml.Node
+
+	for _, node := range current {
+		key := yamlutil.Hash(node)
+		others, ok := seen[key]
+		if !ok {
+			seen[key] = append(seen[key], node)
+			result = append(result, node)
+			continue
+		}
+
+		if !contains(others, node) {
+			seen[key] = append(others, node)
+			result = append(result, node)
+		}
+	}
+	return result, nil
+}
+
+func contains(nodes []*yaml.Node, node *yaml.Node) bool {
+	for _, n := range nodes {
+		if yamlutil.Equal(n, node) {
+			return true
+		}
+	}
+	return false
+}
+
+// IsDistinct returns true if the current collection contains only distinct
+// elements, false otherwise.
+func IsDistinct(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	current := ctx.Current()
+	if len(current) == 0 {
+		return nil, nil
+	}
+
+	// Note: 'Distinct' does not return an error, so we can ignore it here.
+	distinct, _ := Distinct(ctx)
+
+	if len(current) == len(distinct) {
+		return []*yaml.Node{yamlutil.True}, nil
+	}
+	return []*yaml.Node{yamlutil.False}, nil
+}
+
+// All returns true if all nodes satisfy the 'criteria' parameter expression.
+// This applies the singleton-boolean rule to each node to determine if the
+// node is truthy.
+// If the current collection is empty, it returns true.
+func All(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Node, error) {
+	current := ctx.Current()
+
+	for _, node := range current {
+		args, err := params[0].GetArg(ctx.NewContext([]*yaml.Node{node}))
+		if err != nil {
+			return nil, err
+		}
+		if !yamlutil.IsTruthy(args...) {
+			return []*yaml.Node{yamlutil.False}, nil
+		}
+	}
+	return []*yaml.Node{yamlutil.True}, nil
+}
+
+// Any returns true if any node satisfies the 'criteria' parameter expression.
+// This applies the singleton-boolean rule to each node to determine if the
+// node is truthy.
+// If the current collection is empty, it returns false.
+func Any(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Node, error) {
+	current := ctx.Current()
+	for _, node := range current {
+		args, err := params[0].GetArg(ctx.NewContext([]*yaml.Node{node}))
+		if err != nil {
+			return nil, err
+		}
+		if yamlutil.IsTruthy(args...) {
+			return []*yaml.Node{yamlutil.True}, nil
+		}
+	}
+	return []*yaml.Node{yamlutil.False}, nil
+}
+
+// AllTrue evaluates the input collection and returns true if all elements are
+// boolean nodes with the value of true. It returns false if any element is not
+// a boolean node, or if any element is a boolean node with the value of false.
+func AllTrue(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	current := ctx.Current()
+
+	for _, node := range current {
+		b, err := yamlutil.ToBool(node)
+		if err != nil {
+			return []*yaml.Node{yamlutil.False}, nil
+		}
+		if !b {
+			return []*yaml.Node{yamlutil.False}, nil
+		}
+	}
+	return []*yaml.Node{yamlutil.True}, nil
+}
+
+// AnyTrue evaluates the input collection and returns true if any element is a
+// boolean node with the value of true. It returns false if all elements are not
+// boolean nodes, or if all elements are boolean nodes with the value of false.
+func AnyTrue(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	current := ctx.Current()
+
+	for _, node := range current {
+		b, err := yamlutil.ToBool(node)
+		if err != nil {
+			continue
+		}
+		if b {
+			return []*yaml.Node{yamlutil.True}, nil
+		}
+	}
+	return []*yaml.Node{yamlutil.False}, nil
+}
+
+// AllFalse evaluates the input collection and returns true if all elements are
+// boolean nodes with the value of false. It returns false if any element is not
+// a boolean node, or if any element is a boolean node with the value of true.
+func AllFalse(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	current := ctx.Current()
+
+	for _, node := range current {
+		b, err := yamlutil.ToBool(node)
+		if err != nil {
+			return []*yaml.Node{yamlutil.False}, nil
+		}
+		if b {
+			return []*yaml.Node{yamlutil.False}, nil
+		}
+	}
+	return []*yaml.Node{yamlutil.True}, nil
+}
+
+// AnyFalse evaluates the input collection and returns true if any element is a
+// boolean node with the value of false. It returns false if all elements are not
+// boolean nodes, or if all elements are boolean nodes with the value of true.
+func AnyFalse(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	current := ctx.Current()
+
+	for _, node := range current {
+		b, err := yamlutil.ToBool(node)
+		if err != nil {
+			continue
+		}
+		if !b {
+			return []*yaml.Node{yamlutil.True}, nil
+		}
 	}
 	return []*yaml.Node{yamlutil.False}, nil
 }

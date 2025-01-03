@@ -27,7 +27,7 @@ func init() {
 
 	// Filter functions
 	tableV1.Add("where", funcs.Where).SetArity(arity.Exactly(1))
-	tableV1.Add("select", funcs.Select).SetArity(arity.Exactly(1))
+	tableV1.Add("transform", funcs.Transform).SetArity(arity.Exactly(1))
 
 	// Subsetting functions
 	tableV1.Add("first", funcs.First).SetArity(arity.AtMost(1))

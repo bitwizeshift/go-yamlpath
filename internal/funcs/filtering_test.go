@@ -93,7 +93,7 @@ func TestSelect(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := expr.NewContext(tc.input)
 
-			got, err := funcs.Select(ctx, tc.params...)
+			got, err := funcs.Transform(ctx, tc.params...)
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Select() error = %v, want %v", got, want)

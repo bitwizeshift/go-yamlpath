@@ -46,7 +46,7 @@ Feature: Funcs - Filtering
       When the yamlpath `$.people[*].where(@.name == "Mary")` is evaluated
       Then the evaluation result is empty
 
-  Rule: select() transforms the collection to the projection
+  Rule: transform() transforms the collection to the projection
 
     Transforms the collection based on the projection expression provided
     If the input collection is empty, the result is empty.
@@ -57,7 +57,7 @@ Feature: Funcs - Filtering
         """
         people: []
         """
-      When the yamlpath `$.people[*].select(@.name)` is evaluated
+      When the yamlpath `$.people[*].transform(@.name)` is evaluated
       Then the evaluation result is empty
 
     Scenario: Projection transforms the collection
@@ -70,7 +70,7 @@ Feature: Funcs - Filtering
           - name: "Jane"
             age: 25
         """
-      When the yamlpath `$.people[*].select(@.name + " Doe")` is evaluated
+      When the yamlpath `$.people[*].transform(@.name + " Doe")` is evaluated
       Then the evaluation result is:
         """
         "John Doe"

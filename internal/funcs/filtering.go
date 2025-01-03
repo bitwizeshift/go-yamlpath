@@ -26,8 +26,8 @@ func Where(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Node
 	return result, nil
 }
 
-// Select performs a map operation, similar to [()] in JSONPath.
-func Select(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Node, error) {
+// Transform performs a map operation, similar to [()] in JSONPath.
+func Transform(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 	current := ctx.Current()
 

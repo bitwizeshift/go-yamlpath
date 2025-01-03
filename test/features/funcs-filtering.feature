@@ -77,3 +77,57 @@ Feature: Funcs - Filtering
         ---
         "Jane Doe"
         """
+
+  Rule: keys() returns the keys of the map
+
+    Returns the keys of the map as a collection. If the input is not a map,
+    the result is empty.
+
+    Scenario: Input is not a map
+
+      Given the yaml input:
+        """
+        people: []
+        """
+      When the yamlpath `$.people.keys()` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Map has keys
+
+      Given the yaml input:
+        """
+        people:
+          John: 30
+          Jane: 25
+        """
+      When the yamlpath `$.people.keys()` is evaluated
+      Then the evaluation result is:
+        """
+        "John"
+        ---
+        "Jane"
+        """
+
+    Scenario: Recursive-descent of map with keys
+
+      Given the yaml input:
+        """
+        people:
+          John:
+            age: 30
+          Jane:
+            age: 25
+        """
+      When the yamlpath `$..keys()` is evaluated
+      Then the evaluation result is:
+        """
+        "people"
+        ---
+        "John"
+        ---
+        "Jane"
+        ---
+        "age"
+        ---
+        "age"
+        """

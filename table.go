@@ -20,10 +20,10 @@ func init() {
 	tableV1.Add("isDistinct", funcs.IsDistinct).SetArity(arity.None())
 	tableV1.Add("all", funcs.All).SetArity(arity.Exactly(1))
 	tableV1.Add("any", funcs.Any).SetArity(arity.Exactly(1))
-	tableV1.Add("allTrue", funcs.AllTrue).SetArity(arity.Exactly(1))
-	tableV1.Add("anyTrue", funcs.AnyTrue).SetArity(arity.Exactly(1))
-	tableV1.Add("allFalse", funcs.AllFalse).SetArity(arity.Exactly(1))
-	tableV1.Add("anyFalse", funcs.AnyFalse).SetArity(arity.Exactly(1))
+	tableV1.Add("allTrue", funcs.AllTrue).SetArity(arity.None())
+	tableV1.Add("anyTrue", funcs.AnyTrue).SetArity(arity.None())
+	tableV1.Add("allFalse", funcs.AllFalse).SetArity(arity.None())
+	tableV1.Add("anyFalse", funcs.AnyFalse).SetArity(arity.None())
 
 	// Filter functions
 	tableV1.Add("where", funcs.Where).SetArity(arity.Exactly(1))
@@ -35,7 +35,11 @@ func init() {
 	tableV1.Add("skip", funcs.Skip).SetArity(arity.Exactly(1))
 	tableV1.Add("single", funcs.Single).SetArity(arity.None())
 
-	// Conversions
+	// String functions
+	tableV1.Add("lower", funcs.Lower).SetArity(arity.None())
+	tableV1.Add("upper", funcs.Upper).SetArity(arity.None())
+
+	// Conversion functions
 	tableV1.Add("toBoolean", funcs.ToBoolean).SetArity(arity.None())
 	tableV1.Add("toString", funcs.ToString).SetArity(arity.None())
 	tableV1.Add("toNumber", funcs.ToNumber).SetArity(arity.None())

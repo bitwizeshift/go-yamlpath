@@ -236,3 +236,45 @@ Feature: Funcs - Conversion
         """
       When the yamlpath `$.people[*].toNumber()` is evaluated
       Then an error is raised
+
+  Rule: toSequence() converts a single value in the collection to a sequence
+
+    Converts a single value in the collection to a sequence. If the collection
+    contains more than one value, an error is raised to the calling environment.
+    If the collection is empty, this returns an empty collection.
+
+    Scenario: Collection is empty
+
+      Given the yaml input:
+        """
+        people: []
+        """
+      When the yamlpath `$.people[*].toSequence()` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Collection contains single value
+
+      Given the yaml input:
+        """
+        name: "John"
+        """
+      When the yamlpath `$.name.toSequence()` is evaluated
+      Then the evaluation result is:
+        """
+        - "John"
+        """
+
+    Scenario: Collection contains multiple elements
+
+      Given the yaml input:
+        """
+        people:
+          - name: "John"
+          - name: "Jane"
+        """
+      When the yamlpath `$.people[*].name.toSequence()` is evaluated
+      Then the evaluation result is:
+        """
+        - "John"
+        - "Jane"
+        """

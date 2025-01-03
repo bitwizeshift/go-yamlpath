@@ -98,3 +98,20 @@ func ToNumber(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, 
 	}
 	return nil, nil
 }
+
+// ToSequence converts the current node collection into a sequence value.
+func ToSequence(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	current := ctx.Current()
+
+	if len(current) == 0 {
+		return nil, nil
+	}
+
+	node := &yaml.Node{
+		Kind:    yaml.SequenceNode,
+		Tag:     "!!seq",
+		Content: current,
+	}
+
+	return []*yaml.Node{node}, nil
+}

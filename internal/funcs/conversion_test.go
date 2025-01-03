@@ -186,3 +186,45 @@ func TestToNumber(t *testing.T) {
 		})
 	}
 }
+
+func TestToSequence(t *testing.T) {
+	testCases := []struct {
+		name    string
+		input   []*yaml.Node
+		want    []*yaml.Node
+		wantErr error
+	}{
+		{
+			name:  "Empty collection returns empty",
+			input: []*yaml.Node{},
+			want:  []*yaml.Node{},
+		}, {
+			name:  "collection containing multiple values returns list",
+			input: []*yaml.Node{yamlutil.False, yamlutil.String("true"), yamlutil.True},
+			want: []*yaml.Node{{
+				Kind: yaml.SequenceNode,
+				Tag:  "!!seq",
+				Content: []*yaml.Node{
+					yamlutil.False,
+					yamlutil.String("true"),
+					yamlutil.True,
+				},
+			}},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := expr.NewContext(tc.input)
+
+			got, err := funcs.ToSequence(ctx)
+
+			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
+				t.Fatalf("ToSequence() error = %v, want %v", got, want)
+			}
+			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+				t.Errorf("ToSequence() = %v, want %v", got, want)
+			}
+		})
+	}
+}

@@ -21,18 +21,3 @@ func paramToInt(ctx invocation.Context, source string, param invocation.Paramete
 	}
 	return v, nil
 }
-
-func paramToString(ctx invocation.Context, source string, param invocation.Parameter) (string, error) {
-	args, err := param.GetArg(ctx)
-	if err != nil {
-		return "", err
-	}
-	if len(args) != 1 {
-		return "", errs.NewSingletonError(source, args)
-	}
-	v, err := yamlutil.ToString(args[0])
-	if err != nil {
-		return "", errs.NewEvalError(err)
-	}
-	return v, nil
-}

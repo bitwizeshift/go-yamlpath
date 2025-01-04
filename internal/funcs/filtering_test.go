@@ -27,10 +27,10 @@ func TestWhere(t *testing.T) {
 		{
 			name: "Criteria parameter returns true",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlutil.True),
+				invocationtest.SuccessParameter(yamlutil.True).AddSuccess(yamlutil.False),
 			},
 			input: []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar")},
-			want:  []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar")},
+			want:  []*yaml.Node{yamlutil.String("foo")},
 		}, {
 			name: "Criteria parameter returns false",
 			params: []invocation.Parameter{
@@ -76,10 +76,10 @@ func TestTransform(t *testing.T) {
 		{
 			name: "Projection parameter returns elements",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlutil.String("hello")),
+				invocationtest.SuccessParameter(yamlutil.String("hello")).AddSuccess(yamlutil.String("world")),
 			},
 			input: []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar")},
-			want:  []*yaml.Node{yamlutil.String("hello"), yamlutil.String("hello")},
+			want:  []*yaml.Node{yamlutil.String("hello"), yamlutil.String("world")},
 		}, {
 			name: "Projection parameter returns error",
 			params: []invocation.Parameter{

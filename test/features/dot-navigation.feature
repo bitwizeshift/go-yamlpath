@@ -225,14 +225,6 @@ Feature: Dot path navigation
         color: red
         price: 19.95
         ---
-        category: fiction
-        author: Author A
-        title: Book A
-        ---
-        category: non-fiction
-        author: Author B
-        title: Book B
-        ---
         fiction
         ---
         Author A

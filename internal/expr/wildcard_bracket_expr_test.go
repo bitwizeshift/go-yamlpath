@@ -11,7 +11,7 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
-func TestWildcardExpr(t *testing.T) {
+func TestWildcardBracketExpr(t *testing.T) {
 	testCases := []struct {
 		name    string
 		input   []*yaml.Node
@@ -23,33 +23,33 @@ func TestWildcardExpr(t *testing.T) {
 			input: []*yaml.Node{},
 			want:  []*yaml.Node{},
 		}, {
-			name: "Mapping node returns all fields",
+			name: "Sequence node returns all element",
 			input: []*yaml.Node{
-				yamltest.MustParseNode(`{"name": "Alice", "age": 30}`),
+				yamltest.MustParseNode(`["Alice", "Bob"]`),
 			},
 			want: []*yaml.Node{
 				yamlutil.String("Alice"),
-				yamlutil.Number("30"),
+				yamlutil.String("Bob"),
 			},
 		}, {
-			name: "Sequence node returns empty node",
+			name: "Mapping node returns empty node",
 			input: []*yaml.Node{
-				yamltest.MustParseNode(`["Alice", "Bob"]`),
+				yamltest.MustParseNode(`{"name": "Alice", "age": 30}`),
 			},
 			want: []*yaml.Node{},
 		},
 	}
 
-	var sut expr.WildcardExpr
+	var sut expr.WildcardBracketExpr
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			got, err := sut.Eval(expr.NewContext(tc.input))
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
-				t.Errorf("WildcardExpr.Eval() error = %v, want %v", got, want)
+				t.Errorf("WildcardBracketExpr.Eval() error = %v, want %v", got, want)
 			}
 			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
-				t.Errorf("WildcardExpr.Eval() = %v, want %v", got, want)
+				t.Errorf("WildcardBracketExpr.Eval() = %v, want %v", got, want)
 			}
 		})
 	}

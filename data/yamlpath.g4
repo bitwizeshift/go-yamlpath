@@ -14,8 +14,7 @@ expression
       ;
 
 bracketParam
-      : STRING (',' (STRING))*                            # unionStringBracket
-      | NUMBER (',' (NUMBER))*                            # unionNumberBracket
+      : NUMBER (',' (NUMBER))*                            # unionNumberBracket
       | '*'                                               # wildcardBracket
       | (NUMBER)? ':' (NUMBER)? (':' NUMBER)?             # sliceBracket
       | '?' '(' subexpression ')'                         # filterBracket
@@ -62,6 +61,7 @@ mapEntries
 
 invocation
       : identifier                                        # memberInvocation
+      | STRING                                            # quotedMemberInvocation
       | '*'                                               # wildcardInvocation
       | identifier '(' paramList? ')'                     # functionInvocation
       ;

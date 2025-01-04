@@ -36,11 +36,14 @@ func TestNewTree(t *testing.T) {
 			name:  "field expression",
 			input: `$.foo`,
 		}, {
+			name:  "field wildcard expression",
+			input: `$.*`,
+		}, {
+			name:  "quoted field expression",
+			input: `$."foo bar"`,
+		}, {
 			name:  "recursive descent with field expression",
 			input: `$..foo`,
-		}, {
-			name:  "bracket field expression",
-			input: `$["foo"]`,
 		}, {
 			name:  "bracket wildcard expression",
 			input: `$[*]`,
@@ -68,9 +71,6 @@ func TestNewTree(t *testing.T) {
 		}, {
 			name:  "bracket union index expression",
 			input: `$[0,1]`,
-		}, {
-			name:  "bracket union field expression",
-			input: `$["foo","bar"]`,
 		}, {
 			name:  "bracket filter expression with current node",
 			input: `$[?(@)]`,

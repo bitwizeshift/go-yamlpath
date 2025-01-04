@@ -5,7 +5,7 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
-// WildcardExpr is a representation of the `.*` and `[*]` expressions in
+// WildcardExpr is a representation of the `.*` expression in
 // YAMLPath, which will select all fields or sequence elements from the
 // current node.
 type WildcardExpr struct{}
@@ -16,13 +16,11 @@ func (*WildcardExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 
 	nodes := ctx.Current()
 	for _, n := range nodes {
-		switch n.Kind {
-		case yaml.MappingNode:
-			for i := 0; (i + 1) < len(n.Content); i += 2 {
-				result = append(result, n.Content[i+1])
-			}
-		case yaml.SequenceNode:
-			result = append(result, n.Content...)
+		if n.Kind != yaml.MappingNode {
+			continue
+		}
+		for i := 0; (i + 1) < len(n.Content); i += 2 {
+			result = append(result, n.Content[i+1])
 		}
 	}
 	return result, nil

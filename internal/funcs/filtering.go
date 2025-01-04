@@ -2,6 +2,7 @@ package funcs
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
@@ -55,4 +56,87 @@ func Keys(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, erro
 		}
 	}
 	return result, nil
+}
+
+// Select returns the selected keys from the current mapping or the selected
+// indices from the current sequence.
+func Select(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Node, error) {
+	var (
+		keys    []string
+		indices []int
+	)
+	for _, p := range params {
+		input, err := p.GetArg(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if len(input) == 0 {
+			continue
+		}
+		if len(input) > 1 {
+			return nil, errs.NewSingletonError("pick()", input)
+		}
+		node := input[0]
+		if node.Kind != yaml.ScalarNode {
+			return nil, errs.NewKindError("pick()", node, yaml.ScalarNode)
+		}
+		switch node.Tag {
+		case "!!int":
+			index, err := yamlutil.ToInt(node)
+			if err != nil {
+				return nil, errs.NewEvalError(err)
+			}
+			indices = append(indices, index)
+		case "!!str":
+			keys = append(keys, node.Value)
+		default:
+			return nil, errs.NewTagError("pick()", node, "!!int", "!!str")
+		}
+	}
+
+	current := ctx.Current()
+	if len(current) == 0 {
+		return nil, nil
+	}
+
+	var result []*yaml.Node
+	for _, node := range current {
+		switch node.Kind {
+		case yaml.MappingNode:
+			result = append(result, selectKeys(node, keys)...)
+		case yaml.SequenceNode:
+			result = append(result, selectIndices(node, indices)...)
+		}
+	}
+
+	return result, nil
+}
+
+func selectKeys(node *yaml.Node, keys []string) []*yaml.Node {
+	var result []*yaml.Node
+	for i := 0; i < len(node.Content); i += 2 {
+		key := node.Content[i]
+		value := node.Content[i+1]
+		for _, k := range keys {
+			if key.Value == k {
+				result = append(result, value)
+				break
+			}
+		}
+	}
+	return result
+}
+
+func selectIndices(node *yaml.Node, indices []int) []*yaml.Node {
+	var result []*yaml.Node
+	for _, index := range indices {
+		if index < 0 {
+			index = len(node.Content) + index
+		}
+		if index < 0 || index >= len(node.Content) {
+			continue
+		}
+		result = append(result, node.Content[index])
+	}
+	return result
 }

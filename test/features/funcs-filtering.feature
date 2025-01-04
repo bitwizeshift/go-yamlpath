@@ -131,3 +131,50 @@ Feature: Funcs - Filtering
         ---
         "age"
         """
+
+  Rule: select() returns matching keys and indices
+
+    Returns the keys and indices of the map and list as a collection. If a node
+    is not a map or list, the element is ignored for inclusion in the result.
+
+    Scenario: Input is not a map or list
+
+      Given the yaml input:
+        """
+        people: 30
+        """
+      When the yamlpath `$.people.select(0)` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Map has keys
+
+      Given the yaml input:
+        """
+        people:
+          alice: 30
+          bob: 25
+        """
+      When the yamlpath `$.people.select("alice", "bob")` is evaluated
+      Then the evaluation result is:
+        """
+        30
+        ---
+        25
+        """
+
+    Scenario: List has indices
+
+      Given the yaml input:
+        """
+        people:
+          - Alice
+          - Bob
+          - Charlie
+        """
+      When the yamlpath `$.people.select(0, 2)` is evaluated
+      Then the evaluation result is:
+        """
+        "Alice"
+        ---
+        "Charlie"
+        """

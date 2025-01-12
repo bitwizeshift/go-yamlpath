@@ -46,4 +46,7 @@ func init() {
 	tableV1.Add("toString", funcs.ToString).SetArity(arity.None())
 	tableV1.Add("toNumber", funcs.ToNumber).SetArity(arity.None())
 	tableV1.Add("toSequence", funcs.ToSequence).SetArity(arity.None())
+
+	// Reflection
+	tableV1.Add("reflect", funcs.Reflect).SetArity(arity.None())
 }

@@ -43,6 +43,22 @@ var (
 
 	// ErrIncompatible is returned when two operands are incompatible.
 	ErrIncompatible = errors.New("incompatible operands")
+
+	// ErrNotAFunction is an error returned when a non-function is provided to
+	// an option expecting a function
+	ErrNotAFunction = errors.New("not a function")
+
+	// ErrFuncTooFewArguments is an error returned when a function is passed to
+	// WithFunction with too few arguments.
+	ErrFuncTooFewArguments = errors.New("must have at least one argument")
+
+	// ErrBadFirstArgument is an error returned when a function is passed to
+	// WithFunction with a first argument that is not a collection of nodes.
+	ErrBadFirstArgument = errors.New("first argument must be a collection of nodes")
+
+	// ErrBadReturnSignature is an error returned when a function is passed to
+	// WithFunction with either too few or too many return types.
+	ErrBadReturnSignature = errors.New("bad return signature")
 )
 
 // KindError represents an error that occurs when a node encounters an

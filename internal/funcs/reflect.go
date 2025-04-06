@@ -110,3 +110,68 @@ func toNode[T any](v *T) (*yaml.Node, error) {
 	}
 	return yamlutil.Normalize(&node)[0], nil
 }
+
+// IsString checks if the current node is a string.
+func IsString(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	return hasTag(ctx, yaml.ScalarNode, "!!str")
+}
+
+// IsInteger checks if the current node is an integer.
+func IsInteger(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	return hasTag(ctx, yaml.ScalarNode, "!!int")
+}
+
+// IsFloat checks if the current node is a float.
+func IsFloat(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	return hasTag(ctx, yaml.ScalarNode, "!!float")
+}
+
+// IsBoolean checks if the current node is a boolean.
+func IsBoolean(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	return hasTag(ctx, yaml.ScalarNode, "!!bool")
+}
+
+// IsNull checks if the current node is null.
+func IsNull(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	return hasTag(ctx, yaml.ScalarNode, "!!null")
+}
+
+// IsScalar checks if the current node is a scalar.
+func IsScalar(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	current := ctx.Current()
+	if len(current) == 0 {
+		return nil, nil
+	}
+	if len(current) == 1 {
+		node := current[0]
+		if node.Kind == yaml.ScalarNode {
+			return []*yaml.Node{yamlutil.True}, nil
+		}
+		return []*yaml.Node{yamlutil.False}, nil
+	}
+	return []*yaml.Node{yamlutil.False}, nil
+}
+
+// IsSequence checks if the current node is a sequence.
+func IsSequence(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	return hasTag(ctx, yaml.SequenceNode, "!!seq")
+}
+
+// IsMapping checks if the current node is a mapping.
+func IsMapping(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	return hasTag(ctx, yaml.MappingNode, "!!map")
+}
+
+func hasTag(ctx invocation.Context, kind yaml.Kind, tag string) ([]*yaml.Node, error) {
+	current := ctx.Current()
+	if len(current) == 0 {
+		return nil, nil
+	}
+	if len(current) == 1 {
+		node := current[0]
+		return []*yaml.Node{
+			yamlutil.Boolean(fmt.Sprintf("%v", node.Kind == kind && node.Tag == tag)),
+		}, nil
+	}
+	return []*yaml.Node{yamlutil.False}, nil
+}

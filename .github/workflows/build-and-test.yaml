@@ -61,13 +61,13 @@ jobs:
           # Compute the *nix path to the temporary directory, since 'runner.temp'
           # is in a OS-specific format.
           temp_dir="$(cd '${{ runner.temp }}'; pwd)"
-          out_dir="${temp_dir}/coverage"
+          out_dir="${temp_dir}/coverage/unit"
           mkdir -p "${out_dir}"
 
           # Windows paths need to be handled in backslash notation for piping
           # into upload-artifact.
           if [[ "${{ runner.os }}" == "Windows" ]]; then
-            echo 'coverage-dir=${{ runner.temp }}\coverage' >> "${GITHUB_OUTPUT}"
+            echo 'coverage-dir=${{ runner.temp }}\coverage\unit' >> "${GITHUB_OUTPUT}"
           else
             echo "coverage-dir=${out_dir}" >> "${GITHUB_OUTPUT}"
           fi
@@ -76,12 +76,47 @@ jobs:
 
       - name: Compliance Test
         if: (success() || failure())
-        run: go test -v ./test/...
+        id: compliance-test
+        shell: bash
+        run: |
+          temp_dir="$(cd '${{ runner.temp }}'; pwd)"
+          out_dir="${temp_dir}/coverage/compliance"
+          mkdir -p "${out_dir}"
+
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            echo 'coverage-dir=${{ runner.temp }}\coverage\compliance' >> "${GITHUB_OUTPUT}"
+          else
+            echo "coverage-dir=${out_dir}" >> "${GITHUB_OUTPUT}"
+          fi
+
+          go test -coverpkg rodusek.dev/pkg/yamlpath/... -cover -v ./... -args -test.gocoverdir="${out_dir}"
+
+      - name: Merge Coverage
+        if: (success() || failure())
+        id: merge-coverage
+        shell: bash
+        env:
+          unit_coverage_dir: "${{ steps.test.outputs.coverage-dir }}"
+          compliance_coverage_dir: "${{ steps.compliance-test.outputs.coverage-dir }}"
+        run: |
+          temp_dir="$(cd '${{ runner.temp }}'; pwd)"
+          out_dir="${temp_dir}/coverage/merged"
+          mkdir -p "${out_dir}"
+
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            echo 'coverage-dir=${{ runner.temp }}\coverage\merged' >> "${GITHUB_OUTPUT}"
+          else
+            echo "coverage-dir=${out_dir}" >> "${GITHUB_OUTPUT}"
+          fi
+
+          go tool covdata merge \
+            -i="${unit_coverage_dir},${compliance_coverage_dir}" \
+            -o="${out_dir}"
 
       - name: Upload Coverage
         uses: actions/upload-artifact@v4
         with:
-          path: "${{ steps.test.outputs.coverage-dir }}"
+          path: "${{ steps.merge-coverage.outputs.coverage-dir }}"
           name: ${{ matrix.os.image }}-raw-coverage
           retention-days: 1
 

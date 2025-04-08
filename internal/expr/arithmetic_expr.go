@@ -5,7 +5,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // ArithmeticOp is an arithmetic operation that takes two decimal.Decimal
@@ -83,7 +83,7 @@ func (e *ArithmeticExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	}
 	result := e.Operation(lv, rv)
 
-	return []*yaml.Node{yamlutil.Number(result.String())}, nil
+	return []*yaml.Node{yamlconv.RawNumber(result.String())}, nil
 }
 
 func (e *ArithmeticExpr) eval(ctx invocation.Context) ([]*yaml.Node, []*yaml.Node, error) {

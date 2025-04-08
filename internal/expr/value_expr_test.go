@@ -7,8 +7,9 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestValueExpr(t *testing.T) {
@@ -21,18 +22,18 @@ func TestValueExpr(t *testing.T) {
 	}{
 		{
 			name:  "Input node does not affect output",
-			value: yamlutil.String("Hello world"),
+			value: yamlconv.String("Hello world"),
 			input: []*yaml.Node{
 				yamltest.MustParseNode(`{"name": "Alice", "age": 30}`),
 			},
 			want: []*yaml.Node{
-				yamlutil.String("Hello world"),
+				yamlconv.String("Hello world"),
 			},
 		}, {
 			name:  "Sequence node returns all elements",
-			value: yamlutil.String("Hello world"),
+			value: yamlconv.String("Hello world"),
 			want: []*yaml.Node{
-				yamlutil.String("Hello world"),
+				yamlconv.String("Hello world"),
 			},
 		},
 	}
@@ -45,7 +46,7 @@ func TestValueExpr(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Errorf("ValueExpr.Eval() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("ValueExpr.Eval() = %v, want %v", got, want)
 			}
 		})

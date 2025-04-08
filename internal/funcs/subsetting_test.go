@@ -12,7 +12,8 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/funcs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/invocation/invocationtest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 func TestSingle(t *testing.T) {
@@ -28,11 +29,11 @@ func TestSingle(t *testing.T) {
 			want:  []*yaml.Node{},
 		}, {
 			name:  "single value returns that value",
-			input: []*yaml.Node{yamlutil.String("false")},
-			want:  []*yaml.Node{yamlutil.String("false")},
+			input: []*yaml.Node{yamlconv.String("false")},
+			want:  []*yaml.Node{yamlconv.String("false")},
 		}, {
 			name:    "multiple values returns singleton error",
-			input:   []*yaml.Node{yamlutil.False, yamlutil.False},
+			input:   []*yaml.Node{yamlconv.Bool(false), yamlconv.Bool(false)},
 			wantErr: errs.ErrNotSingleton,
 		},
 	}
@@ -46,7 +47,7 @@ func TestSingle(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Single() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Single() = %v, want %v", got, want)
 			}
 		})
@@ -68,23 +69,23 @@ func TestFirst(t *testing.T) {
 			want:  []*yaml.Node{},
 		}, {
 			name:  "Multiple elements, no parameter returns first parameter",
-			input: []*yaml.Node{yamlutil.String("hello"), yamlutil.String("world")},
-			want:  []*yaml.Node{yamlutil.String("hello")},
+			input: []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
+			want:  []*yaml.Node{yamlconv.String("hello")},
 		}, {
 			name:    "Multiple elements, parameter returns error",
-			input:   []*yaml.Node{yamlutil.String("hello"), yamlutil.String("world")},
+			input:   []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
 			param:   invocationtest.ErrorParameter(testErr),
 			wantErr: testErr,
 		}, {
 			name:  "Multiple elements, parameter returns less than input",
-			input: []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar"), yamlutil.String("baz")},
-			param: invocationtest.SuccessParameter(yamlutil.Number("2")),
-			want:  []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar")},
+			input: []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar"), yamlconv.String("baz")},
+			param: invocationtest.SuccessParameter(yamlconv.Number(2)),
+			want:  []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar")},
 		}, {
 			name:  "Multiple elemtns, parameter returns more than input",
-			input: []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar"), yamlutil.String("baz")},
-			param: invocationtest.SuccessParameter(yamlutil.Number("6")),
-			want:  []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar"), yamlutil.String("baz")},
+			input: []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar"), yamlconv.String("baz")},
+			param: invocationtest.SuccessParameter(yamlconv.Number(6)),
+			want:  []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar"), yamlconv.String("baz")},
 		},
 	}
 
@@ -101,7 +102,7 @@ func TestFirst(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("First() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("First() = %v, want %v", got, want)
 			}
 		})
@@ -123,23 +124,23 @@ func TestLast(t *testing.T) {
 			want:  []*yaml.Node{},
 		}, {
 			name:  "Multiple elements, no parameter returns last parameter",
-			input: []*yaml.Node{yamlutil.String("hello"), yamlutil.String("world")},
-			want:  []*yaml.Node{yamlutil.String("world")},
+			input: []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
+			want:  []*yaml.Node{yamlconv.String("world")},
 		}, {
 			name:    "Multiple elements, parameter returns error",
-			input:   []*yaml.Node{yamlutil.String("hello"), yamlutil.String("world")},
+			input:   []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
 			param:   invocationtest.ErrorParameter(testErr),
 			wantErr: testErr,
 		}, {
 			name:  "Multiple elements, parameter returns less than input",
-			input: []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar"), yamlutil.String("baz")},
-			param: invocationtest.SuccessParameter(yamlutil.Number("2")),
-			want:  []*yaml.Node{yamlutil.String("bar"), yamlutil.String("baz")},
+			input: []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar"), yamlconv.String("baz")},
+			param: invocationtest.SuccessParameter(yamlconv.Number(2)),
+			want:  []*yaml.Node{yamlconv.String("bar"), yamlconv.String("baz")},
 		}, {
 			name:  "Multiple elements, parameter returns more than input",
-			input: []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar"), yamlutil.String("baz")},
-			param: invocationtest.SuccessParameter(yamlutil.Number("6")),
-			want:  []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar"), yamlutil.String("baz")},
+			input: []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar"), yamlconv.String("baz")},
+			param: invocationtest.SuccessParameter(yamlconv.Number(6)),
+			want:  []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar"), yamlconv.String("baz")},
 		},
 	}
 
@@ -156,7 +157,7 @@ func TestLast(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Last() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Last() = %v, want %v", got, want)
 			}
 		})
@@ -174,38 +175,38 @@ func TestSkip(t *testing.T) {
 	}{
 		{
 			name:  "Empty collection returns empty",
-			param: invocationtest.SuccessParameter(yamlutil.Number("2")),
+			param: invocationtest.SuccessParameter(yamlconv.Number(2)),
 			input: []*yaml.Node{},
 			want:  []*yaml.Node{},
 		}, {
 			name:  "Multiple elements, skips n elements",
-			param: invocationtest.SuccessParameter(yamlutil.Number("1")),
-			input: []*yaml.Node{yamlutil.String("hello"), yamlutil.String("world")},
-			want:  []*yaml.Node{yamlutil.String("world")},
+			param: invocationtest.SuccessParameter(yamlconv.Number(1)),
+			input: []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
+			want:  []*yaml.Node{yamlconv.String("world")},
 		}, {
 			name:    "Multiple elements, parameter returns error",
-			input:   []*yaml.Node{yamlutil.String("hello"), yamlutil.String("world")},
+			input:   []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
 			param:   invocationtest.ErrorParameter(testErr),
 			wantErr: testErr,
 		}, {
 			name:  "Multiple elements, parameter returns less than input",
-			param: invocationtest.SuccessParameter(yamlutil.Number("2")),
-			input: []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar"), yamlutil.String("baz")},
-			want:  []*yaml.Node{yamlutil.String("baz")},
+			param: invocationtest.SuccessParameter(yamlconv.Number(2)),
+			input: []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar"), yamlconv.String("baz")},
+			want:  []*yaml.Node{yamlconv.String("baz")},
 		}, {
 			name:  "Multiple elements, parameter returns more than input",
-			param: invocationtest.SuccessParameter(yamlutil.Number("6")),
-			input: []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar"), yamlutil.String("baz")},
+			param: invocationtest.SuccessParameter(yamlconv.Number(6)),
+			input: []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar"), yamlconv.String("baz")},
 			want:  []*yaml.Node{},
 		}, {
 			name:  "Multiple elements, negative number within range",
-			param: invocationtest.SuccessParameter(yamlutil.Number("-2")),
-			input: []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar"), yamlutil.String("baz")},
-			want:  []*yaml.Node{yamlutil.String("foo")},
+			param: invocationtest.SuccessParameter(yamlconv.Number(-2)),
+			input: []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar"), yamlconv.String("baz")},
+			want:  []*yaml.Node{yamlconv.String("foo")},
 		}, {
 			name:  "Multiple elements, parameter returns more than input",
-			param: invocationtest.SuccessParameter(yamlutil.Number("-6")),
-			input: []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar"), yamlutil.String("baz")},
+			param: invocationtest.SuccessParameter(yamlconv.Number(-6)),
+			input: []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar"), yamlconv.String("baz")},
 			want:  []*yaml.Node{},
 		},
 	}
@@ -219,7 +220,7 @@ func TestSkip(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Skip() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Skip() = %v, want %v", got, want)
 			}
 		})

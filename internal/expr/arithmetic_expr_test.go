@@ -10,8 +10,9 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestArithmeticExpr(t *testing.T) {
@@ -31,131 +32,131 @@ func TestArithmeticExpr(t *testing.T) {
 		}, {
 			name:    "Left returns error",
 			left:    exprtest.Error(testErr),
-			right:   exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Return(yamlconv.String("hello")),
 			wantErr: testErr,
 		}, {
 			name:    "Right returns error",
-			left:    exprtest.Return(yamlutil.String("hello")),
+			left:    exprtest.Return(yamlconv.String("hello")),
 			right:   exprtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:    "Left returns multiple elements",
-			left:    exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
-			right:   exprtest.Return(yamlutil.String("foo")),
+			left:    exprtest.Return(yamlconv.String("hello"), yamlconv.String("world")),
+			right:   exprtest.Return(yamlconv.String("foo")),
 			wantErr: errs.ErrEval,
 		}, {
 			name:    "Right returns multiple elements",
-			left:    exprtest.Return(yamlutil.String("hello")),
-			right:   exprtest.Return(yamlutil.String("foo"), yamlutil.String("bar")),
+			left:    exprtest.Return(yamlconv.String("hello")),
+			right:   exprtest.Return(yamlconv.String("foo"), yamlconv.String("bar")),
 			wantErr: errs.ErrEval,
 		}, {
 			name:    "Left returns non-scalar value",
 			left:    exprtest.Return(yamltest.MustParseNode(`{"foo": "bar"}`)),
-			right:   exprtest.Return(yamlutil.String("foo")),
+			right:   exprtest.Return(yamlconv.String("foo")),
 			wantErr: errs.ErrEval,
 		}, {
 			name:    "Right returns non-scalar value",
-			left:    exprtest.Return(yamlutil.String("foo")),
+			left:    exprtest.Return(yamlconv.String("foo")),
 			right:   exprtest.Return(yamltest.MustParseNode(`{"foo": "bar"}`)),
 			wantErr: errs.ErrEval,
 		}, {
 			name:    "Left returns scalar non-numeric value",
-			left:    exprtest.Return(yamlutil.String("foo")),
-			right:   exprtest.Return(yamlutil.Number("42")),
+			left:    exprtest.Return(yamlconv.String("foo")),
+			right:   exprtest.Return(yamlconv.Number(42)),
 			wantErr: errs.ErrEval,
 		}, {
 			name:    "Right returns scalar non-numeric value",
-			left:    exprtest.Return(yamlutil.Number("42")),
-			right:   exprtest.Return(yamlutil.String("foo")),
+			left:    exprtest.Return(yamlconv.Number(42)),
+			right:   exprtest.Return(yamlconv.String("foo")),
 			wantErr: errs.ErrEval,
 		}, {
 			name:    "Left value is invalid number",
-			left:    exprtest.Return(yamlutil.Number("foo")),
-			right:   exprtest.Return(yamlutil.Number("42")),
+			left:    exprtest.Return(yamlconv.RawNumber("foo")),
+			right:   exprtest.Return(yamlconv.Number(42)),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Right value is invalid number",
-			left:    exprtest.Return(yamlutil.Number("42")),
-			right:   exprtest.Return(yamlutil.Number("foo")),
+			left:    exprtest.Return(yamlconv.Number(42)),
+			right:   exprtest.Return(yamlconv.RawNumber("foo")),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:      "operator '-' where left and right are ints",
 			operation: expr.Subtraction,
-			left:      exprtest.Return(yamlutil.Number("42")),
-			right:     exprtest.Return(yamlutil.Number("42")),
-			want:      []*yaml.Node{yamlutil.Number("0")},
+			left:      exprtest.Return(yamlconv.Number(42)),
+			right:     exprtest.Return(yamlconv.Number(42)),
+			want:      []*yaml.Node{yamlconv.Number(0)},
 		}, {
 			name:      "operator '-' where left and right are floats",
 			operation: expr.Subtraction,
-			left:      exprtest.Return(yamlutil.Number("42.69")),
-			right:     exprtest.Return(yamlutil.Number("42.69")),
-			want:      []*yaml.Node{yamlutil.Number("0.00")},
+			left:      exprtest.Return(yamlconv.Number(42.69)),
+			right:     exprtest.Return(yamlconv.Number(42.69)),
+			want:      []*yaml.Node{yamlconv.Number(0.00)},
 		}, {
 			name:      "operator '-' where left is int and right is float",
 			operation: expr.Subtraction,
-			left:      exprtest.Return(yamlutil.Number("42")),
-			right:     exprtest.Return(yamlutil.Number("42.69")),
-			want:      []*yaml.Node{yamlutil.Number("-0.69")},
+			left:      exprtest.Return(yamlconv.Number(42)),
+			right:     exprtest.Return(yamlconv.Number(42.69)),
+			want:      []*yaml.Node{yamlconv.Number(-0.69)},
 		}, {
 			name:      "operator '-' where left is float and right is int",
 			operation: expr.Subtraction,
-			left:      exprtest.Return(yamlutil.Number("42.69")),
-			right:     exprtest.Return(yamlutil.Number("42")),
-			want:      []*yaml.Node{yamlutil.Number("0.69")},
+			left:      exprtest.Return(yamlconv.Number(42.69)),
+			right:     exprtest.Return(yamlconv.Number(42)),
+			want:      []*yaml.Node{yamlconv.Number(0.69)},
 		}, {
 			name:      "operator '*' where left and right are ints",
 			operation: expr.Multiplication,
-			left:      exprtest.Return(yamlutil.Number("5")),
-			right:     exprtest.Return(yamlutil.Number("5")),
-			want:      []*yaml.Node{yamlutil.Number("25")},
+			left:      exprtest.Return(yamlconv.Number(5)),
+			right:     exprtest.Return(yamlconv.Number(5)),
+			want:      []*yaml.Node{yamlconv.Number(25)},
 		}, {
 			name:      "operator '*' where left and right are floats",
 			operation: expr.Multiplication,
-			left:      exprtest.Return(yamlutil.Number("5.5")),
-			right:     exprtest.Return(yamlutil.Number("5.5")),
-			want:      []*yaml.Node{yamlutil.Number("30.25")},
+			left:      exprtest.Return(yamlconv.Number(5.5)),
+			right:     exprtest.Return(yamlconv.Number(5.5)),
+			want:      []*yaml.Node{yamlconv.Number(30.25)},
 		}, {
 			name:      "operator '*' where left is int and right is float",
 			operation: expr.Multiplication,
-			left:      exprtest.Return(yamlutil.Number("5")),
-			right:     exprtest.Return(yamlutil.Number("5.5")),
-			want:      []*yaml.Node{yamlutil.Number("27.5")},
+			left:      exprtest.Return(yamlconv.Number(5)),
+			right:     exprtest.Return(yamlconv.Number(5.5)),
+			want:      []*yaml.Node{yamlconv.Number(27.5)},
 		}, {
 			name:      "operator '*' where left is float and right is int",
 			operation: expr.Multiplication,
-			left:      exprtest.Return(yamlutil.Number("5.5")),
-			right:     exprtest.Return(yamlutil.Number("5")),
-			want:      []*yaml.Node{yamlutil.Number("27.5")},
+			left:      exprtest.Return(yamlconv.Number(5.5)),
+			right:     exprtest.Return(yamlconv.Number(5)),
+			want:      []*yaml.Node{yamlconv.Number(27.5)},
 		}, {
 			name:      "operator '/' where left and right are ints",
 			operation: expr.Division,
-			left:      exprtest.Return(yamlutil.Number("10")),
-			right:     exprtest.Return(yamlutil.Number("2")),
-			want:      []*yaml.Node{yamlutil.Number("5")},
+			left:      exprtest.Return(yamlconv.Number(10)),
+			right:     exprtest.Return(yamlconv.Number(2)),
+			want:      []*yaml.Node{yamlconv.Number(5)},
 		}, {
 			name:      "operator '/' where left and right are floats",
 			operation: expr.Division,
-			left:      exprtest.Return(yamlutil.Number("10.5")),
-			right:     exprtest.Return(yamlutil.Number("2.5")),
-			want:      []*yaml.Node{yamlutil.Number("4.2")},
+			left:      exprtest.Return(yamlconv.Number(10.5)),
+			right:     exprtest.Return(yamlconv.Number(2.5)),
+			want:      []*yaml.Node{yamlconv.Number(4.2)},
 		}, {
 			name:      "operator '/' where left is int and right is float",
 			operation: expr.Division,
-			left:      exprtest.Return(yamlutil.Number("10")),
-			right:     exprtest.Return(yamlutil.Number("2.5")),
-			want:      []*yaml.Node{yamlutil.Number("4")},
+			left:      exprtest.Return(yamlconv.Number(10)),
+			right:     exprtest.Return(yamlconv.Number(2.5)),
+			want:      []*yaml.Node{yamlconv.Number(4)},
 		}, {
 			name:      "operator '/' where left is float and right is int",
 			operation: expr.Division,
-			left:      exprtest.Return(yamlutil.Number("10.5")),
-			right:     exprtest.Return(yamlutil.Number("2")),
-			want:      []*yaml.Node{yamlutil.Number("5.25")},
+			left:      exprtest.Return(yamlconv.Number(10.5)),
+			right:     exprtest.Return(yamlconv.Number(2)),
+			want:      []*yaml.Node{yamlconv.Number(5.25)},
 		}, {
 			name:      "operator '%' where left and right are ints",
 			operation: expr.Modulus,
-			left:      exprtest.Return(yamlutil.Number("10")),
-			right:     exprtest.Return(yamlutil.Number("3")),
-			want:      []*yaml.Node{yamlutil.Number("1")},
+			left:      exprtest.Return(yamlconv.Number(10)),
+			right:     exprtest.Return(yamlconv.Number(3)),
+			want:      []*yaml.Node{yamlconv.Number(1)},
 		},
 	}
 
@@ -176,7 +177,7 @@ func TestArithmeticExpr(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("ArithmeticExpr.Eval() error = %v, wantErr %v", err, tc.wantErr)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("ArithmeticExpr.Eval() = %v, want %v", got, want)
 			}
 		})

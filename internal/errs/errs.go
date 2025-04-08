@@ -82,7 +82,11 @@ func NewKindError(source string, got *yaml.Node, want ...yaml.Kind) error {
 func (e *KindError) Error() string {
 	var sb strings.Builder
 	_, _ = fmt.Fprint(&sb, ErrEval.Error())
-	_, _ = fmt.Fprintf(&sb, ": %s expected YAML node with kind", e.Source)
+	_, _ = fmt.Fprint(&sb, ":")
+	if e.Source != "" {
+		_, _ = fmt.Fprintf(&sb, " %s", e.Source)
+	}
+	_, _ = fmt.Fprint(&sb, " expected YAML node with kind")
 	_, _ = fmt.Fprintf(&sb, " '%s'", kindToString(e.Expected[0]))
 	if len(e.Expected) > 1 {
 		for i := 1; i < len(e.Expected)-1; i++ {
@@ -219,4 +223,18 @@ func kindToString(kind yaml.Kind) string {
 		return "alias"
 	}
 	return fmt.Sprintf("unknown(%d)", kind)
+}
+
+// IncludeSource adds a source to the error if it is an [KindError], or
+// [TagError], or [NotSingletonError].
+func IncludeSource(err error, source string) error {
+	switch err := err.(type) {
+	case *NotSingletonError:
+		err.Source = source
+	case *KindError:
+		err.Source = source
+	case *TagError:
+		err.Source = source
+	}
+	return err
 }

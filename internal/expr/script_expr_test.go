@@ -10,8 +10,9 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestScriptExpr(t *testing.T) {
@@ -29,7 +30,7 @@ func TestScriptExpr(t *testing.T) {
 			wantErr: testErr,
 		}, {
 			name:    "Expr returns multiple nodes",
-			expr:    exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
+			expr:    exprtest.Return(yamlconv.String("hello"), yamlconv.String("world")),
 			wantErr: errs.ErrEval,
 		}, {
 			name:    "Expr returns single non-scalar node",
@@ -37,21 +38,21 @@ func TestScriptExpr(t *testing.T) {
 			wantErr: errs.ErrEval,
 		}, {
 			name:  "Expr returns single scalar int node",
-			expr:  exprtest.Return(yamlutil.Number("1")),
+			expr:  exprtest.Return(yamlconv.Number(1)),
 			input: []*yaml.Node{yamltest.MustParseNode(`[1, 2, 3]`)},
-			want:  []*yaml.Node{yamlutil.Number("2")},
+			want:  []*yaml.Node{yamlconv.Number(2)},
 		}, {
 			name:  "Expr returns single scalar string node",
-			expr:  exprtest.Return(yamlutil.String("key")),
+			expr:  exprtest.Return(yamlconv.String("key")),
 			input: []*yaml.Node{yamltest.MustParseNode(`{"key": "value"}`)},
-			want:  []*yaml.Node{yamlutil.String("value")},
+			want:  []*yaml.Node{yamlconv.String("value")},
 		}, {
 			name:    "Expr returns invalid integer node",
-			expr:    exprtest.Return(yamlutil.Number("foo")),
+			expr:    exprtest.Return(yamlconv.RawNumber("foo")),
 			wantErr: errs.ErrEval,
 		}, {
 			name:    "Expr returns scalar boolean node",
-			expr:    exprtest.Return(yamlutil.True),
+			expr:    exprtest.Return(yamlconv.Bool(true)),
 			wantErr: errs.ErrEval,
 		},
 	}
@@ -65,7 +66,7 @@ func TestScriptExpr(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Errorf("ScriptExpr.Eval() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("ScriptExpr.Eval() = %v, want %v", got, want)
 			}
 		})

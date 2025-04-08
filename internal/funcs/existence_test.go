@@ -11,7 +11,8 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/funcs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/invocation/invocationtest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 func TestEmpty(t *testing.T) {
@@ -24,11 +25,11 @@ func TestEmpty(t *testing.T) {
 		{
 			name:  "Empty input evalutes to true",
 			input: []*yaml.Node{},
-			want:  []*yaml.Node{yamlutil.True},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:  "Non-empty input evalutes to false",
-			input: []*yaml.Node{yamlutil.String("hello")},
-			want:  []*yaml.Node{yamlutil.False},
+			input: []*yaml.Node{yamlconv.String("hello")},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		},
 	}
 
@@ -41,7 +42,7 @@ func TestEmpty(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Empty() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Empty() = %v, want %v", got, want)
 			}
 		})
@@ -60,31 +61,31 @@ func TestExists(t *testing.T) {
 		{
 			name:  "Empty input set returns false",
 			input: []*yaml.Node{},
-			want:  []*yaml.Node{yamlutil.False},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		}, {
 			name:  "Non-empty input set returns true",
-			input: []*yaml.Node{yamlutil.String("hello")},
-			want:  []*yaml.Node{yamlutil.True},
+			input: []*yaml.Node{yamlconv.String("hello")},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name: "Non-empty input set with params that returns values is true",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlutil.String("example")),
+				invocationtest.SuccessParameter(yamlconv.String("example")),
 			},
-			input: []*yaml.Node{yamlutil.String("hello")},
-			want:  []*yaml.Node{yamlutil.True},
+			input: []*yaml.Node{yamlconv.String("hello")},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name: "Non-empty input set with params that returns no values is false",
 			params: []invocation.Parameter{
 				invocationtest.SuccessParameter(),
 			},
-			input: []*yaml.Node{yamlutil.String("hello")},
-			want:  []*yaml.Node{yamlutil.False},
+			input: []*yaml.Node{yamlconv.String("hello")},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		}, {
 			name: "Non-empty input set with params that returns error is error",
 			params: []invocation.Parameter{
 				invocationtest.ErrorParameter(testErr),
 			},
-			input:   []*yaml.Node{yamlutil.String("hello")},
+			input:   []*yaml.Node{yamlconv.String("hello")},
 			wantErr: testErr,
 		},
 	}
@@ -98,7 +99,7 @@ func TestExists(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Exists() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Exists() = %v, want %v", got, want)
 			}
 		})
@@ -115,11 +116,11 @@ func TestCount(t *testing.T) {
 		{
 			name:  "Empty input set returns 0",
 			input: []*yaml.Node{},
-			want:  []*yaml.Node{yamlutil.Number("0")},
+			want:  []*yaml.Node{yamlconv.Number(0)},
 		}, {
 			name:  "Non-empty collection returns count",
-			input: []*yaml.Node{yamlutil.String("hello")},
-			want:  []*yaml.Node{yamlutil.Number("1")},
+			input: []*yaml.Node{yamlconv.String("hello")},
+			want:  []*yaml.Node{yamlconv.Number(1)},
 		},
 	}
 
@@ -132,7 +133,7 @@ func TestCount(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Count() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Count() = %v, want %v", got, want)
 			}
 		})
@@ -153,23 +154,23 @@ func TestDistinct(t *testing.T) {
 		}, {
 			name: "Input contains duplicates",
 			input: []*yaml.Node{
-				yamlutil.String("hello"),
-				yamlutil.String("world"),
-				yamlutil.String("hello")},
+				yamlconv.String("hello"),
+				yamlconv.String("world"),
+				yamlconv.String("hello")},
 			want: []*yaml.Node{
-				yamlutil.String("hello"),
-				yamlutil.String("world")},
+				yamlconv.String("hello"),
+				yamlconv.String("world")},
 		}, {
 			name: "Input contains no duplicates",
 			input: []*yaml.Node{
-				yamlutil.String("hello"),
-				yamlutil.String("world"),
-				yamlutil.String("goodbye"),
+				yamlconv.String("hello"),
+				yamlconv.String("world"),
+				yamlconv.String("goodbye"),
 			},
 			want: []*yaml.Node{
-				yamlutil.String("hello"),
-				yamlutil.String("world"),
-				yamlutil.String("goodbye"),
+				yamlconv.String("hello"),
+				yamlconv.String("world"),
+				yamlconv.String("goodbye"),
 			},
 		},
 	}
@@ -183,7 +184,7 @@ func TestDistinct(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Distinct() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Distinct() = %v, want %v", got, want)
 			}
 		})
@@ -204,21 +205,21 @@ func TestIsDistinct(t *testing.T) {
 		}, {
 			name: "Input contains duplicates",
 			input: []*yaml.Node{
-				yamlutil.String("hello"),
-				yamlutil.String("world"),
-				yamlutil.String("hello")},
+				yamlconv.String("hello"),
+				yamlconv.String("world"),
+				yamlconv.String("hello")},
 			want: []*yaml.Node{
-				yamlutil.Boolean("false"),
+				yamlconv.Bool(false),
 			},
 		}, {
 			name: "Input contains no duplicates",
 			input: []*yaml.Node{
-				yamlutil.String("hello"),
-				yamlutil.String("world"),
-				yamlutil.String("goodbye"),
+				yamlconv.String("hello"),
+				yamlconv.String("world"),
+				yamlconv.String("goodbye"),
 			},
 			want: []*yaml.Node{
-				yamlutil.Boolean("true"),
+				yamlconv.Bool(true),
 			},
 		},
 	}
@@ -232,7 +233,7 @@ func TestIsDistinct(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Distinct() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Distinct() = %v, want %v", got, want)
 			}
 		})
@@ -251,21 +252,21 @@ func TestAll(t *testing.T) {
 		{
 			name:  "Empty collection returns true",
 			input: []*yaml.Node{},
-			want:  []*yaml.Node{yamlutil.True},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		},
 		{
 			name:  "Param returns truthy value",
-			input: []*yaml.Node{yamlutil.String("hello")},
-			param: invocationtest.SuccessParameter(yamlutil.True),
-			want:  []*yaml.Node{yamlutil.True},
+			input: []*yaml.Node{yamlconv.String("hello")},
+			param: invocationtest.SuccessParameter(yamlconv.Bool(true)),
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:  "Param returns falsey value",
-			input: []*yaml.Node{yamlutil.String("hello")},
-			param: invocationtest.SuccessParameter(yamlutil.False),
-			want:  []*yaml.Node{yamlutil.False},
+			input: []*yaml.Node{yamlconv.String("hello")},
+			param: invocationtest.SuccessParameter(yamlconv.Bool(false)),
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		}, {
 			name:    "Param returns error",
-			input:   []*yaml.Node{yamlutil.String("hello")},
+			input:   []*yaml.Node{yamlconv.String("hello")},
 			param:   invocationtest.ErrorParameter(testErr),
 			wantErr: testErr,
 		},
@@ -280,7 +281,7 @@ func TestAll(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("All() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("All() = %v, want %v", got, want)
 			}
 		})
@@ -299,28 +300,28 @@ func TestAny(t *testing.T) {
 		{
 			name:  "Empty collection returns false",
 			input: []*yaml.Node{},
-			want:  []*yaml.Node{yamlutil.False},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		},
 		{
 			name:  "Param returns truthy value",
-			input: []*yaml.Node{yamlutil.String("hello")},
-			param: invocationtest.SuccessParameter(yamlutil.True),
-			want:  []*yaml.Node{yamlutil.True},
+			input: []*yaml.Node{yamlconv.String("hello")},
+			param: invocationtest.SuccessParameter(yamlconv.Bool(true)),
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:  "Param returns falsey value",
-			input: []*yaml.Node{yamlutil.String("hello")},
-			param: invocationtest.SuccessParameter(yamlutil.False),
-			want:  []*yaml.Node{yamlutil.False},
+			input: []*yaml.Node{yamlconv.String("hello")},
+			param: invocationtest.SuccessParameter(yamlconv.Bool(false)),
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		}, {
 			name:    "Param returns error",
-			input:   []*yaml.Node{yamlutil.String("hello")},
+			input:   []*yaml.Node{yamlconv.String("hello")},
 			param:   invocationtest.ErrorParameter(testErr),
 			wantErr: testErr,
 		}, {
 			name:  "Param returns false then true",
-			input: []*yaml.Node{yamlutil.String("hello"), yamlutil.String("world")},
-			param: invocationtest.NewParameter().AddSuccess(yamlutil.False).AddSuccess(yamlutil.True),
-			want:  []*yaml.Node{yamlutil.True},
+			input: []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
+			param: invocationtest.NewParameter().AddSuccess(yamlconv.Bool(false)).AddSuccess(yamlconv.Bool(true)),
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		},
 	}
 
@@ -333,7 +334,7 @@ func TestAny(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Any() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Any() = %v, want %v", got, want)
 			}
 		})
@@ -350,19 +351,19 @@ func TestAllTrue(t *testing.T) {
 		{
 			name:  "Empty collection returns true",
 			input: []*yaml.Node{},
-			want:  []*yaml.Node{yamlutil.True},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:  "non-boolean input returns false",
-			input: []*yaml.Node{yamlutil.True, yamlutil.String("true"), yamlutil.True},
-			want:  []*yaml.Node{yamlutil.False},
+			input: []*yaml.Node{yamlconv.Bool(true), yamlconv.String("true"), yamlconv.Bool(true)},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		}, {
 			name:  "all true values return true",
-			input: []*yaml.Node{yamlutil.True, yamlutil.True, yamlutil.True},
-			want:  []*yaml.Node{yamlutil.True},
+			input: []*yaml.Node{yamlconv.Bool(true), yamlconv.Bool(true), yamlconv.Bool(true)},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:  "any false values return false",
-			input: []*yaml.Node{yamlutil.True, yamlutil.False, yamlutil.True},
-			want:  []*yaml.Node{yamlutil.False},
+			input: []*yaml.Node{yamlconv.Bool(true), yamlconv.Bool(false), yamlconv.Bool(true)},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		},
 	}
 
@@ -375,7 +376,7 @@ func TestAllTrue(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("AllTrue() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("AllTrue() = %v, want %v", got, want)
 			}
 		})
@@ -392,15 +393,15 @@ func TestAnyTrue(t *testing.T) {
 		{
 			name:  "Empty collection returns false",
 			input: []*yaml.Node{},
-			want:  []*yaml.Node{yamlutil.False},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		}, {
 			name:  "any true value returns true",
-			input: []*yaml.Node{yamlutil.False, yamlutil.String("true"), yamlutil.True},
-			want:  []*yaml.Node{yamlutil.True},
+			input: []*yaml.Node{yamlconv.Bool(false), yamlconv.String("true"), yamlconv.Bool(true)},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:  "all false or non-boolean returns false",
-			input: []*yaml.Node{yamlutil.False, yamlutil.String("true"), yamlutil.False},
-			want:  []*yaml.Node{yamlutil.False},
+			input: []*yaml.Node{yamlconv.Bool(false), yamlconv.String("true"), yamlconv.Bool(false)},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		},
 	}
 
@@ -413,7 +414,7 @@ func TestAnyTrue(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("AnyTrue() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("AnyTrue() = %v, want %v", got, want)
 			}
 		})
@@ -430,19 +431,19 @@ func TestAllFalse(t *testing.T) {
 		{
 			name:  "Empty collection returns true",
 			input: []*yaml.Node{},
-			want:  []*yaml.Node{yamlutil.True},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:  "non-boolean input returns false",
-			input: []*yaml.Node{yamlutil.False, yamlutil.String("false"), yamlutil.False},
-			want:  []*yaml.Node{yamlutil.False},
+			input: []*yaml.Node{yamlconv.Bool(false), yamlconv.String("false"), yamlconv.Bool(false)},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		}, {
 			name:  "all false values return true",
-			input: []*yaml.Node{yamlutil.False, yamlutil.False, yamlutil.False},
-			want:  []*yaml.Node{yamlutil.True},
+			input: []*yaml.Node{yamlconv.Bool(false), yamlconv.Bool(false), yamlconv.Bool(false)},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:  "any true values return false",
-			input: []*yaml.Node{yamlutil.False, yamlutil.False, yamlutil.True},
-			want:  []*yaml.Node{yamlutil.False},
+			input: []*yaml.Node{yamlconv.Bool(false), yamlconv.Bool(false), yamlconv.Bool(true)},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		},
 	}
 
@@ -455,7 +456,7 @@ func TestAllFalse(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("AllFalse() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("AllFalse() = %v, want %v", got, want)
 			}
 		})
@@ -472,15 +473,15 @@ func TestAnyFalse(t *testing.T) {
 		{
 			name:  "Empty collection returns false",
 			input: []*yaml.Node{},
-			want:  []*yaml.Node{yamlutil.False},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		}, {
 			name:  "any false value returns true",
-			input: []*yaml.Node{yamlutil.True, yamlutil.String("true"), yamlutil.False},
-			want:  []*yaml.Node{yamlutil.True},
+			input: []*yaml.Node{yamlconv.Bool(true), yamlconv.String("true"), yamlconv.Bool(false)},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:  "all true or non-boolean returns false",
-			input: []*yaml.Node{yamlutil.True, yamlutil.String("true"), yamlutil.True},
-			want:  []*yaml.Node{yamlutil.False},
+			input: []*yaml.Node{yamlconv.Bool(true), yamlconv.String("true"), yamlconv.Bool(true)},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		},
 	}
 
@@ -493,7 +494,7 @@ func TestAnyFalse(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("AnyFalse() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("AnyFalse() = %v, want %v", got, want)
 			}
 		})

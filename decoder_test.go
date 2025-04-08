@@ -7,8 +7,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"rodusek.dev/pkg/yamlpath"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestDecoder_Decode_DecodesSequenceAndReturnsEOF(t *testing.T) {
@@ -47,7 +47,7 @@ func TestDecoder_Decode_DecodesSequenceAndReturnsEOF(t *testing.T) {
 
 func TestDecoder_Decode_BadDecodingReturnsError(t *testing.T) {
 	collection := yamlpath.Collection{
-		yamlutil.String("hello"),
+		yamlconv.String("hello"),
 	}
 
 	sut := collection.Decoder()

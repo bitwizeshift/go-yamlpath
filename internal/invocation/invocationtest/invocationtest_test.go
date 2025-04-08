@@ -8,11 +8,12 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation/invocationtest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 func TestSuccessParameter(t *testing.T) {
-	input := []*yaml.Node{yamlutil.String("hello world")}
+	input := []*yaml.Node{yamlconv.String("hello world")}
 
 	sut := invocationtest.SuccessParameter(input...)
 
@@ -21,7 +22,7 @@ func TestSuccessParameter(t *testing.T) {
 	if got, want := err, (error)(nil); !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 		t.Fatalf("SuccessParameter(...).GetArg() error = %v, want %v", got, want)
 	}
-	if got, want := got, input; !yamlutil.EqualRange(got, want) {
+	if got, want := got, input; !yamlcmp.EqualRange(got, want) {
 		t.Errorf("SuccessParameter(...).GetArg() = %v, want %v", got, want)
 	}
 }

@@ -9,7 +9,8 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 func TestEqualityExpr(t *testing.T) {
@@ -24,25 +25,25 @@ func TestEqualityExpr(t *testing.T) {
 			name:  "empty left and right expression returns true",
 			left:  exprtest.Return(),
 			right: exprtest.Return(),
-			want:  []*yaml.Node{yamlutil.True},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:  "left and right are the same",
-			left:  exprtest.Return(yamlutil.String("hello")),
-			right: exprtest.Return(yamlutil.String("hello")),
-			want:  []*yaml.Node{yamlutil.True},
+			left:  exprtest.Return(yamlconv.String("hello")),
+			right: exprtest.Return(yamlconv.String("hello")),
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:  "left and right are different",
-			left:  exprtest.Return(yamlutil.String("hello")),
-			right: exprtest.Return(yamlutil.String("world")),
-			want:  []*yaml.Node{yamlutil.False},
+			left:  exprtest.Return(yamlconv.String("hello")),
+			right: exprtest.Return(yamlconv.String("world")),
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		}, {
 			name:    "left expression returns error",
 			left:    exprtest.Error(testErr),
-			right:   exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Return(yamlconv.String("hello")),
 			wantErr: testErr,
 		}, {
 			name:    "right expression returns error",
-			left:    exprtest.Return(yamlutil.String("hello")),
+			left:    exprtest.Return(yamlconv.String("hello")),
 			right:   exprtest.Error(testErr),
 			wantErr: testErr,
 		},
@@ -60,7 +61,7 @@ func TestEqualityExpr(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("EqualityExpr.Eval() error = %v, wantErr %v", err, tc.wantErr)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("EqualityExpr.Eval() = %v, want %v", got, want)
 			}
 		})

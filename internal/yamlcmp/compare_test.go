@@ -1,4 +1,4 @@
-package yamlutil_test
+package yamlcmp_test
 
 import (
 	"testing"
@@ -6,8 +6,9 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestLessRange(t *testing.T) {
@@ -22,23 +23,23 @@ func TestLessRange(t *testing.T) {
 			want: false,
 		}, {
 			name: "Left range is empty",
-			rhs:  []*yaml.Node{yamlutil.Boolean("true")},
+			rhs:  []*yaml.Node{yamlconv.Bool(true)},
 			want: true,
 		}, {
 			name: "Right range is empty",
-			lhs:  []*yaml.Node{yamlutil.Boolean("true")},
+			lhs:  []*yaml.Node{yamlconv.Bool(true)},
 			want: false,
 		}, {
 			name:    "Ranges have different kinds",
-			lhs:     []*yaml.Node{yamlutil.Number("42")},
-			rhs:     []*yaml.Node{yamlutil.String("42")},
+			lhs:     []*yaml.Node{yamlconv.Number(42)},
+			rhs:     []*yaml.Node{yamlconv.String("42")},
 			wantErr: cmpopts.AnyError,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := yamlutil.LessRange(tc.lhs, tc.rhs)
+			got, err := yamlcmp.LessRange(tc.lhs, tc.rhs)
 
 			if got, want := got, tc.want; !cmp.Equal(got, want) {
 				t.Errorf("LessRange() = %v; want %v", got, tc.want)
@@ -62,37 +63,37 @@ func TestCompareRange(t *testing.T) {
 			want: 0,
 		}, {
 			name: "Left range is empty",
-			rhs:  []*yaml.Node{yamlutil.Boolean("true")},
+			rhs:  []*yaml.Node{yamlconv.Bool(true)},
 			want: -1,
 		}, {
 			name: "Right range is empty",
-			lhs:  []*yaml.Node{yamlutil.Boolean("true")},
+			lhs:  []*yaml.Node{yamlconv.Bool(true)},
 			want: 1,
 		}, {
 			name: "Ranges are different length",
-			lhs:  []*yaml.Node{yamlutil.Number("42")},
-			rhs:  []*yaml.Node{yamlutil.Number("42"), yamlutil.Number("43")},
+			lhs:  []*yaml.Node{yamlconv.Number(42)},
+			rhs:  []*yaml.Node{yamlconv.Number(42), yamlconv.Number(43)},
 			want: -1,
 		}, {
 			name: "Ranges have different values",
-			lhs:  []*yaml.Node{yamlutil.Number("42"), yamlutil.Number("43")},
-			rhs:  []*yaml.Node{yamlutil.Number("42"), yamlutil.Number("44")},
+			lhs:  []*yaml.Node{yamlconv.Number(42), yamlconv.Number(43)},
+			rhs:  []*yaml.Node{yamlconv.Number(42), yamlconv.Number(44)},
 			want: -1,
 		}, {
 			name: "Ranges are equal",
-			lhs:  []*yaml.Node{yamlutil.Number("42"), yamlutil.Number("43")},
-			rhs:  []*yaml.Node{yamlutil.Number("42"), yamlutil.Number("43")},
+			lhs:  []*yaml.Node{yamlconv.Number(42), yamlconv.Number(43)},
+			rhs:  []*yaml.Node{yamlconv.Number(42), yamlconv.Number(43)},
 		}, {
 			name:    "Ranges have different kinds",
-			lhs:     []*yaml.Node{yamlutil.Number("42")},
-			rhs:     []*yaml.Node{yamlutil.String("42")},
+			lhs:     []*yaml.Node{yamlconv.Number(42)},
+			rhs:     []*yaml.Node{yamlconv.String("42")},
 			wantErr: cmpopts.AnyError,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := yamlutil.CompareRange(tc.lhs, tc.rhs)
+			got, err := yamlcmp.CompareRange(tc.lhs, tc.rhs)
 
 			if got, want := got, tc.want; !cmp.Equal(got, want) {
 				t.Errorf("CompareRange() = %v; want %v", got, tc.want)
@@ -117,51 +118,51 @@ func TestCompare(t *testing.T) {
 			want: 0,
 		}, {
 			name: "Left node is nil",
-			rhs:  yamlutil.Boolean("true"),
+			rhs:  yamlconv.Bool(true),
 			want: -1,
 		}, {
 			name: "Right node is nil",
-			lhs:  yamlutil.Boolean("true"),
+			lhs:  yamlconv.Bool(true),
 			want: 1,
 		}, {
 			name: "Both nodes are identical scalar strings",
-			lhs:  yamlutil.String("hello"),
-			rhs:  yamlutil.String("hello"),
+			lhs:  yamlconv.String("hello"),
+			rhs:  yamlconv.String("hello"),
 			want: 0,
 		}, {
 			name: "Both nodes are different scalar strings",
-			lhs:  yamlutil.String("hello"),
-			rhs:  yamlutil.String("world"),
+			lhs:  yamlconv.String("hello"),
+			rhs:  yamlconv.String("world"),
 			want: -1,
 		}, {
 			name: "Both nodes are equivalent scalar numbers",
-			lhs:  yamlutil.Number("42e0"),
-			rhs:  yamlutil.Number("42"),
+			lhs:  yamlconv.Number(42e0),
+			rhs:  yamlconv.Number(42),
 			want: 0,
 		}, {
 			name: "Both nodes are different scalar numbers",
-			lhs:  yamlutil.Number("42"),
-			rhs:  yamlutil.Number("43"),
+			lhs:  yamlconv.Number(42),
+			rhs:  yamlconv.Number(43),
 			want: -1,
 		}, {
 			name: "Both nodes are the same scalar booleans",
-			lhs:  yamlutil.Boolean("true"),
-			rhs:  yamlutil.Boolean("true"),
+			lhs:  yamlconv.Bool(true),
+			rhs:  yamlconv.Bool(true),
 			want: 0,
 		}, {
 			name: "Left node is false, right node is true",
-			lhs:  yamlutil.Boolean("false"),
-			rhs:  yamlutil.Boolean("true"),
+			lhs:  yamlconv.Bool(false),
+			rhs:  yamlconv.Bool(true),
 			want: -1,
 		}, {
 			name: "Left node is true, right node is false",
-			lhs:  yamlutil.Boolean("true"),
-			rhs:  yamlutil.Boolean("false"),
+			lhs:  yamlconv.Bool(true),
+			rhs:  yamlconv.Bool(false),
 			want: 1,
 		}, {
 			name: "Null nodes compare equal",
-			lhs:  yamlutil.Null(),
-			rhs:  yamlutil.Null(),
+			lhs:  yamlconv.Null(),
+			rhs:  yamlconv.Null(),
 			want: 0,
 		},
 		// Sequence Values
@@ -184,40 +185,40 @@ func TestCompare(t *testing.T) {
 		// Errors
 		{
 			name: "Node kinds are different",
-			lhs:  yamlutil.Boolean("true"),
+			lhs:  yamlconv.Bool(true),
 			rhs: &yaml.Node{
 				Kind: yaml.SequenceNode,
 			},
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Scalar values with different tags",
-			lhs:     yamlutil.Number("1234"),
-			rhs:     yamlutil.String("true"),
+			lhs:     yamlconv.Number(1234),
+			rhs:     yamlconv.String("true"),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Scalar values with different non-numeric tags",
-			lhs:     yamlutil.String("hello"),
-			rhs:     yamlutil.Boolean("true"),
+			lhs:     yamlconv.String("hello"),
+			rhs:     yamlconv.Bool(true),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Scalar numeric values, left node is invalid",
-			lhs:     yamlutil.Number("hello"),
-			rhs:     yamlutil.Number("42"),
+			lhs:     yamlconv.RawNumber("hello"),
+			rhs:     yamlconv.Number(42),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Scalar numeric values, right node is invalid",
-			lhs:     yamlutil.Number("42"),
-			rhs:     yamlutil.Number("world"),
+			lhs:     yamlconv.Number(42),
+			rhs:     yamlconv.RawNumber("world"),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Scalar boolean values, left node is invalid",
-			lhs:     yamlutil.Boolean("hello"),
-			rhs:     yamlutil.Boolean("true"),
+			lhs:     yamlconv.RawBool("hello"),
+			rhs:     yamlconv.Bool(true),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Scalar boolean values, right node is invalid",
-			lhs:     yamlutil.Boolean("true"),
-			rhs:     yamlutil.Boolean("world"),
+			lhs:     yamlconv.Bool(true),
+			rhs:     yamlconv.RawBool("world"),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name: "Scalar nodes with equivalent but invalid tags",
@@ -240,7 +241,7 @@ func TestCompare(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := yamlutil.Compare(tc.lhs, tc.rhs)
+			got, err := yamlcmp.Compare(tc.lhs, tc.rhs)
 
 			if got, want := got, tc.want; !cmp.Equal(got, want) {
 				t.Errorf("Compare() = %v; want %v", got, tc.want)

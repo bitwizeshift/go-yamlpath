@@ -7,8 +7,8 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 type anyYAMLPath struct{}
@@ -129,8 +129,8 @@ func TestYAMLPath_Match(t *testing.T) {
 			path:  yamlpath.MustCompile("$[*].name"),
 			input: yamltest.MustParseNode(`[{"name": "Alice"}, {"name": "Bob"}]`),
 			want: yamlpath.Collection{
-				yamlutil.String("Alice"),
-				yamlutil.String("Bob"),
+				yamlconv.String("Alice"),
+				yamlconv.String("Bob"),
 			},
 		}, {
 			name:    "Evaluation error surfaces error",
@@ -160,8 +160,8 @@ func TestYAMLPath_MustMatch(t *testing.T) {
 	got := sut.MustMatch(input)
 
 	want := yamlpath.Collection{
-		yamlutil.String("Alice"),
-		yamlutil.String("Bob"),
+		yamlconv.String("Alice"),
+		yamlconv.String("Bob"),
 	}
 
 	if got, want := got, want; !cmp.Equal(got, want) {

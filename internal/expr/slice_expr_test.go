@@ -8,8 +8,9 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestSliceExpr(t *testing.T) {
@@ -32,8 +33,8 @@ func TestSliceExpr(t *testing.T) {
 				yamltest.MustParseNode(`["Alice", "Bob", "Charlie"]`),
 			},
 			want: []*yaml.Node{
-				yamlutil.String("Bob"),
-				yamlutil.String("Charlie"),
+				yamlconv.String("Bob"),
+				yamlconv.String("Charlie"),
 			},
 		}, {
 			name:  "Input is mapping",
@@ -49,8 +50,8 @@ func TestSliceExpr(t *testing.T) {
 				yamltest.MustParseNode(`["Alice", "Bob", "Charlie", "David"]`),
 			},
 			want: []*yaml.Node{
-				yamlutil.String("Bob"),
-				yamlutil.String("David"),
+				yamlconv.String("Bob"),
+				yamlconv.String("David"),
 			},
 		},
 	}
@@ -66,7 +67,7 @@ func TestSliceExpr(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Errorf("SliceExpr.Eval() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("SliceExpr.Eval() = %v, want %v", got, want)
 			}
 		})

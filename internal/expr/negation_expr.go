@@ -3,7 +3,7 @@ package expr
 import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // NegationExpr is a representation of the '!' operator in YAMLPath expressions.
@@ -18,8 +18,8 @@ func (e *NegationExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	if yamlutil.IsTruthy(result...) {
-		return []*yaml.Node{yamlutil.False}, nil
+	if yamlconv.IsTruthy(result...) {
+		return []*yaml.Node{yamlconv.Bool(false)}, nil
 	}
-	return []*yaml.Node{yamlutil.True}, nil
+	return []*yaml.Node{yamlconv.Bool(true)}, nil
 }

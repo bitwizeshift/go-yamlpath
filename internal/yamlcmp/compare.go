@@ -1,4 +1,4 @@
-package yamlutil
+package yamlcmp
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // LessRange compares two ranges of yaml nodes for less than.
@@ -16,7 +17,7 @@ func LessRange(lhs, rhs []*yaml.Node) (bool, error) {
 
 // CompareRange compares two ranges of yaml nodes for less than.
 func CompareRange(lhs, rhs []*yaml.Node) (int, error) {
-	lhs, rhs = Normalize(lhs...), Normalize(rhs...)
+	lhs, rhs = yamlconv.FlattenDocuments(lhs...), yamlconv.FlattenDocuments(rhs...)
 
 	if len(lhs) != len(rhs) {
 		return len(lhs) - len(rhs), nil
@@ -80,11 +81,11 @@ func compareScalar(lhs, rhs *yaml.Node) (int, error) {
 
 	switch lhs.Tag {
 	case "!!bool":
-		l, err := ToBool(lhs)
+		l, err := yamlconv.ParseBool(lhs)
 		if err != nil {
 			return 0, err
 		}
-		r, err := ToBool(rhs)
+		r, err := yamlconv.ParseBool(rhs)
 		if err != nil {
 			return 0, err
 		}

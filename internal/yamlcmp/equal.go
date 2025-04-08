@@ -1,14 +1,15 @@
-package yamlutil
+package yamlcmp
 
 import (
 	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // EqualRange compares two ranges of yaml nodes for equality.
 // Documents, source locations, and comments are ignored.
 func EqualRange(lhs, rhs []*yaml.Node) bool {
-	lhs, rhs = Normalize(lhs...), Normalize(rhs...)
+	lhs, rhs = yamlconv.FlattenDocuments(lhs...), yamlconv.FlattenDocuments(rhs...)
 
 	if len(lhs) != len(rhs) {
 		return false
@@ -29,7 +30,7 @@ func Equal(lhs, rhs *yaml.Node) bool {
 	if lhs == nil || rhs == nil {
 		return false
 	}
-	lhs, rhs = Normalize(lhs)[0], Normalize(rhs)[0]
+	lhs, rhs = yamlconv.FlattenDocuments(lhs)[0], yamlconv.FlattenDocuments(rhs)[0]
 
 	if lhs.Kind != rhs.Kind {
 		return false

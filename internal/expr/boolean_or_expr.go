@@ -3,7 +3,7 @@ package expr
 import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // BooleanOrExpr represents a boolean OR expression.
@@ -17,17 +17,17 @@ func (e *BooleanOrExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	if yamlutil.IsTruthy(left...) {
-		return []*yaml.Node{yamlutil.True}, nil
+	if yamlconv.IsTruthy(left...) {
+		return []*yaml.Node{yamlconv.Bool(true)}, nil
 	}
 
 	right, err := e.Right.Eval(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if yamlutil.IsTruthy(right...) {
-		return []*yaml.Node{yamlutil.True}, nil
+	if yamlconv.IsTruthy(right...) {
+		return []*yaml.Node{yamlconv.Bool(true)}, nil
 	}
 
-	return []*yaml.Node{yamlutil.False}, nil
+	return []*yaml.Node{yamlconv.Bool(false)}, nil
 }

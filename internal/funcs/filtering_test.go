@@ -12,8 +12,9 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/funcs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/invocation/invocationtest"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestWhere(t *testing.T) {
@@ -28,23 +29,23 @@ func TestWhere(t *testing.T) {
 		{
 			name: "Criteria parameter returns true",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlutil.True).AddSuccess(yamlutil.False),
+				invocationtest.SuccessParameter(yamlconv.Bool(true)).AddSuccess(yamlconv.Bool(false)),
 			},
-			input: []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar")},
-			want:  []*yaml.Node{yamlutil.String("foo")},
+			input: []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar")},
+			want:  []*yaml.Node{yamlconv.String("foo")},
 		}, {
 			name: "Criteria parameter returns false",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlutil.False),
+				invocationtest.SuccessParameter(yamlconv.Bool(false)),
 			},
-			input: []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar")},
+			input: []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar")},
 			want:  []*yaml.Node{},
 		}, {
 			name: "Criteria parameter returns error",
 			params: []invocation.Parameter{
 				invocationtest.ErrorParameter(testErr),
 			},
-			input:   []*yaml.Node{yamlutil.String("hello")},
+			input:   []*yaml.Node{yamlconv.String("hello")},
 			wantErr: testErr,
 		},
 	}
@@ -58,7 +59,7 @@ func TestWhere(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Where() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Where() = %v, want %v", got, want)
 			}
 		})
@@ -77,16 +78,16 @@ func TestTransform(t *testing.T) {
 		{
 			name: "Projection parameter returns elements",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlutil.String("hello")).AddSuccess(yamlutil.String("world")),
+				invocationtest.SuccessParameter(yamlconv.String("hello")).AddSuccess(yamlconv.String("world")),
 			},
-			input: []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar")},
-			want:  []*yaml.Node{yamlutil.String("hello"), yamlutil.String("world")},
+			input: []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar")},
+			want:  []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
 		}, {
 			name: "Projection parameter returns error",
 			params: []invocation.Parameter{
 				invocationtest.ErrorParameter(testErr),
 			},
-			input:   []*yaml.Node{yamlutil.String("hello")},
+			input:   []*yaml.Node{yamlconv.String("hello")},
 			wantErr: testErr,
 		},
 	}
@@ -100,7 +101,7 @@ func TestTransform(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Select() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Select() = %v, want %v", got, want)
 			}
 		})
@@ -116,7 +117,7 @@ func TestKeys(t *testing.T) {
 		{
 			name:  "Keys of a mapping",
 			input: []*yaml.Node{yamltest.MustParseNode(`{"foo": "bar", "baz": "qux"}`)},
-			want:  []*yaml.Node{yamlutil.String("foo"), yamlutil.String("baz")},
+			want:  []*yaml.Node{yamlconv.String("foo"), yamlconv.String("baz")},
 		}, {
 			name:  "Keys of a sequence",
 			input: []*yaml.Node{yamltest.MustParseNode(`["foo", "bar", "baz", "qux"]`)},
@@ -133,7 +134,7 @@ func TestKeys(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Keys() error = %v", err)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Keys() = %v, want %v", got, want)
 			}
 		})
@@ -155,36 +156,36 @@ func TestSelect(t *testing.T) {
 			want:  []*yaml.Node{},
 		}, {
 			name:  "Multiple elements, no parameters returns empty",
-			input: []*yaml.Node{yamlutil.String("hello"), yamlutil.String("world")},
+			input: []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
 			want:  []*yaml.Node{},
 		}, {
 			name: "Parameter returns error",
 			params: []invocation.Parameter{
 				invocationtest.ErrorParameter(testErr),
 			},
-			input:   []*yaml.Node{yamlutil.String("hello"), yamlutil.String("world")},
+			input:   []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
 			wantErr: testErr,
 		}, {
 			name: "Multiple elements, one parameter returns nothing",
 			params: []invocation.Parameter{
 				invocationtest.SuccessParameter(),
 			},
-			input: []*yaml.Node{yamlutil.String("hello"), yamlutil.String("world")},
+			input: []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
 		}, {
 			name: "Multiple elements, one parameter returning single string",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlutil.String("key")),
+				invocationtest.SuccessParameter(yamlconv.String("key")),
 			},
 			input: []*yaml.Node{yamltest.MustParseNode(`{"key": "value"}`)},
-			want:  []*yaml.Node{yamlutil.String("value")},
+			want:  []*yaml.Node{yamlconv.String("value")},
 		}, {
 			name: "Multiple elements, one parameter returning single number",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlutil.Number("1")),
-				invocationtest.SuccessParameter(yamlutil.Number("2")),
+				invocationtest.SuccessParameter(yamlconv.Number(1)),
+				invocationtest.SuccessParameter(yamlconv.Number(2)),
 			},
 			input: []*yaml.Node{yamltest.MustParseNode(`[1,2,3]`)},
-			want:  []*yaml.Node{yamlutil.Number("2"), yamlutil.Number("3")},
+			want:  []*yaml.Node{yamlconv.Number(2), yamlconv.Number(3)},
 		}, {
 			name: "Multiple elements, parameter returns non-scalar",
 			params: []invocation.Parameter{
@@ -195,35 +196,35 @@ func TestSelect(t *testing.T) {
 		}, {
 			name: "Multiple elements, parameter returns scalar with bad tag",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlutil.Boolean("true")),
+				invocationtest.SuccessParameter(yamlconv.Bool(true)),
 			},
 			input:   []*yaml.Node{yamltest.MustParseNode(`{"key": "value"}`)},
 			wantErr: errs.ErrBadTag,
 		}, {
 			name: "Multiple elements, parameter returns multiple values",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlutil.String("key"), yamlutil.String("value")),
+				invocationtest.SuccessParameter(yamlconv.String("key"), yamlconv.String("value")),
 			},
 			input:   []*yaml.Node{yamltest.MustParseNode(`{"key": "value"}`)},
 			wantErr: errs.ErrNotSingleton,
 		}, {
 			name: "Multiple elements, parameter returns negative int",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlutil.Number("-1")),
+				invocationtest.SuccessParameter(yamlconv.Number(-1)),
 			},
 			input: []*yaml.Node{yamltest.MustParseNode(`["hello", "world"]`)},
-			want:  []*yaml.Node{yamlutil.String("world")},
+			want:  []*yaml.Node{yamlconv.String("world")},
 		}, {
 			name: "Multiple elements, parameter returns index out of range",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlutil.Number("2")),
+				invocationtest.SuccessParameter(yamlconv.Number(2)),
 			},
 			input: []*yaml.Node{yamltest.MustParseNode(`["hello", "world"]`)},
 			want:  []*yaml.Node{},
 		}, {
 			name: "invalid integer definition",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlutil.Number("bad")),
+				invocationtest.SuccessParameter(yamlconv.RawNumber("bad")),
 			},
 			input:   []*yaml.Node{yamltest.MustParseNode(`["hello", "world"]`)},
 			wantErr: errs.ErrEval,
@@ -239,7 +240,7 @@ func TestSelect(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Select() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Select() = %v, want %v", got, want)
 			}
 		})

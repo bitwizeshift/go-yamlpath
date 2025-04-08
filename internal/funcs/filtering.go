@@ -4,7 +4,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // Where performs a filter operation, similar to [?()] in JSONPath.
@@ -20,7 +20,7 @@ func Where(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Node
 		if err != nil {
 			return nil, err
 		}
-		if yamlutil.IsTruthy(args...) {
+		if yamlconv.IsTruthy(args...) {
 			result = append(result, node)
 		}
 	}
@@ -63,7 +63,7 @@ func Keys(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, erro
 func Select(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Node, error) {
 	var (
 		keys    []string
-		indices []int
+		indices []int64
 	)
 	for _, p := range params {
 		input, err := p.GetArg(ctx)
@@ -74,15 +74,15 @@ func Select(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Nod
 			continue
 		}
 		if len(input) > 1 {
-			return nil, errs.NewSingletonError("pick()", input)
+			return nil, errs.NewSingletonError("select()", input)
 		}
 		node := input[0]
 		if node.Kind != yaml.ScalarNode {
-			return nil, errs.NewKindError("pick()", node, yaml.ScalarNode)
+			return nil, errs.NewKindError("select()", node, yaml.ScalarNode)
 		}
 		switch node.Tag {
 		case "!!int":
-			index, err := yamlutil.ToInt(node)
+			index, err := yamlconv.ParseInt(node)
 			if err != nil {
 				return nil, errs.NewEvalError(err)
 			}
@@ -90,7 +90,7 @@ func Select(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Nod
 		case "!!str":
 			keys = append(keys, node.Value)
 		default:
-			return nil, errs.NewTagError("pick()", node, "!!int", "!!str")
+			return nil, errs.NewTagError("select()", node, "!!int", "!!str")
 		}
 	}
 
@@ -127,13 +127,13 @@ func selectKeys(node *yaml.Node, keys []string) []*yaml.Node {
 	return result
 }
 
-func selectIndices(node *yaml.Node, indices []int) []*yaml.Node {
+func selectIndices(node *yaml.Node, indices []int64) []*yaml.Node {
 	var result []*yaml.Node
 	for _, index := range indices {
 		if index < 0 {
-			index = len(node.Content) + index
+			index = int64(len(node.Content)) + index
 		}
-		if index < 0 || index >= len(node.Content) {
+		if index < 0 || index >= int64(len(node.Content)) {
 			continue
 		}
 		result = append(result, node.Content[index])

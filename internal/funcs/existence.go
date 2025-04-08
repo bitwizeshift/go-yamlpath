@@ -1,10 +1,10 @@
 package funcs
 
 import (
-	"fmt"
-
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
@@ -12,9 +12,9 @@ import (
 func Empty(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
 	current := ctx.Current()
 	if len(current) == 0 {
-		return []*yaml.Node{yamlutil.True}, nil
+		return []*yaml.Node{yamlconv.Bool(true)}, nil
 	}
-	return []*yaml.Node{yamlutil.False}, nil
+	return []*yaml.Node{yamlconv.Bool(false)}, nil
 }
 
 // Exists returns true if the current node exists, false otherwise.
@@ -22,9 +22,9 @@ func Exists(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Nod
 	if len(params) == 0 {
 		current := ctx.Current()
 		if len(current) > 0 {
-			return []*yaml.Node{yamlutil.True}, nil
+			return []*yaml.Node{yamlconv.Bool(true)}, nil
 		}
-		return []*yaml.Node{yamlutil.False}, nil
+		return []*yaml.Node{yamlconv.Bool(false)}, nil
 	}
 	next, err := Where(ctx, params...)
 	if err != nil {
@@ -32,16 +32,16 @@ func Exists(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Nod
 	}
 
 	if len(next) > 0 {
-		return []*yaml.Node{yamlutil.True}, nil
+		return []*yaml.Node{yamlconv.Bool(true)}, nil
 	}
-	return []*yaml.Node{yamlutil.False}, nil
+	return []*yaml.Node{yamlconv.Bool(false)}, nil
 }
 
 // Count returns the number of elements in the current collection. If the
 // current collection is empty, it returns 0.
 func Count(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
 	current := ctx.Current()
-	return []*yaml.Node{yamlutil.Number(fmt.Sprintf("%v", len(current)))}, nil
+	return []*yaml.Node{yamlconv.Number(len(current))}, nil
 }
 
 // Distinct returns a collection with all duplicate elements removed.
@@ -76,7 +76,7 @@ func Distinct(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, 
 
 func contains(nodes []*yaml.Node, node *yaml.Node) bool {
 	for _, n := range nodes {
-		if yamlutil.Equal(n, node) {
+		if yamlcmp.Equal(n, node) {
 			return true
 		}
 	}
@@ -95,9 +95,9 @@ func IsDistinct(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node
 	distinct, _ := Distinct(ctx)
 
 	if len(current) == len(distinct) {
-		return []*yaml.Node{yamlutil.True}, nil
+		return []*yaml.Node{yamlconv.Bool(true)}, nil
 	}
-	return []*yaml.Node{yamlutil.False}, nil
+	return []*yaml.Node{yamlconv.Bool(false)}, nil
 }
 
 // All returns true if all nodes satisfy the 'criteria' parameter expression.
@@ -112,11 +112,11 @@ func All(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Node, 
 		if err != nil {
 			return nil, err
 		}
-		if !yamlutil.IsTruthy(args...) {
-			return []*yaml.Node{yamlutil.False}, nil
+		if !yamlconv.IsTruthy(args...) {
+			return []*yaml.Node{yamlconv.Bool(false)}, nil
 		}
 	}
-	return []*yaml.Node{yamlutil.True}, nil
+	return []*yaml.Node{yamlconv.Bool(true)}, nil
 }
 
 // Any returns true if any node satisfies the 'criteria' parameter expression.
@@ -130,11 +130,11 @@ func Any(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Node, 
 		if err != nil {
 			return nil, err
 		}
-		if yamlutil.IsTruthy(args...) {
-			return []*yaml.Node{yamlutil.True}, nil
+		if yamlconv.IsTruthy(args...) {
+			return []*yaml.Node{yamlconv.Bool(true)}, nil
 		}
 	}
-	return []*yaml.Node{yamlutil.False}, nil
+	return []*yaml.Node{yamlconv.Bool(false)}, nil
 }
 
 // AllTrue evaluates the input collection and returns true if all elements are
@@ -144,15 +144,15 @@ func AllTrue(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, e
 	current := ctx.Current()
 
 	for _, node := range current {
-		b, err := yamlutil.ToBool(node)
+		b, err := yamlconv.ParseBool(node)
 		if err != nil {
-			return []*yaml.Node{yamlutil.False}, nil
+			return []*yaml.Node{yamlconv.Bool(false)}, nil
 		}
 		if !b {
-			return []*yaml.Node{yamlutil.False}, nil
+			return []*yaml.Node{yamlconv.Bool(false)}, nil
 		}
 	}
-	return []*yaml.Node{yamlutil.True}, nil
+	return []*yaml.Node{yamlconv.Bool(true)}, nil
 }
 
 // AnyTrue evaluates the input collection and returns true if any element is a
@@ -162,15 +162,15 @@ func AnyTrue(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, e
 	current := ctx.Current()
 
 	for _, node := range current {
-		b, err := yamlutil.ToBool(node)
+		b, err := yamlconv.ParseBool(node)
 		if err != nil {
 			continue
 		}
 		if b {
-			return []*yaml.Node{yamlutil.True}, nil
+			return []*yaml.Node{yamlconv.Bool(true)}, nil
 		}
 	}
-	return []*yaml.Node{yamlutil.False}, nil
+	return []*yaml.Node{yamlconv.Bool(false)}, nil
 }
 
 // AllFalse evaluates the input collection and returns true if all elements are
@@ -180,15 +180,15 @@ func AllFalse(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, 
 	current := ctx.Current()
 
 	for _, node := range current {
-		b, err := yamlutil.ToBool(node)
+		b, err := yamlconv.ParseBool(node)
 		if err != nil {
-			return []*yaml.Node{yamlutil.False}, nil
+			return []*yaml.Node{yamlconv.Bool(false)}, nil
 		}
 		if b {
-			return []*yaml.Node{yamlutil.False}, nil
+			return []*yaml.Node{yamlconv.Bool(false)}, nil
 		}
 	}
-	return []*yaml.Node{yamlutil.True}, nil
+	return []*yaml.Node{yamlconv.Bool(true)}, nil
 }
 
 // AnyFalse evaluates the input collection and returns true if any element is a
@@ -198,13 +198,13 @@ func AnyFalse(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, 
 	current := ctx.Current()
 
 	for _, node := range current {
-		b, err := yamlutil.ToBool(node)
+		b, err := yamlconv.ParseBool(node)
 		if err != nil {
 			continue
 		}
 		if !b {
-			return []*yaml.Node{yamlutil.True}, nil
+			return []*yaml.Node{yamlconv.Bool(true)}, nil
 		}
 	}
-	return []*yaml.Node{yamlutil.False}, nil
+	return []*yaml.Node{yamlconv.Bool(false)}, nil
 }

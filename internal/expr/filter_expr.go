@@ -3,7 +3,7 @@ package expr
 import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // FilterExpr is a representation of the filter operator `[?(...)]` in YAMLPath.
@@ -22,7 +22,7 @@ func (f *FilterExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 			return nil, err
 		}
 
-		if yamlutil.IsTruthy(filtered...) {
+		if yamlconv.IsTruthy(filtered...) {
 			result = append(result, node)
 		}
 	}

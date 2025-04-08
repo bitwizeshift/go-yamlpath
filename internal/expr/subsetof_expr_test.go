@@ -9,7 +9,8 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 func TestSubsetOfExpr(t *testing.T) {
@@ -25,7 +26,7 @@ func TestSubsetOfExpr(t *testing.T) {
 			name:  "Empty ranges compare equal",
 			left:  exprtest.Return(),
 			right: exprtest.Return(),
-			want:  []*yaml.Node{yamlutil.True},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:    "Left returns error",
 			left:    exprtest.Error(testErr),
@@ -38,14 +39,14 @@ func TestSubsetOfExpr(t *testing.T) {
 			wantErr: testErr,
 		}, {
 			name:  "Left is subset of right",
-			left:  exprtest.Return(yamlutil.String("hello")),
-			right: exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
-			want:  []*yaml.Node{yamlutil.True},
+			left:  exprtest.Return(yamlconv.String("hello")),
+			right: exprtest.Return(yamlconv.String("hello"), yamlconv.String("world")),
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:  "Left is not subset of right",
-			left:  exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
-			right: exprtest.Return(yamlutil.String("hello")),
-			want:  []*yaml.Node{yamlutil.False},
+			left:  exprtest.Return(yamlconv.String("hello"), yamlconv.String("world")),
+			right: exprtest.Return(yamlconv.String("hello")),
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		},
 	}
 
@@ -62,7 +63,7 @@ func TestSubsetOfExpr(t *testing.T) {
 				t.Fatalf("SubsetofExpr.Eval() error = %v, want %v", got, want)
 			}
 
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Fatalf("SubsetofExpr.Eval() = %v, want %v", got, want)
 			}
 		})

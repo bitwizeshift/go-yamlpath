@@ -8,7 +8,8 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 func TestEmpty_Eval(t *testing.T) {
@@ -23,14 +24,14 @@ func TestEmpty_Eval(t *testing.T) {
 }
 
 func TestReturn_Eval(t *testing.T) {
-	nodes := []*yaml.Node{yamlutil.Boolean("true")}
+	nodes := []*yaml.Node{yamlconv.Bool(true)}
 
 	got, err := exprtest.Return(nodes...).Eval(nil)
 
 	if got, want := err, (error)(nil); !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 		t.Fatalf("Return.Eval() error = %v, want %v", got, want)
 	}
-	if got, want := got, nodes; !yamlutil.EqualRange(got, want) {
+	if got, want := got, nodes; !yamlcmp.EqualRange(got, want) {
 		t.Errorf("Return.Eval() = %v, want %v", got, want)
 	}
 }

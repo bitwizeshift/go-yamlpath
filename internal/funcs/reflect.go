@@ -5,7 +5,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // Reflect returns a reflected YAML representation of the current nodes.
@@ -108,7 +108,7 @@ func toNode[T any](v *T) (*yaml.Node, error) {
 	if err := yaml.Unmarshal(data, &node); err != nil {
 		return nil, err
 	}
-	return yamlutil.Normalize(&node)[0], nil
+	return yamlconv.FlattenDocuments(&node)[0], nil
 }
 
 // IsString checks if the current node is a string.
@@ -145,11 +145,11 @@ func IsScalar(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, 
 	if len(current) == 1 {
 		node := current[0]
 		if node.Kind == yaml.ScalarNode {
-			return []*yaml.Node{yamlutil.True}, nil
+			return []*yaml.Node{yamlconv.Bool(true)}, nil
 		}
-		return []*yaml.Node{yamlutil.False}, nil
+		return []*yaml.Node{yamlconv.Bool(false)}, nil
 	}
-	return []*yaml.Node{yamlutil.False}, nil
+	return []*yaml.Node{yamlconv.Bool(false)}, nil
 }
 
 // IsSequence checks if the current node is a sequence.
@@ -170,8 +170,8 @@ func hasTag(ctx invocation.Context, kind yaml.Kind, tag string) ([]*yaml.Node, e
 	if len(current) == 1 {
 		node := current[0]
 		return []*yaml.Node{
-			yamlutil.Boolean(fmt.Sprintf("%v", node.Kind == kind && node.Tag == tag)),
+			yamlconv.Bool(node.Kind == kind && node.Tag == tag),
 		}, nil
 	}
-	return []*yaml.Node{yamlutil.False}, nil
+	return []*yaml.Node{yamlconv.Bool(false)}, nil
 }

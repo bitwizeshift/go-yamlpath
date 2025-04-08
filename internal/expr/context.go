@@ -5,7 +5,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // ctx represents the current context of the expression evaluation.
@@ -17,7 +17,7 @@ type ctx struct {
 
 // NewContext creates a new context with the given root node.
 func NewContext(root []*yaml.Node) *ctx {
-	root = yamlutil.Normalize(root...)
+	root = yamlconv.FlattenDocuments(root...)
 	return &ctx{
 		root:    root,
 		current: root,

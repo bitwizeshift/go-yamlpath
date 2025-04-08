@@ -7,8 +7,9 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestRecursiveDescentExpr(t *testing.T) {
@@ -27,9 +28,9 @@ func TestRecursiveDescentExpr(t *testing.T) {
 			},
 			want: []*yaml.Node{
 				yamltest.MustParseNode(`["Alice", "Bob", "Charlie"]`),
-				yamlutil.String("Alice"),
-				yamlutil.String("Bob"),
-				yamlutil.String("Charlie"),
+				yamlconv.String("Alice"),
+				yamlconv.String("Bob"),
+				yamlconv.String("Charlie"),
 			},
 		}, {
 			name: "Input is mapping",
@@ -38,8 +39,8 @@ func TestRecursiveDescentExpr(t *testing.T) {
 			},
 			want: []*yaml.Node{
 				yamltest.MustParseNode(`{"name": "Alice", "age": 30}`),
-				yamlutil.String("Alice"),
-				yamlutil.Number("30"),
+				yamlconv.String("Alice"),
+				yamlconv.Number(30),
 			},
 		}, {
 			name: "Input is document",
@@ -48,8 +49,8 @@ func TestRecursiveDescentExpr(t *testing.T) {
 			},
 			want: []*yaml.Node{
 				yamltest.MustParseDocument(`{"name": "Alice", "age": 30}`),
-				yamlutil.String("Alice"),
-				yamlutil.Number("30"),
+				yamlconv.String("Alice"),
+				yamlconv.Number(30),
 			},
 		},
 	}
@@ -63,7 +64,7 @@ func TestRecursiveDescentExpr(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Errorf("RecursiveDescentExpr.Eval() error = %v; want %v", err, tc.wantErr)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("RecursiveDescentExpr.Apply() = %v, want %v", got, want)
 			}
 		})

@@ -3,7 +3,8 @@ package expr
 import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // EqualityExpr is a representation of the '==' operator in the YAMLPath
@@ -23,8 +24,8 @@ func (e *EqualityExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 		return nil, err
 	}
 
-	if yamlutil.EqualRange(left, right) {
-		return []*yaml.Node{yamlutil.True}, nil
+	if yamlcmp.EqualRange(left, right) {
+		return []*yaml.Node{yamlconv.Bool(true)}, nil
 	}
-	return []*yaml.Node{yamlutil.False}, nil
+	return []*yaml.Node{yamlconv.Bool(false)}, nil
 }

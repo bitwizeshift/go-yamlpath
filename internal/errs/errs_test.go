@@ -8,7 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/errs"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 func TestKindError_Is(t *testing.T) {
@@ -146,8 +146,8 @@ func TestNotSingletonError_Error(t *testing.T) {
 
 func TestIncompatibleError_Is(t *testing.T) {
 	sut := errs.NewIncompatibleError("source",
-		yamlutil.String("hello"),
-		yamlutil.Boolean("true"),
+		yamlconv.String("hello"),
+		yamlconv.Bool(true),
 	)
 
 	if got, want := sut, errs.ErrIncompatible; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
@@ -160,8 +160,8 @@ func TestIncompatibleError_Is(t *testing.T) {
 
 func TestIncompatibleError_Error(t *testing.T) {
 	sut := errs.NewIncompatibleError("source",
-		yamlutil.String("hello"),
-		yamlutil.Boolean("true"),
+		yamlconv.String("hello"),
+		yamlconv.Bool(true),
 	)
 
 	want := "yamlpath eval: source has incompatible operands (scalar,!!str) and (scalar,!!bool)"

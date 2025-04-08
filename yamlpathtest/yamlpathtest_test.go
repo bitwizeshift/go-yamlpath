@@ -7,17 +7,17 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"rodusek.dev/pkg/yamlpath"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 	"rodusek.dev/pkg/yamlpath/yamlpathtest"
 )
 
 func TestCollection(t *testing.T) {
 	// Arrange
 	want := yamlpath.Collection{
-		yamlutil.String("a"),
-		yamlutil.String("b"),
-		yamlutil.String("c"),
+		yamlconv.String("a"),
+		yamlconv.String("b"),
+		yamlconv.String("c"),
 	}
 	sut := yamlpathtest.Collection(
 		yamltest.MustParseNode(`"a"`),
@@ -39,7 +39,7 @@ func TestCollection(t *testing.T) {
 
 func TestString(t *testing.T) {
 	// Arrange
-	want := yamlpath.Collection{yamlutil.String("test")}
+	want := yamlpath.Collection{yamlconv.String("test")}
 	sut := yamlpathtest.String("test")
 
 	// Act
@@ -222,7 +222,7 @@ func TestIntSequence(t *testing.T) {
 
 func TestNull(t *testing.T) {
 	// Arrange
-	want := yamlpath.Collection{yamlutil.Null()}
+	want := yamlpath.Collection{yamlconv.Null()}
 	sut := yamlpathtest.Null()
 
 	// Act

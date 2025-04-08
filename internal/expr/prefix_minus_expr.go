@@ -4,7 +4,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 type PrefixMinusExpr struct {
@@ -31,9 +31,9 @@ func (e *PrefixMinusExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	switch node.Tag {
 	case "!!int", "!!float":
 		if node.Value[0] == '-' {
-			result = append(result, yamlutil.Number(node.Value[1:]))
+			result = append(result, yamlconv.RawNumber(node.Value[1:]))
 		} else {
-			result = append(result, yamlutil.Number("-"+node.Value))
+			result = append(result, yamlconv.RawNumber("-"+node.Value))
 		}
 	default:
 		return nil, errs.NewTagError("operator prefix '-'", node, "!!int", "!!float")

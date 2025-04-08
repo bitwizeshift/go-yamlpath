@@ -14,7 +14,8 @@ import (
 	"github.com/cucumber/godog/colors"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 var opts = godog.Options{
@@ -153,9 +154,9 @@ func TheEvaluationResultIs(ctx context.Context, content string) error {
 		}
 		want = append(want, &next)
 	}
-	want = yamlutil.Normalize(want...) // normalize documents
+	want = yamlconv.FlattenDocuments(want...) // normalize documents
 
-	if !yamlutil.EqualRange(got, want) {
+	if !yamlcmp.EqualRange(got, want) {
 		return fmt.Errorf("unexpected got:\n%s\nwant:\n%s", nodesToString(got), nodesToString(want))
 	}
 

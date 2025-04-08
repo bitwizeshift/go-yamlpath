@@ -5,7 +5,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // ConcatExpr represents an expression that concatenates two expressions
@@ -49,10 +49,10 @@ func (e *ConcatExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 			return nil, err
 		}
 		prod := lv.Add(rv)
-		return []*yaml.Node{yamlutil.Number(prod.String())}, nil
+		return []*yaml.Node{yamlconv.RawNumber(prod.String())}, nil
 	} else if lhs.Tag == "!!str" && rhs.Tag == "!!str" {
 		concat := lhs.Value + rhs.Value
-		return []*yaml.Node{yamlutil.String(concat)}, nil
+		return []*yaml.Node{yamlconv.String(concat)}, nil
 	}
 	return nil, errs.NewIncompatibleError("operator +", lhs, rhs)
 }

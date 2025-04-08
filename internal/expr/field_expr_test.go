@@ -7,8 +7,9 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestFieldExpr(t *testing.T) {
@@ -31,7 +32,7 @@ func TestFieldExpr(t *testing.T) {
 				yamltest.MustParseNode(`{"foo": 1, "bar": 2}`),
 			},
 			want: []*yaml.Node{
-				yamlutil.Number("1"),
+				yamlconv.Number(1),
 			},
 		}, {
 			name:   "field matches multiple nodes",
@@ -41,8 +42,8 @@ func TestFieldExpr(t *testing.T) {
 				yamltest.MustParseNode(`{"foo": 3, "bar": 4}`),
 			},
 			want: []*yaml.Node{
-				yamlutil.Number("1"),
-				yamlutil.Number("3"),
+				yamlconv.Number(1),
+				yamlconv.Number(3),
 			},
 		}, {
 			name:   "multiple fields match node",
@@ -51,14 +52,14 @@ func TestFieldExpr(t *testing.T) {
 				yamltest.MustParseNode(`{"foo": 1, "bar": 2}`),
 			},
 			want: []*yaml.Node{
-				yamlutil.Number("1"),
-				yamlutil.Number("2"),
+				yamlconv.Number(1),
+				yamlconv.Number(2),
 			},
 		}, {
 			name:   "Non-map is ignored",
 			fields: []string{"foo"},
 			input: []*yaml.Node{
-				yamlutil.String("hello"),
+				yamlconv.String("hello"),
 			},
 			want: []*yaml.Node{},
 		},
@@ -75,7 +76,7 @@ func TestFieldExpr(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("FieldExpr.Eval() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("FieldExpr.Eval() = %v, want %v", got, want)
 			}
 		})

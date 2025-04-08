@@ -9,7 +9,8 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 func TestNegationExpr(t *testing.T) {
@@ -24,19 +25,19 @@ func TestNegationExpr(t *testing.T) {
 		{
 			name: "Empty node evaluates to true",
 			expr: exprtest.Return(),
-			want: []*yaml.Node{yamlutil.True},
+			want: []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:    "Subexpr evaluates error",
 			expr:    exprtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name: "Subexpr returns scalar non-bool value",
-			expr: exprtest.Return(yamlutil.String("hello")),
-			want: []*yaml.Node{yamlutil.False},
+			expr: exprtest.Return(yamlconv.String("hello")),
+			want: []*yaml.Node{yamlconv.Bool(false)},
 		}, {
 			name: "Subexpr returns scalar bool value",
-			expr: exprtest.Return(yamlutil.True),
-			want: []*yaml.Node{yamlutil.False},
+			expr: exprtest.Return(yamlconv.Bool(true)),
+			want: []*yaml.Node{yamlconv.Bool(false)},
 		},
 	}
 
@@ -49,7 +50,7 @@ func TestNegationExpr(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Errorf("NegationExpr.Eval() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("NegationExpr.Eval() = %v, want %v", got, want)
 			}
 		})

@@ -8,7 +8,8 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/invocation/arity"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 func TestTable_Lookup(t *testing.T) {
@@ -59,7 +60,7 @@ func TestTable_Invoke(t *testing.T) {
 		{
 			name:   "Calls func",
 			params: []invocation.Parameter{nil},
-			want:   []*yaml.Node{yamlutil.True},
+			want:   []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:    "Wrong number of params",
 			wantErr: arity.ErrBadArity,
@@ -83,7 +84,7 @@ func TestTable_Invoke(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Entry.Invoke() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Entry.Invoke() = %v, want %v", got, want)
 			}
 		})

@@ -5,7 +5,8 @@ import (
 
 	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v3"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // Collection represents a collection of YAML nodes that can be retrieved from
@@ -28,7 +29,7 @@ func (c Collection) Nodes() []*yaml.Node {
 //   - A collection with a single node that is a boolean is considered truthy if
 //     the boolean value is true
 func (c Collection) IsTruthy() bool {
-	return yamlutil.IsTruthy(c...)
+	return yamlconv.IsTruthy(c...)
 }
 
 // Decoder returns a new Decoder that can be used to decode the collection
@@ -130,7 +131,7 @@ func (c Collection) Decimals() ([]decimal.Decimal, error) {
 //
 // This comparison follows the same behavior as the `==` operator.
 func (c Collection) Equal(other Collection) bool {
-	return yamlutil.EqualRange(c, other)
+	return yamlcmp.EqualRange(c, other)
 }
 
 func decodeSingleton[T any](nodes Collection) (T, error) {

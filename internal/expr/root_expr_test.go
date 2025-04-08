@@ -7,12 +7,13 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 func TestRootExpr(t *testing.T) {
-	root := []*yaml.Node{yamlutil.String("hello")}
-	current := []*yaml.Node{yamlutil.String("world")}
+	root := []*yaml.Node{yamlconv.String("hello")}
+	current := []*yaml.Node{yamlconv.String("world")}
 
 	testCases := []struct {
 		name    string
@@ -46,7 +47,7 @@ func TestRootExpr(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("RootExpr.Eval() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("RootExpr.Eval() = %v, want %v", got, want)
 			}
 		})

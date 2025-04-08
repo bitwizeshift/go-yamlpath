@@ -7,8 +7,9 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestIndexExpr(t *testing.T) {
@@ -28,7 +29,7 @@ func TestIndexExpr(t *testing.T) {
 			name:    "negative index selects from end of the sequence",
 			indices: []int64{-1},
 			input:   []*yaml.Node{yamltest.MustParseNode(`["hello", "world"]`)},
-			want:    []*yaml.Node{yamlutil.String("world")},
+			want:    []*yaml.Node{yamlconv.String("world")},
 		}, {
 			name:    "index out of range returns empty",
 			indices: []int64{2},
@@ -38,11 +39,11 @@ func TestIndexExpr(t *testing.T) {
 			name:    "multiple indices select multiple nodes",
 			indices: []int64{1, 2},
 			input:   []*yaml.Node{yamltest.MustParseNode(`["foo", "bar", "baz", "buz"]`)},
-			want:    []*yaml.Node{yamlutil.String("bar"), yamlutil.String("baz")},
+			want:    []*yaml.Node{yamlconv.String("bar"), yamlconv.String("baz")},
 		}, {
 			name:    "Non-sequence nodes are ignored",
 			indices: []int64{0},
-			input:   []*yaml.Node{yamlutil.String("hello")},
+			input:   []*yaml.Node{yamlconv.String("hello")},
 			want:    []*yaml.Node{},
 		},
 	}
@@ -58,7 +59,7 @@ func TestIndexExpr(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("IndexExpr.Eval() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("IndexExpr.Eval() = %v, want %v", got, want)
 			}
 		})

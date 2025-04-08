@@ -4,7 +4,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // ScriptExpr represents a script expression that can be used to create
@@ -40,7 +40,7 @@ func (e *ScriptExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 func (e *ScriptExpr) createExpr(node *yaml.Node) (Expr, error) {
 	switch node.Tag {
 	case "!!int":
-		key, err := yamlutil.ToInt(node)
+		key, err := yamlconv.ParseInt(node)
 		if err != nil {
 			return nil, errs.NewEvalError(err)
 		}

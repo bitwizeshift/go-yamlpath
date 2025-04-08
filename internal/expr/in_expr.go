@@ -4,7 +4,8 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // InExpr checks for the presence of a single value in a collection of values.
@@ -38,11 +39,11 @@ func (e *InExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 
 	l := left[0]
 	for _, r := range right {
-		if yamlutil.Equal(l, r) {
-			return []*yaml.Node{yamlutil.True}, nil
+		if yamlcmp.Equal(l, r) {
+			return []*yaml.Node{yamlconv.Bool(true)}, nil
 		}
 	}
-	return []*yaml.Node{yamlutil.False}, nil
+	return []*yaml.Node{yamlconv.Bool(false)}, nil
 }
 
 // unwrap nodes by examining whether the result is a single sequence node and,

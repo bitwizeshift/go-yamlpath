@@ -11,7 +11,7 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/parser"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // Visitor is a visitor that walks the parse tree to generate an expression
@@ -502,25 +502,25 @@ func (v *Visitor) visitStringLiteral(ctx *parser.StringLiteralContext) (expr.Exp
 		return nil, NewSemanticErrorf(ctx, "string: %s", ctx.GetText())
 	}
 	return &expr.ValueExpr{
-		Nodes: []*yaml.Node{yamlutil.String(s)},
+		Nodes: []*yaml.Node{yamlconv.String(s)},
 	}, nil
 }
 
 func (v *Visitor) visitNumberLiteral(ctx *parser.NumberLiteralContext) (expr.Expr, error) {
 	return &expr.ValueExpr{
-		Nodes: []*yaml.Node{yamlutil.Number(ctx.GetText())},
+		Nodes: []*yaml.Node{yamlconv.RawNumber(ctx.GetText())},
 	}, nil
 }
 
 func (v *Visitor) visitBooleanLiteral(ctx *parser.BooleanLiteralContext) (expr.Expr, error) {
 	return &expr.ValueExpr{
-		Nodes: []*yaml.Node{yamlutil.Boolean(ctx.GetText())},
+		Nodes: []*yaml.Node{yamlconv.RawBool(ctx.GetText())},
 	}, nil
 }
 
 func (v *Visitor) visitNullLiteral(_ *parser.NullLiteralContext) (expr.Expr, error) {
 	return &expr.ValueExpr{
-		Nodes: []*yaml.Node{yamlutil.Null()},
+		Nodes: []*yaml.Node{yamlconv.Null()},
 	}, nil
 }
 
@@ -567,7 +567,7 @@ func (v *Visitor) visitYAMLText(str string) ([]*yaml.Node, error) {
 	if err := decoder.Decode(&node); err != nil {
 		return nil, err
 	}
-	return yamlutil.Normalize(&node), nil
+	return yamlconv.FlattenDocuments(&node), nil
 }
 
 func (v *Visitor) getTreeText(tree antlr.Tree) string {

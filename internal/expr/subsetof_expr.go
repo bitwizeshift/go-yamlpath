@@ -3,7 +3,8 @@ package expr
 import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // SubsetOfExpr checks if the left-hand side is a subset of the right-hand side
@@ -27,16 +28,16 @@ func (e *SubsetOfExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	for _, l := range left {
 		found := false
 		for _, r := range right {
-			if yamlutil.Equal(l, r) {
+			if yamlcmp.Equal(l, r) {
 				found = true
 				break
 			}
 		}
 		if !found {
-			return []*yaml.Node{yamlutil.False}, nil
+			return []*yaml.Node{yamlconv.Bool(false)}, nil
 		}
 	}
-	return []*yaml.Node{yamlutil.True}, nil
+	return []*yaml.Node{yamlconv.Bool(true)}, nil
 }
 
 var _ Expr = (*SubsetOfExpr)(nil)

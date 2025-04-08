@@ -3,7 +3,8 @@ package expr
 import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // Comparator is a comparator function that represents a comparison operator.
@@ -39,14 +40,14 @@ func (e *CompareExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 		return nil, err
 	}
 
-	cmp, err := yamlutil.CompareRange(left, right)
+	cmp, err := yamlcmp.CompareRange(left, right)
 	if err != nil {
 		return nil, err
 	}
 	if e.Compare(cmp) {
-		return []*yaml.Node{yamlutil.True}, nil
+		return []*yaml.Node{yamlconv.Bool(true)}, nil
 	}
-	return []*yaml.Node{yamlutil.False}, nil
+	return []*yaml.Node{yamlconv.Bool(false)}, nil
 }
 
 var _ Expr = (*CompareExpr)(nil)

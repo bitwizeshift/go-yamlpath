@@ -9,11 +9,12 @@ import (
 	"github.com/shopspring/decimal"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 func TestCollection_Nodes(t *testing.T) {
-	collection := yamlpath.Collection{yamlutil.Boolean("true")}
+	collection := yamlpath.Collection{yamlconv.Bool(true)}
 
 	want := ([]*yaml.Node)(collection)
 	got := collection.Nodes()
@@ -35,19 +36,19 @@ func TestCollection_IsTruthy(t *testing.T) {
 			want:  false,
 		}, {
 			name:  "Single non-bool node is truthy",
-			input: yamlpath.Collection{yamlutil.String("hello")},
+			input: yamlpath.Collection{yamlconv.String("hello")},
 			want:  true,
 		}, {
 			name:  "Single true node is truthy",
-			input: yamlpath.Collection{yamlutil.True},
+			input: yamlpath.Collection{yamlconv.Bool(true)},
 			want:  true,
 		}, {
 			name:  "Single false node is falsey",
-			input: yamlpath.Collection{yamlutil.False},
+			input: yamlpath.Collection{yamlconv.Bool(false)},
 			want:  false,
 		}, {
 			name:  "Multiple nodes are truthy",
-			input: yamlpath.Collection{yamlutil.True, yamlutil.False},
+			input: yamlpath.Collection{yamlconv.Bool(true), yamlconv.Bool(false)},
 			want:  true,
 		},
 	}
@@ -75,7 +76,7 @@ func TestCollection_IsEmpty(t *testing.T) {
 			want:  true,
 		}, {
 			name:  "Non-empty collection is not empty",
-			input: yamlpath.Collection{yamlutil.String("hello")},
+			input: yamlpath.Collection{yamlconv.String("hello")},
 			want:  false,
 		},
 	}
@@ -104,11 +105,11 @@ func TestCollection_Singleton(t *testing.T) {
 			wantErr: yamlpath.ErrNotSingleton,
 		}, {
 			name:  "Single node returns node",
-			input: yamlpath.Collection{yamlutil.String("hello")},
-			want:  yamlutil.String("hello"),
+			input: yamlpath.Collection{yamlconv.String("hello")},
+			want:  yamlconv.String("hello"),
 		}, {
 			name:    "Multiple nodes returns error",
-			input:   yamlpath.Collection{yamlutil.String("hello"), yamlutil.String("world")},
+			input:   yamlpath.Collection{yamlconv.String("hello"), yamlconv.String("world")},
 			wantErr: yamlpath.ErrNotSingleton,
 		},
 	}
@@ -120,7 +121,7 @@ func TestCollection_Singleton(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Errorf("Collection.Singleton() error = %v, want %v", err, tc.wantErr)
 			}
-			if got, want := got, tc.want; !yamlutil.Equal(got, want) {
+			if got, want := got, tc.want; !yamlcmp.Equal(got, want) {
 				t.Errorf("Collection.Singleton() = %v, want %v", got, tc.want)
 			}
 		})
@@ -140,11 +141,11 @@ func TestCollection_SingletonString(t *testing.T) {
 			wantErr: yamlpath.ErrNotSingleton,
 		}, {
 			name:  "Single node returns string",
-			input: yamlpath.Collection{yamlutil.String("hello")},
+			input: yamlpath.Collection{yamlconv.String("hello")},
 			want:  "hello",
 		}, {
 			name:    "Multiple nodes returns error",
-			input:   yamlpath.Collection{yamlutil.String("hello"), yamlutil.String("world")},
+			input:   yamlpath.Collection{yamlconv.String("hello"), yamlconv.String("world")},
 			wantErr: yamlpath.ErrNotSingleton,
 		},
 	}
@@ -176,15 +177,15 @@ func TestCollection_SingletonBool(t *testing.T) {
 			wantErr: yamlpath.ErrNotSingleton,
 		}, {
 			name:  "Single true node returns true",
-			input: yamlpath.Collection{yamlutil.True},
+			input: yamlpath.Collection{yamlconv.Bool(true)},
 			want:  true,
 		}, {
 			name:    "Multiple nodes returns error",
-			input:   yamlpath.Collection{yamlutil.True, yamlutil.False},
+			input:   yamlpath.Collection{yamlconv.Bool(true), yamlconv.Bool(false)},
 			wantErr: yamlpath.ErrNotSingleton,
 		}, {
 			name:    "Single non-bool node returns error",
-			input:   yamlpath.Collection{yamlutil.String("hello")},
+			input:   yamlpath.Collection{yamlconv.String("hello")},
 			wantErr: cmpopts.AnyError,
 		},
 	}
@@ -216,15 +217,15 @@ func TestCollection_SingletonInt(t *testing.T) {
 			wantErr: yamlpath.ErrNotSingleton,
 		}, {
 			name:  "Single node returns int",
-			input: yamlpath.Collection{yamlutil.Number("42")},
+			input: yamlpath.Collection{yamlconv.Number(42)},
 			want:  42,
 		}, {
 			name:    "Multiple nodes returns error",
-			input:   yamlpath.Collection{yamlutil.Number("42"), yamlutil.Number("42")},
+			input:   yamlpath.Collection{yamlconv.Number(42), yamlconv.Number(42)},
 			wantErr: yamlpath.ErrNotSingleton,
 		}, {
 			name:    "Single non-int node returns error",
-			input:   yamlpath.Collection{yamlutil.String("hello")},
+			input:   yamlpath.Collection{yamlconv.String("hello")},
 			wantErr: cmpopts.AnyError,
 		},
 	}
@@ -256,15 +257,15 @@ func TestCollection_SingletonFloat64(t *testing.T) {
 			wantErr: yamlpath.ErrNotSingleton,
 		}, {
 			name:  "Single node returns float64",
-			input: yamlpath.Collection{yamlutil.Number("42")},
+			input: yamlpath.Collection{yamlconv.Number(42)},
 			want:  42,
 		}, {
 			name:    "Multiple nodes returns error",
-			input:   yamlpath.Collection{yamlutil.Number("42"), yamlutil.Number("42")},
+			input:   yamlpath.Collection{yamlconv.Number(42), yamlconv.Number(42)},
 			wantErr: yamlpath.ErrNotSingleton,
 		}, {
 			name:    "Single non-float64 node returns error",
-			input:   yamlpath.Collection{yamlutil.String("hello")},
+			input:   yamlpath.Collection{yamlconv.String("hello")},
 			wantErr: cmpopts.AnyError,
 		},
 	}
@@ -296,15 +297,15 @@ func TestCollection_SingletonDecimal(t *testing.T) {
 			wantErr: yamlpath.ErrNotSingleton,
 		}, {
 			name:  "Single node returns decimal",
-			input: yamlpath.Collection{yamlutil.Number("42.69")},
+			input: yamlpath.Collection{yamlconv.Number(42.69)},
 			want:  decimal.New(4269, -2),
 		}, {
 			name:    "Multiple nodes returns error",
-			input:   yamlpath.Collection{yamlutil.Number("42"), yamlutil.Number("42")},
+			input:   yamlpath.Collection{yamlconv.Number(42), yamlconv.Number(42)},
 			wantErr: yamlpath.ErrNotSingleton,
 		}, {
 			name:    "Single non-decimal node returns error",
-			input:   yamlpath.Collection{yamlutil.String("hello")},
+			input:   yamlpath.Collection{yamlconv.String("hello")},
 			wantErr: cmpopts.AnyError,
 		},
 	}
@@ -337,12 +338,12 @@ func TestCollection_Strings(t *testing.T) {
 			wantErr: nil,
 		}, {
 			name:    "Single node returns slice",
-			input:   yamlpath.Collection{yamlutil.String("hello")},
+			input:   yamlpath.Collection{yamlconv.String("hello")},
 			want:    []string{"hello"},
 			wantErr: nil,
 		}, {
 			name:    "Multiple nodes returns slice",
-			input:   yamlpath.Collection{yamlutil.String("hello"), yamlutil.String("world")},
+			input:   yamlpath.Collection{yamlconv.String("hello"), yamlconv.String("world")},
 			want:    []string{"hello", "world"},
 			wantErr: nil,
 		},
@@ -376,17 +377,17 @@ func TestCollection_Bools(t *testing.T) {
 			wantErr: nil,
 		}, {
 			name:    "Single node returns slice",
-			input:   yamlpath.Collection{yamlutil.True},
+			input:   yamlpath.Collection{yamlconv.Bool(true)},
 			want:    []bool{true},
 			wantErr: nil,
 		}, {
 			name:    "Multiple nodes returns slice",
-			input:   yamlpath.Collection{yamlutil.True, yamlutil.False},
+			input:   yamlpath.Collection{yamlconv.Bool(true), yamlconv.Bool(false)},
 			want:    []bool{true, false},
 			wantErr: nil,
 		}, {
 			name:    "Single non-bool node returns error",
-			input:   yamlpath.Collection{yamlutil.String("hello")},
+			input:   yamlpath.Collection{yamlconv.String("hello")},
 			wantErr: cmpopts.AnyError,
 		},
 	}
@@ -419,17 +420,17 @@ func TestCollection_Ints(t *testing.T) {
 			wantErr: nil,
 		}, {
 			name:    "Single node returns slice",
-			input:   yamlpath.Collection{yamlutil.Number("42")},
+			input:   yamlpath.Collection{yamlconv.Number(42)},
 			want:    []int{42},
 			wantErr: nil,
 		}, {
 			name:    "Multiple nodes returns slice",
-			input:   yamlpath.Collection{yamlutil.Number("42"), yamlutil.Number("69")},
+			input:   yamlpath.Collection{yamlconv.Number(42), yamlconv.Number(69)},
 			want:    []int{42, 69},
 			wantErr: nil,
 		}, {
 			name:    "Single non-int node returns error",
-			input:   yamlpath.Collection{yamlutil.String("hello")},
+			input:   yamlpath.Collection{yamlconv.String("hello")},
 			wantErr: cmpopts.AnyError,
 		},
 	}
@@ -462,17 +463,17 @@ func TestCollection_Float64s(t *testing.T) {
 			wantErr: nil,
 		}, {
 			name:    "Single node returns slice",
-			input:   yamlpath.Collection{yamlutil.Number("42")},
+			input:   yamlpath.Collection{yamlconv.Number(42)},
 			want:    []float64{42},
 			wantErr: nil,
 		}, {
 			name:    "Multiple nodes returns slice",
-			input:   yamlpath.Collection{yamlutil.Number("42"), yamlutil.Number("69")},
+			input:   yamlpath.Collection{yamlconv.Number(42), yamlconv.Number(69)},
 			want:    []float64{42, 69},
 			wantErr: nil,
 		}, {
 			name:    "Single non-float64 node returns error",
-			input:   yamlpath.Collection{yamlutil.String("hello")},
+			input:   yamlpath.Collection{yamlconv.String("hello")},
 			wantErr: cmpopts.AnyError,
 		},
 	}
@@ -505,17 +506,17 @@ func TestCollection_Decimals(t *testing.T) {
 			wantErr: nil,
 		}, {
 			name:    "Single node returns slice",
-			input:   yamlpath.Collection{yamlutil.Number("42.69")},
+			input:   yamlpath.Collection{yamlconv.Number(42.69)},
 			want:    []decimal.Decimal{decimal.New(4269, -2)},
 			wantErr: nil,
 		}, {
 			name:    "Multiple nodes returns slice",
-			input:   yamlpath.Collection{yamlutil.Number("42.69"), yamlutil.Number("69.42")},
+			input:   yamlpath.Collection{yamlconv.Number(42.69), yamlconv.Number(69.42)},
 			want:    []decimal.Decimal{decimal.New(4269, -2), decimal.New(6942, -2)},
 			wantErr: nil,
 		}, {
 			name:    "Single non-decimal node returns error",
-			input:   yamlpath.Collection{yamlutil.String("hello")},
+			input:   yamlpath.Collection{yamlconv.String("hello")},
 			wantErr: cmpopts.AnyError,
 		},
 	}

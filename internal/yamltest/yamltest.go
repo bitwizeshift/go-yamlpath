@@ -7,12 +7,12 @@ import (
 	"fmt"
 
 	"gopkg.in/yaml.v3"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // MustParseNode unmarshals the given yaml string into a yaml.Node
 func MustParseNode(data string) *yaml.Node {
-	return yamlutil.Normalize(MustParseDocument(data))[0]
+	return yamlconv.FlattenDocuments(MustParseDocument(data))[0]
 }
 
 // MustParseDocument unmarshals the given yaml string into a yaml.Node without normalizing

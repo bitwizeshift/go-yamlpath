@@ -5,7 +5,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // ToBoolean converts the current node to a boolean value.
@@ -25,22 +25,22 @@ func ToBoolean(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node,
 		case "!!bool":
 			return []*yaml.Node{node}, nil
 		case "!!int", "!!float":
-			d, err := yamlutil.ToDecimal(node)
+			d, err := yamlconv.ParseDecimal(node)
 			if err != nil {
 				return nil, err
 			}
 			if d.Equal(decimal.Zero) {
-				return []*yaml.Node{yamlutil.False}, nil
+				return []*yaml.Node{yamlconv.Bool(false)}, nil
 			}
 			if d.Equal(decimal.NewFromInt(1)) {
-				return []*yaml.Node{yamlutil.True}, nil
+				return []*yaml.Node{yamlconv.Bool(true)}, nil
 			}
 		case "!!str":
 			switch node.Value {
 			case "true", "1", "1.0":
-				return []*yaml.Node{yamlutil.True}, nil
+				return []*yaml.Node{yamlconv.Bool(true)}, nil
 			case "false", "0", "0.0":
-				return []*yaml.Node{yamlutil.False}, nil
+				return []*yaml.Node{yamlconv.Bool(false)}, nil
 			}
 		}
 	}
@@ -60,7 +60,7 @@ func ToString(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, 
 	node := current[0]
 	switch node.Kind {
 	case yaml.ScalarNode:
-		return []*yaml.Node{yamlutil.String(node.Value)}, nil
+		return []*yaml.Node{yamlconv.String(node.Value)}, nil
 	}
 	return nil, nil
 }
@@ -82,17 +82,17 @@ func ToNumber(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, 
 		case "!!int", "!!float":
 			return []*yaml.Node{node}, nil
 		case "!!bool":
-			b, err := yamlutil.ToBool(node)
+			b, err := yamlconv.ParseBool(node)
 			if err != nil {
 				return nil, nil
 			}
 			if b {
-				return []*yaml.Node{yamlutil.Number("1")}, nil
+				return []*yaml.Node{yamlconv.Number(1)}, nil
 			}
-			return []*yaml.Node{yamlutil.Number("0")}, nil
+			return []*yaml.Node{yamlconv.Number(0)}, nil
 		case "!!str":
 			if _, err := decimal.NewFromString(node.Value); err == nil {
-				return []*yaml.Node{yamlutil.Number(node.Value)}, nil
+				return []*yaml.Node{yamlconv.RawNumber(node.Value)}, nil
 			}
 		}
 	}

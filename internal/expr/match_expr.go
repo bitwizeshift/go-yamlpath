@@ -5,7 +5,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // MatchExpr represents a regular expression match expression in YAMLPath.
@@ -21,18 +21,18 @@ func (e *MatchExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 		return nil, err
 	}
 	if len(left) != 1 {
-		return []*yaml.Node{yamlutil.False}, nil
+		return []*yaml.Node{yamlconv.Bool(false)}, nil
 	}
 	node := left[0]
 
 	if node.Kind != yaml.ScalarNode || node.Tag != "!!str" {
-		return []*yaml.Node{yamlutil.False}, nil
+		return []*yaml.Node{yamlconv.Bool(false)}, nil
 	}
 
 	if e.Regex.MatchString(node.Value) {
-		return []*yaml.Node{yamlutil.True}, nil
+		return []*yaml.Node{yamlconv.Bool(true)}, nil
 	}
-	return []*yaml.Node{yamlutil.False}, nil
+	return []*yaml.Node{yamlconv.Bool(false)}, nil
 }
 
 var _ Expr = (*MatchExpr)(nil)

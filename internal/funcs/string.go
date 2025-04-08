@@ -6,7 +6,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // Lower converts a singleton string input into lowercase.
@@ -27,7 +27,7 @@ func Lower(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, err
 		return nil, errs.NewTagError("lower()", node, "!!str")
 	}
 
-	return []*yaml.Node{yamlutil.String(strings.ToLower(node.Value))}, nil
+	return []*yaml.Node{yamlconv.String(strings.ToLower(node.Value))}, nil
 }
 
 // Upper converts a singleton string input into uppercase.
@@ -47,5 +47,5 @@ func Upper(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, err
 	if node.Tag != "!!str" {
 		return nil, errs.NewTagError("upper()", node, "!!str")
 	}
-	return []*yaml.Node{yamlutil.String(strings.ToUpper(node.Value))}, nil
+	return []*yaml.Node{yamlconv.String(strings.ToUpper(node.Value))}, nil
 }

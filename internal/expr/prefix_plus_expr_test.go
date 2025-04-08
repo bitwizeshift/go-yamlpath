@@ -10,8 +10,9 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestPrefixPlusExpr(t *testing.T) {
@@ -32,7 +33,7 @@ func TestPrefixPlusExpr(t *testing.T) {
 			expr: exprtest.Return(),
 		}, {
 			name:    "subexpr returns multiple values",
-			expr:    exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
+			expr:    exprtest.Return(yamlconv.String("hello"), yamlconv.String("world")),
 			wantErr: errs.ErrEval,
 		}, {
 			name:    "subexpr returns single non-scalar value",
@@ -40,12 +41,12 @@ func TestPrefixPlusExpr(t *testing.T) {
 			wantErr: errs.ErrEval,
 		}, {
 			name:    "subexpr returns scalar non-numeric value",
-			expr:    exprtest.Return(yamlutil.String("hello")),
+			expr:    exprtest.Return(yamlconv.String("hello")),
 			wantErr: errs.ErrEval,
 		}, {
 			name: "subexpr returns scalar numeric value",
-			expr: exprtest.Return(yamlutil.Number("42")),
-			want: []*yaml.Node{yamlutil.Number("42")},
+			expr: exprtest.Return(yamlconv.Number(42)),
+			want: []*yaml.Node{yamlconv.Number(42)},
 		},
 	}
 
@@ -58,7 +59,7 @@ func TestPrefixPlusExpr(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Errorf("PrefixPlusExpr.Eval() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("PrefixPlusExpr.Eval() = %v, want %v", got, want)
 			}
 		})

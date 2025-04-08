@@ -7,8 +7,9 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestWildcardBracketExpr(t *testing.T) {
@@ -28,8 +29,8 @@ func TestWildcardBracketExpr(t *testing.T) {
 				yamltest.MustParseNode(`["Alice", "Bob"]`),
 			},
 			want: []*yaml.Node{
-				yamlutil.String("Alice"),
-				yamlutil.String("Bob"),
+				yamlconv.String("Alice"),
+				yamlconv.String("Bob"),
 			},
 		}, {
 			name: "Mapping node returns empty node",
@@ -48,7 +49,7 @@ func TestWildcardBracketExpr(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Errorf("WildcardBracketExpr.Eval() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("WildcardBracketExpr.Eval() = %v, want %v", got, want)
 			}
 		})

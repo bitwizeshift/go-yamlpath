@@ -9,8 +9,9 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/funcs"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestLower(t *testing.T) {
@@ -27,19 +28,19 @@ func TestLower(t *testing.T) {
 		},
 		{
 			name:  "Input is string",
-			input: []*yaml.Node{yamlutil.String("HELLO WORLD")},
-			want:  []*yaml.Node{yamlutil.String("hello world")},
+			input: []*yaml.Node{yamlconv.String("HELLO WORLD")},
+			want:  []*yaml.Node{yamlconv.String("hello world")},
 		}, {
 			name:    "Input is not scalar node",
 			input:   []*yaml.Node{yamltest.MustParseNode(`{"foo": "bar"}`)},
 			wantErr: errs.ErrBadKind,
 		}, {
 			name:    "Input is non-string scalar node",
-			input:   []*yaml.Node{yamlutil.True},
+			input:   []*yaml.Node{yamlconv.Bool(true)},
 			wantErr: errs.ErrBadTag,
 		}, {
 			name:    "Multiple elements",
-			input:   []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar")},
+			input:   []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar")},
 			wantErr: errs.ErrNotSingleton,
 		},
 	}
@@ -53,7 +54,7 @@ func TestLower(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Lower() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Lower() = %v, want %v", got, want)
 			}
 		})
@@ -74,19 +75,19 @@ func TestUpper(t *testing.T) {
 		},
 		{
 			name:  "Input is string",
-			input: []*yaml.Node{yamlutil.String("hello world")},
-			want:  []*yaml.Node{yamlutil.String("HELLO WORLD")},
+			input: []*yaml.Node{yamlconv.String("hello world")},
+			want:  []*yaml.Node{yamlconv.String("HELLO WORLD")},
 		}, {
 			name:    "Input is not scalar node",
 			input:   []*yaml.Node{yamltest.MustParseNode(`{"foo": "bar"}`)},
 			wantErr: errs.ErrBadKind,
 		}, {
 			name:    "Input is non-string scalar node",
-			input:   []*yaml.Node{yamlutil.True},
+			input:   []*yaml.Node{yamlconv.Bool(true)},
 			wantErr: errs.ErrBadTag,
 		}, {
 			name:    "Multiple elements",
-			input:   []*yaml.Node{yamlutil.String("foo"), yamlutil.String("bar")},
+			input:   []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar")},
 			wantErr: errs.ErrNotSingleton,
 		},
 	}
@@ -100,7 +101,7 @@ func TestUpper(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("Upper() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("Upper() = %v, want %v", got, want)
 			}
 		})

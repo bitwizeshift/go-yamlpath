@@ -10,7 +10,8 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 func TestFilterExpr(t *testing.T) {
@@ -30,19 +31,19 @@ func TestFilterExpr(t *testing.T) {
 		}, {
 			name:    "Subexpr returns error",
 			expr:    exprtest.Error(testErr),
-			input:   []*yaml.Node{yamlutil.String("hello")},
+			input:   []*yaml.Node{yamlconv.String("hello")},
 			wantErr: testErr,
 		}, {
 			name: "Includs only filtered values",
 			expr: exprtest.Func(func(ctx invocation.Context) ([]*yaml.Node, error) {
 				nodes := ctx.Current()
 				if nodes[0].Value == "hello" {
-					return []*yaml.Node{yamlutil.True}, nil
+					return []*yaml.Node{yamlconv.Bool(true)}, nil
 				}
-				return []*yaml.Node{yamlutil.False}, nil
+				return []*yaml.Node{yamlconv.Bool(false)}, nil
 			}),
-			input: []*yaml.Node{yamlutil.String("hello"), yamlutil.String("world")},
-			want:  []*yaml.Node{yamlutil.String("hello")},
+			input: []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
+			want:  []*yaml.Node{yamlconv.String("hello")},
 		},
 	}
 
@@ -58,7 +59,7 @@ func TestFilterExpr(t *testing.T) {
 				t.Fatalf("FilterExpr.Eval() error = %v, want %v", got, want)
 			}
 
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("FilterExpr.Eval() = %v, want %v", got, want)
 			}
 		})

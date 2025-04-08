@@ -10,12 +10,12 @@ package yamlpathtest
 import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // Collection returns a [yamlpath.YAMLPath] object that returns the given nodes.
 func Collection(nodes ...*yaml.Node) *yamlpath.YAMLPath {
-	nodes = yamlutil.Normalize(nodes...)
+	nodes = yamlconv.FlattenDocuments(nodes...)
 	fn := func(yamlpath.Collection) yamlpath.Collection {
 		return nodes
 	}
@@ -24,7 +24,7 @@ func Collection(nodes ...*yaml.Node) *yamlpath.YAMLPath {
 
 // String returns a [yamlpath.YAMLPath] object that returns the given string.
 func String(s string) *yamlpath.YAMLPath {
-	node := yamlutil.String(s)
+	node := yamlconv.String(s)
 	fn := func(yamlpath.Collection) *yaml.Node {
 		return node
 	}
@@ -111,7 +111,7 @@ func ObjectSequence(vs ...any) *yamlpath.YAMLPath {
 // Null returns a [yamlpath.YAMLPath] object that returns a null value.
 func Null() *yamlpath.YAMLPath {
 	fn := func(yamlpath.Collection) *yaml.Node {
-		return yamlutil.Null()
+		return yamlconv.Null()
 	}
 	return compile(fn)
 }

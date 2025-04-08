@@ -9,8 +9,9 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
+	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
 )
 
 func TestInExpr(t *testing.T) {
@@ -29,43 +30,43 @@ func TestInExpr(t *testing.T) {
 		}, {
 			name:  "empty left expression returns empty expression",
 			left:  exprtest.Return(),
-			right: exprtest.Return(yamlutil.String("hello")),
+			right: exprtest.Return(yamlconv.String("hello")),
 			want:  []*yaml.Node{},
 		}, {
 			name:  "empty right expression returns empty expression",
-			left:  exprtest.Return(yamlutil.String("hello")),
+			left:  exprtest.Return(yamlconv.String("hello")),
 			right: exprtest.Return(),
 			want:  []*yaml.Node{},
 		}, {
 			name:    "left expression returns multiple nodes",
-			left:    exprtest.Return(yamlutil.String("hello"), yamlutil.String("world")),
-			right:   exprtest.Return(yamlutil.String("hello")),
+			left:    exprtest.Return(yamlconv.String("hello"), yamlconv.String("world")),
+			right:   exprtest.Return(yamlconv.String("hello")),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "left expression returns error",
 			left:    exprtest.Error(testErr),
-			right:   exprtest.Return(yamlutil.String("hello")),
+			right:   exprtest.Return(yamlconv.String("hello")),
 			wantErr: testErr,
 		}, {
 			name:    "right expression returns error",
-			left:    exprtest.Return(yamlutil.String("hello")),
+			left:    exprtest.Return(yamlconv.String("hello")),
 			right:   exprtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:  "right returns list containing left element",
-			left:  exprtest.Return(yamlutil.String("hello")),
+			left:  exprtest.Return(yamlconv.String("hello")),
 			right: exprtest.Return(yamltest.MustParseNode(`["hello", "world"]`)),
-			want:  []*yaml.Node{yamlutil.True},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		}, {
 			name:  "right returns list not containing left element",
-			left:  exprtest.Return(yamlutil.String("hello")),
+			left:  exprtest.Return(yamlconv.String("hello")),
 			right: exprtest.Return(yamltest.MustParseNode(`["world", "foo"]`)),
-			want:  []*yaml.Node{yamlutil.False},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
 		}, {
 			name:  "right returns non-list node that matches",
-			left:  exprtest.Return(yamlutil.String("hello")),
-			right: exprtest.Return(yamlutil.String("hello")),
-			want:  []*yaml.Node{yamlutil.True},
+			left:  exprtest.Return(yamlconv.String("hello")),
+			right: exprtest.Return(yamlconv.String("hello")),
+			want:  []*yaml.Node{yamlconv.Bool(true)},
 		},
 	}
 
@@ -81,7 +82,7 @@ func TestInExpr(t *testing.T) {
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
 				t.Fatalf("InExpr.Eval() error = %v, want %v", got, want)
 			}
-			if got, want := got, tc.want; !yamlutil.EqualRange(got, want) {
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
 				t.Errorf("InExpr.Eval() = %v, want %v", got, want)
 			}
 		})

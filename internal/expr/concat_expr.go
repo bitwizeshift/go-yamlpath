@@ -49,7 +49,7 @@ func (e *ConcatExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 			return nil, err
 		}
 		prod := lv.Add(rv)
-		return []*yaml.Node{yamlconv.RawNumber(prod.String())}, nil
+		return []*yaml.Node{yamlconv.NumberString(prod.String())}, nil
 	} else if lhs.Tag == "!!str" && rhs.Tag == "!!str" {
 		concat := lhs.Value + rhs.Value
 		return []*yaml.Node{yamlconv.String(concat)}, nil

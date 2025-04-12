@@ -31,30 +31,12 @@ const (
 
 // Int converts an integer to a YAML node.
 func Int[T constraints.Integer](n T) *yaml.Node {
-	return RawInt(strconv.FormatInt(int64(n), 10))
-}
-
-// RawInt creates a YAML node with a raw integer value.
-func RawInt(s string) *yaml.Node {
-	return &yaml.Node{
-		Kind:  yaml.ScalarNode,
-		Tag:   yamlIntTag,
-		Value: s,
-	}
+	return IntString(strconv.FormatInt(int64(n), 10))
 }
 
 // Float converts a float64 to a YAML node.
 func Float[T constraints.Float](f T) *yaml.Node {
-	return RawFloat(strconv.FormatFloat(float64(f), 'f', -1, 64))
-}
-
-// RawFloat creates a YAML node with a raw float value.
-func RawFloat(s string) *yaml.Node {
-	return &yaml.Node{
-		Kind:  yaml.ScalarNode,
-		Tag:   yamlFloatTag,
-		Value: s,
-	}
+	return FloatString(strconv.FormatFloat(float64(f), 'f', -1, 64))
 }
 
 // Number converts a number (int or float) to a YAML node.
@@ -72,19 +54,6 @@ func Number[T constraints.Integer | constraints.Float](n T) *yaml.Node {
 	}
 }
 
-// RawNumber creates a YAML node with a raw number string value.
-func RawNumber(s string) *yaml.Node {
-	tag := yamlIntTag
-	if strings.Contains(s, ".") || strings.Contains(s, "e") || strings.Contains(s, "E") {
-		tag = yamlFloatTag
-	}
-	return &yaml.Node{
-		Kind:  yaml.ScalarNode,
-		Tag:   tag,
-		Value: s,
-	}
-}
-
 // String converts a string to a YAML node.
 func String(s string) *yaml.Node {
 	return &yaml.Node{
@@ -96,16 +65,7 @@ func String(s string) *yaml.Node {
 
 // Bool converts a boolean to a YAML node.
 func Bool(b bool) *yaml.Node {
-	return RawBool(strconv.FormatBool(b))
-}
-
-// RawBool creates a YAML node with a raw boolean value.
-func RawBool(s string) *yaml.Node {
-	return &yaml.Node{
-		Kind:  yaml.ScalarNode,
-		Tag:   yamlBoolTag,
-		Value: s,
-	}
+	return BoolString(strconv.FormatBool(b))
 }
 
 // Null creates a YAML node representing a null value.
@@ -113,7 +73,7 @@ func Null() *yaml.Node {
 	return &yaml.Node{
 		Kind:  yaml.ScalarNode,
 		Tag:   "!!null",
-		Value: "",
+		Value: "null",
 	}
 }
 
@@ -133,6 +93,51 @@ func Node[T Primitive](v T) *yaml.Node {
 		return Bool(rv.Bool())
 	default:
 		panic("unreachable")
+	}
+}
+
+// IntString creates a YAML node with a string value representing an integer. It
+// does not do any error checking on the string value.
+func IntString(s string) *yaml.Node {
+	return &yaml.Node{
+		Kind:  yaml.ScalarNode,
+		Tag:   yamlIntTag,
+		Value: s,
+	}
+}
+
+// FloatString creates a YAML node with a string value representing a float. It
+// does not do any error checking on the string value.
+func FloatString(s string) *yaml.Node {
+	return &yaml.Node{
+		Kind:  yaml.ScalarNode,
+		Tag:   yamlFloatTag,
+		Value: s,
+	}
+}
+
+// NumberString creates a YAML node with a string value representing a number. It
+// does not do any error checking on the string value. It determines the tag
+// based on the presence of a decimal point or exponent in the string.
+func NumberString(s string) *yaml.Node {
+	tag := yamlIntTag
+	if strings.Contains(s, ".") || strings.Contains(s, "e") || strings.Contains(s, "E") {
+		tag = yamlFloatTag
+	}
+	return &yaml.Node{
+		Kind:  yaml.ScalarNode,
+		Tag:   tag,
+		Value: s,
+	}
+}
+
+// BoolString creates a YAML node with a string value representing a boolean. It
+// does not do any error checking on the string value.
+func BoolString(s string) *yaml.Node {
+	return &yaml.Node{
+		Kind:  yaml.ScalarNode,
+		Tag:   yamlBoolTag,
+		Value: s,
 	}
 }
 
@@ -191,19 +196,12 @@ func Document(nodes ...*yaml.Node) *yaml.Node {
 	}
 }
 
-// ParseString parses a YAML node as a string.
-func ParseString(node *yaml.Node) (string, error) {
-	if node.Kind != yaml.ScalarNode {
-		return "", errs.NewKindError("", node, yaml.ScalarNode)
-	}
-	if tag := yamlStringTag; node.Tag != tag {
-		return "", errs.NewTagError("", node, tag)
-	}
-	return node.Value, nil
-}
-
 // ParseInt parses a YAML node as an integer.
-func ParseInt(node *yaml.Node) (int64, error) {
+func ParseInt(nodes ...*yaml.Node) (int64, error) {
+	if len(nodes) != 1 {
+		return 0, errs.NewSingletonError("", nodes)
+	}
+	node := nodes[0]
 	if node.Kind != yaml.ScalarNode {
 		return 0, errs.NewKindError("", node, yaml.ScalarNode)
 	}
@@ -213,19 +211,12 @@ func ParseInt(node *yaml.Node) (int64, error) {
 	return strconv.ParseInt(node.Value, 10, 64)
 }
 
-// ParseBool parses a YAML node as a boolean.
-func ParseBool(node *yaml.Node) (bool, error) {
-	if node.Kind != yaml.ScalarNode {
-		return false, errs.NewKindError("", node, yaml.ScalarNode)
-	}
-	if tag := yamlBoolTag; node.Tag != tag {
-		return false, errs.NewTagError("", node, tag)
-	}
-	return strconv.ParseBool(node.Value)
-}
-
 // ParseFloat parses a YAML node as a float.
-func ParseFloat(node *yaml.Node) (float64, error) {
+func ParseFloat(nodes ...*yaml.Node) (float64, error) {
+	if len(nodes) != 1 {
+		return 0, errs.NewSingletonError("", nodes)
+	}
+	node := nodes[0]
 	if node.Kind != yaml.ScalarNode {
 		return 0, errs.NewKindError("", node, yaml.ScalarNode)
 	}
@@ -236,7 +227,11 @@ func ParseFloat(node *yaml.Node) (float64, error) {
 }
 
 // ParseDecimal parses a yaml node to a decimal.
-func ParseDecimal(node *yaml.Node) (decimal.Decimal, error) {
+func ParseDecimal(nodes ...*yaml.Node) (decimal.Decimal, error) {
+	if len(nodes) != 1 {
+		return decimal.Zero, errs.NewSingletonError("", nodes)
+	}
+	node := nodes[0]
 	if node.Kind != yaml.ScalarNode {
 		return decimal.Zero, errs.NewKindError("", node, yaml.ScalarNode)
 	}
@@ -244,6 +239,36 @@ func ParseDecimal(node *yaml.Node) (decimal.Decimal, error) {
 		return decimal.Zero, errs.NewTagError("", node, yamlIntTag, yamlFloatTag)
 	}
 	return decimal.NewFromString(node.Value)
+}
+
+// ParseString parses a YAML node as a string.
+func ParseString(nodes ...*yaml.Node) (string, error) {
+	if len(nodes) != 1 {
+		return "", errs.NewSingletonError("", nodes)
+	}
+	node := nodes[0]
+	if node.Kind != yaml.ScalarNode {
+		return "", errs.NewKindError("", node, yaml.ScalarNode)
+	}
+	if tag := yamlStringTag; node.Tag != tag {
+		return "", errs.NewTagError("", node, tag)
+	}
+	return node.Value, nil
+}
+
+// ParseBool parses a YAML node as a boolean.
+func ParseBool(nodes ...*yaml.Node) (bool, error) {
+	if len(nodes) != 1 {
+		return false, errs.NewSingletonError("", nodes)
+	}
+	node := nodes[0]
+	if node.Kind != yaml.ScalarNode {
+		return false, errs.NewKindError("", node, yaml.ScalarNode)
+	}
+	if tag := yamlBoolTag; node.Tag != tag {
+		return false, errs.NewTagError("", node, tag)
+	}
+	return strconv.ParseBool(node.Value)
 }
 
 // FlattenDocuments normalizes a list of yaml nodes by flattening any document

@@ -508,13 +508,13 @@ func (v *Visitor) visitStringLiteral(ctx *parser.StringLiteralContext) (expr.Exp
 
 func (v *Visitor) visitNumberLiteral(ctx *parser.NumberLiteralContext) (expr.Expr, error) {
 	return &expr.ValueExpr{
-		Nodes: []*yaml.Node{yamlconv.RawNumber(ctx.GetText())},
+		Nodes: []*yaml.Node{yamlconv.NumberString(ctx.GetText())},
 	}, nil
 }
 
 func (v *Visitor) visitBooleanLiteral(ctx *parser.BooleanLiteralContext) (expr.Expr, error) {
 	return &expr.ValueExpr{
-		Nodes: []*yaml.Node{yamlconv.RawBool(ctx.GetText())},
+		Nodes: []*yaml.Node{yamlconv.BoolString(ctx.GetText())},
 	}, nil
 }
 

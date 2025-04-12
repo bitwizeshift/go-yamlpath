@@ -202,23 +202,23 @@ func TestCompare(t *testing.T) {
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Scalar numeric values, left node is invalid",
-			lhs:     yamlconv.RawNumber("hello"),
+			lhs:     yamlconv.NumberString("hello"),
 			rhs:     yamlconv.Number(42),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Scalar numeric values, right node is invalid",
 			lhs:     yamlconv.Number(42),
-			rhs:     yamlconv.RawNumber("world"),
+			rhs:     yamlconv.NumberString("world"),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Scalar boolean values, left node is invalid",
-			lhs:     yamlconv.RawBool("hello"),
+			lhs:     yamlconv.BoolString("hello"),
 			rhs:     yamlconv.Bool(true),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Scalar boolean values, right node is invalid",
 			lhs:     yamlconv.Bool(true),
-			rhs:     yamlconv.RawBool("world"),
+			rhs:     yamlconv.BoolString("world"),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name: "Scalar nodes with equivalent but invalid tags",

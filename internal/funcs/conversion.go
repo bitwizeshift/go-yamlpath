@@ -92,7 +92,7 @@ func ToNumber(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, 
 			return []*yaml.Node{yamlconv.Number(0)}, nil
 		case "!!str":
 			if _, err := decimal.NewFromString(node.Value); err == nil {
-				return []*yaml.Node{yamlconv.RawNumber(node.Value)}, nil
+				return []*yaml.Node{yamlconv.NumberString(node.Value)}, nil
 			}
 		}
 	}

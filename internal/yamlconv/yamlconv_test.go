@@ -10,6 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
+	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 )
 
 func toNumber[T constraints.Integer | constraints.Float](v T) func() *yaml.Node {
@@ -24,6 +25,26 @@ func toNode[T yamlconv.Primitive](v T) func() *yaml.Node {
 	}
 }
 
+func TestInt(t *testing.T) {
+	want := yamltest.MustParseNode(`42`)
+
+	got := yamlconv.Int(42)
+
+	if got, want := got, want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+		t.Errorf("Int() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
+	}
+}
+
+func TestFloat(t *testing.T) {
+	want := yamltest.MustParseNode(`42.3`)
+
+	got := yamlconv.Float(42.3)
+
+	if got, want := got, want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+		t.Errorf("Float() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
+	}
+}
+
 func TestNumber(t *testing.T) {
 	testCases := []struct {
 		name string
@@ -33,27 +54,15 @@ func TestNumber(t *testing.T) {
 		{
 			name: "int",
 			call: toNumber(42),
-			want: &yaml.Node{
-				Kind:  yaml.ScalarNode,
-				Tag:   "!!int",
-				Value: "42",
-			},
+			want: yamltest.MustParseNode(`42`),
 		}, {
 			name: "uint",
 			call: toNumber(uint(42)),
-			want: &yaml.Node{
-				Kind:  yaml.ScalarNode,
-				Tag:   "!!int",
-				Value: "42",
-			},
+			want: yamltest.MustParseNode(`42`),
 		}, {
 			name: "float64",
 			call: toNumber(42.3),
-			want: &yaml.Node{
-				Kind:  yaml.ScalarNode,
-				Tag:   "!!float",
-				Value: "42.3",
-			},
+			want: yamltest.MustParseNode(`42.3`),
 		},
 	}
 
@@ -61,40 +70,40 @@ func TestNumber(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := tc.call()
 
-			if got, want := got, tc.want; !cmp.Equal(got, want) {
-				t.Errorf("Number() = %v, want %v", got, want)
+			if got, want := got, tc.want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+				t.Errorf("Number() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 			}
 		})
 	}
 }
 
 func TestString(t *testing.T) {
-	input := "foo"
-	want := &yaml.Node{
-		Kind:  yaml.ScalarNode,
-		Tag:   "!!str",
-		Value: input,
-	}
+	want := yamltest.MustParseNode(`"foo"`)
 
 	got := yamlconv.String("foo")
 
-	if got, want := got, want; !cmp.Equal(got, want) {
-		t.Errorf("String() = %v, want %v", got, want)
+	if got, want := got, want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+		t.Errorf("String() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 	}
 }
 
 func TestBool(t *testing.T) {
-	input := true
-	want := &yaml.Node{
-		Kind:  yaml.ScalarNode,
-		Tag:   "!!bool",
-		Value: "true",
+	want := yamltest.MustParseNode(`true`)
+
+	got := yamlconv.Bool(true)
+
+	if got, want := got, want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+		t.Errorf("Bool() = (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 	}
+}
 
-	got := yamlconv.Bool(input)
+func TestNull(t *testing.T) {
+	want := yamltest.MustParseNode(`null`)
 
-	if got, want := got, want; !cmp.Equal(got, want) {
-		t.Errorf("Bool() = %v, want %v", got, want)
+	got := yamlconv.Null()
+
+	if got, want := got, want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+		t.Errorf("Null() = (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 	}
 }
 
@@ -107,43 +116,23 @@ func TestNode(t *testing.T) {
 		{
 			name: "int",
 			call: toNode(42),
-			want: &yaml.Node{
-				Kind:  yaml.ScalarNode,
-				Tag:   "!!int",
-				Value: "42",
-			},
+			want: yamltest.MustParseNode(`42`),
 		}, {
 			name: "uint",
 			call: toNode(uint(42)),
-			want: &yaml.Node{
-				Kind:  yaml.ScalarNode,
-				Tag:   "!!int",
-				Value: "42",
-			},
+			want: yamltest.MustParseNode(`42`),
 		}, {
 			name: "float64",
 			call: toNode(42.3),
-			want: &yaml.Node{
-				Kind:  yaml.ScalarNode,
-				Tag:   "!!float",
-				Value: "42.3",
-			},
+			want: yamltest.MustParseNode(`42.3`),
 		}, {
 			name: "string",
 			call: toNode("foo"),
-			want: &yaml.Node{
-				Kind:  yaml.ScalarNode,
-				Tag:   "!!str",
-				Value: "foo",
-			},
+			want: yamltest.MustParseNode(`"foo"`),
 		}, {
 			name: "bool",
 			call: toNode(true),
-			want: &yaml.Node{
-				Kind:  yaml.ScalarNode,
-				Tag:   "!!bool",
-				Value: "true",
-			},
+			want: yamltest.MustParseNode(`true`),
 		},
 	}
 
@@ -151,10 +140,68 @@ func TestNode(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := tc.call()
 
-			if got, want := got, tc.want; !cmp.Equal(got, want) {
-				t.Errorf("Node() = %v, want %v", got, want)
+			if got, want := got, tc.want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+				t.Errorf("Node() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 			}
 		})
+	}
+}
+
+func TestIntString(t *testing.T) {
+	want := yamltest.MustParseNode(`42`)
+
+	got := yamlconv.IntString("42")
+
+	if got, want := got, want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+		t.Errorf("IntString() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
+	}
+}
+
+func TestFloatString(t *testing.T) {
+	want := yamltest.MustParseNode(`42.3`)
+
+	got := yamlconv.FloatString("42.3")
+
+	if got, want := got, want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+		t.Errorf("FloatString() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
+	}
+}
+
+func TestNumberString(t *testing.T) {
+	testCases := []struct {
+		name  string
+		input string
+		want  *yaml.Node
+	}{
+		{
+			name:  "int",
+			input: "42",
+			want:  yamltest.MustParseNode(`42`),
+		}, {
+			name:  "float",
+			input: "42.3",
+			want:  yamltest.MustParseNode(`42.3`),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := yamlconv.NumberString(tc.input)
+
+			if got, want := got, tc.want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+				t.Errorf("NumberString() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
+			}
+		})
+	}
+}
+
+func TestBoolString(t *testing.T) {
+	want := yamltest.MustParseNode(`true`)
+
+	got := yamlconv.BoolString("true")
+
+	if got, want := got, want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+		t.Errorf("BoolString() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 	}
 }
 
@@ -172,25 +219,14 @@ func TestInts(t *testing.T) {
 			name:  "single",
 			input: []int{42},
 			want: []*yaml.Node{
-				{
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!int",
-					Value: "42",
-				},
+				yamltest.MustParseNode(`42`),
 			},
 		}, {
 			name:  "multiple",
 			input: []int{42, 43},
 			want: []*yaml.Node{
-				{
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!int",
-					Value: "42",
-				}, {
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!int",
-					Value: "43",
-				},
+				yamltest.MustParseNode(`42`),
+				yamltest.MustParseNode(`43`),
 			},
 		},
 	}
@@ -199,8 +235,8 @@ func TestInts(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := yamlconv.Ints(tc.input...)
 
-			if got, want := got, tc.want; !cmp.Equal(got, want) {
-				t.Errorf("Ints() = %v, want %v", got, want)
+			if got, want := got, tc.want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+				t.Errorf("Ints() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 			}
 		})
 	}
@@ -220,25 +256,14 @@ func TestFloats(t *testing.T) {
 			name:  "single",
 			input: []float64{42.3},
 			want: []*yaml.Node{
-				{
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!float",
-					Value: "42.3",
-				},
+				yamltest.MustParseNode(`42.3`),
 			},
 		}, {
 			name:  "multiple",
 			input: []float64{42.3, 43.4},
 			want: []*yaml.Node{
-				{
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!float",
-					Value: "42.3",
-				}, {
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!float",
-					Value: "43.4",
-				},
+				yamltest.MustParseNode(`42.3`),
+				yamltest.MustParseNode(`43.4`),
 			},
 		},
 	}
@@ -247,8 +272,8 @@ func TestFloats(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := yamlconv.Floats(tc.input...)
 
-			if got, want := got, tc.want; !cmp.Equal(got, want) {
-				t.Errorf("Floats() = %v, want %v", got, want)
+			if got, want := got, tc.want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+				t.Errorf("Floats() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 			}
 		})
 	}
@@ -268,25 +293,14 @@ func TestNumbers(t *testing.T) {
 			name:  "single",
 			input: []int{42},
 			want: []*yaml.Node{
-				{
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!int",
-					Value: "42",
-				},
+				yamltest.MustParseNode(`42`),
 			},
 		}, {
 			name:  "multiple",
 			input: []int{42, 44},
 			want: []*yaml.Node{
-				{
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!int",
-					Value: "42",
-				}, {
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!int",
-					Value: "44",
-				},
+				yamltest.MustParseNode(`42`),
+				yamltest.MustParseNode(`44`),
 			},
 		},
 	}
@@ -295,8 +309,8 @@ func TestNumbers(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := yamlconv.Numbers(tc.input...)
 
-			if got, want := got, tc.want; !cmp.Equal(got, want) {
-				t.Errorf("Numbers() = %v, want %v", got, want)
+			if got, want := got, tc.want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+				t.Errorf("Numbers() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 			}
 		})
 	}
@@ -316,25 +330,14 @@ func TestStrings(t *testing.T) {
 			name:  "single",
 			input: []string{"foo"},
 			want: []*yaml.Node{
-				{
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!str",
-					Value: "foo",
-				},
+				yamltest.MustParseNode(`"foo"`),
 			},
 		}, {
 			name:  "multiple",
 			input: []string{"foo", "bar"},
 			want: []*yaml.Node{
-				{
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!str",
-					Value: "foo",
-				}, {
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!str",
-					Value: "bar",
-				},
+				yamltest.MustParseNode(`"foo"`),
+				yamltest.MustParseNode(`"bar"`),
 			},
 		},
 	}
@@ -343,8 +346,8 @@ func TestStrings(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := yamlconv.Strings(tc.input...)
 
-			if got, want := got, tc.want; !cmp.Equal(got, want) {
-				t.Errorf("Strings() = %v, want %v", got, want)
+			if got, want := got, tc.want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+				t.Errorf("Strings() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 			}
 		})
 	}
@@ -364,25 +367,14 @@ func TestBools(t *testing.T) {
 			name:  "single",
 			input: []bool{true},
 			want: []*yaml.Node{
-				{
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!bool",
-					Value: "true",
-				},
+				yamltest.MustParseNode(`true`),
 			},
 		}, {
 			name:  "multiple",
 			input: []bool{true, false},
 			want: []*yaml.Node{
-				{
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!bool",
-					Value: "true",
-				}, {
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!bool",
-					Value: "false",
-				},
+				yamltest.MustParseNode(`true`),
+				yamltest.MustParseNode(`false`),
 			},
 		},
 	}
@@ -391,8 +383,8 @@ func TestBools(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := yamlconv.Bools(tc.input...)
 
-			if got, want := got, tc.want; !cmp.Equal(got, want) {
-				t.Errorf("Bools() = %v, want %v", got, want)
+			if got, want := got, tc.want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+				t.Errorf("Bools() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 			}
 		})
 	}
@@ -412,25 +404,14 @@ func TestNodes(t *testing.T) {
 			name:  "single",
 			input: []int{42},
 			want: []*yaml.Node{
-				{
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!int",
-					Value: "42",
-				},
+				yamltest.MustParseNode(`42`),
 			},
 		}, {
 			name:  "multiple",
 			input: []int{42, 50},
 			want: []*yaml.Node{
-				{
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!int",
-					Value: "42",
-				}, {
-					Kind:  yaml.ScalarNode,
-					Tag:   "!!int",
-					Value: "50",
-				},
+				yamltest.MustParseNode(`42`),
+				yamltest.MustParseNode(`50`),
 			},
 		},
 	}
@@ -439,8 +420,8 @@ func TestNodes(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := yamlconv.Nodes(tc.input...)
 
-			if got, want := got, tc.want; !cmp.Equal(got, want) {
-				t.Errorf("Nodes() = %v, want %v", got, want)
+			if got, want := got, tc.want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+				t.Errorf("Nodes() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 			}
 		})
 	}
@@ -483,8 +464,8 @@ func TestSequence(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := yamlconv.Sequence(tc.input...)
 
-			if got, want := got, tc.want; !cmp.Equal(got, want) {
-				t.Errorf("Sequence() = %v, want %v", got, want)
+			if got, want := got, tc.want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+				t.Errorf("Sequence() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 			}
 		})
 	}
@@ -524,45 +505,8 @@ func TestDocument(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := yamlconv.Document(tc.input...)
 
-			if got, want := got, tc.want; !cmp.Equal(got, want) {
-				t.Errorf("Document() = %v, want %v", got, want)
-			}
-		})
-	}
-}
-
-func TestParseString(t *testing.T) {
-	testCases := []struct {
-		name    string
-		input   *yaml.Node
-		want    string
-		wantErr error
-	}{
-		{
-			name:    "wrong kind",
-			input:   yamlconv.Sequence(),
-			wantErr: errs.ErrBadKind,
-		}, {
-			name:    "wrong tag",
-			input:   yamlconv.Int(4),
-			wantErr: errs.ErrBadTag,
-		}, {
-			name:  "valid string",
-			input: yamlconv.String("foo"),
-			want:  "foo",
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			got, err := yamlconv.ParseString(tc.input)
-
-			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
-				t.Errorf("ParseString() error = %v, want %v", err, tc.wantErr)
-			}
-
-			if got, want := got, tc.want; !cmp.Equal(got, want) {
-				t.Errorf("ParseString() = %v, want %v", got, tc.want)
+			if got, want := got, tc.want; !cmp.Equal(got, want, yamltest.IgnoreMetaFields()) {
+				t.Errorf("Document() = diff (-got,+want):\n%s", cmp.Diff(got, want, yamltest.IgnoreMetaFields()))
 			}
 		})
 	}
@@ -571,72 +515,46 @@ func TestParseString(t *testing.T) {
 func TestParseInt(t *testing.T) {
 	testCases := []struct {
 		name    string
-		input   *yaml.Node
+		input   []*yaml.Node
 		want    int64
 		wantErr error
 	}{
 		{
-			name:    "wrong kind",
-			input:   yamlconv.Sequence(),
+			name:    "empty",
+			input:   []*yaml.Node{},
+			wantErr: errs.ErrNotSingleton,
+		}, {
+			name:    "more than one",
+			input:   yamlconv.Ints(1, 2),
+			wantErr: errs.ErrNotSingleton,
+		}, {
+			name:  "single value, valid int",
+			input: yamlconv.Ints(42),
+			want:  42,
+		}, {
+			name:    "single value, wrong kind",
+			input:   []*yaml.Node{yamlconv.Sequence()},
 			wantErr: errs.ErrBadKind,
 		}, {
-			name:    "wrong tag",
-			input:   yamlconv.String("foo"),
+			name:    "single value, wrong tag",
+			input:   []*yaml.Node{yamlconv.String("foo")},
 			wantErr: errs.ErrBadTag,
 		}, {
-			name:  "valid int",
-			input: yamlconv.Int(42),
-			want:  42,
+			name:    "single value, invalid int",
+			input:   []*yaml.Node{yamlconv.IntString("foo")},
+			wantErr: cmpopts.AnyError,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := yamlconv.ParseInt(tc.input)
+			got, err := yamlconv.ParseInt(tc.input...)
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
-				t.Errorf("ParseInt() error = %v, want %v", err, tc.wantErr)
+				t.Fatalf("ParseInt() error = %v, want %v", err, tc.wantErr)
 			}
-
 			if got, want := got, tc.want; !cmp.Equal(got, want) {
 				t.Errorf("ParseInt() = %v, want %v", got, tc.want)
-			}
-		})
-	}
-}
-
-func TestParseBool(t *testing.T) {
-	testCases := []struct {
-		name    string
-		input   *yaml.Node
-		want    bool
-		wantErr error
-	}{
-		{
-			name:    "wrong kind",
-			input:   yamlconv.Sequence(),
-			wantErr: errs.ErrBadKind,
-		}, {
-			name:    "wrong tag",
-			input:   yamlconv.Int(42),
-			wantErr: errs.ErrBadTag,
-		}, {
-			name:  "valid bool",
-			input: yamlconv.Bool(true),
-			want:  true,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			got, err := yamlconv.ParseBool(tc.input)
-
-			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
-				t.Errorf("ParseBool() error = %v, want %v", err, tc.wantErr)
-			}
-
-			if got, want := got, tc.want; !cmp.Equal(got, want) {
-				t.Errorf("ParseBool() = %v, want %v", got, tc.want)
 			}
 		})
 	}
@@ -645,33 +563,44 @@ func TestParseBool(t *testing.T) {
 func TestParseFloat(t *testing.T) {
 	testCases := []struct {
 		name    string
-		input   *yaml.Node
+		input   []*yaml.Node
 		want    float64
 		wantErr error
 	}{
 		{
-			name:    "wrong kind",
-			input:   yamlconv.Sequence(),
+			name:    "empty",
+			input:   []*yaml.Node{},
+			wantErr: errs.ErrNotSingleton,
+		}, {
+			name:    "more than one",
+			input:   yamlconv.Floats(1.1, 2.2),
+			wantErr: errs.ErrNotSingleton,
+		}, {
+			name:  "single value, valid float",
+			input: yamlconv.Floats(42.3),
+			want:  42.3,
+		}, {
+			name:    "single value, wrong kind",
+			input:   []*yaml.Node{yamlconv.Sequence()},
 			wantErr: errs.ErrBadKind,
 		}, {
-			name:    "wrong tag",
-			input:   yamlconv.String("foo"),
+			name:    "single value, wrong tag",
+			input:   []*yaml.Node{yamlconv.String("foo")},
 			wantErr: errs.ErrBadTag,
 		}, {
-			name:  "valid float",
-			input: yamlconv.Float(42.3),
-			want:  42.3,
+			name:    "single value, invalid float",
+			input:   []*yaml.Node{yamlconv.FloatString("foo")},
+			wantErr: cmpopts.AnyError,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := yamlconv.ParseFloat(tc.input)
+			got, err := yamlconv.ParseFloat(tc.input...)
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
-				t.Errorf("ParseFloat() error = %v, want %v", err, tc.wantErr)
+				t.Fatalf("ParseFloat() error = %v, want %v", err, tc.wantErr)
 			}
-
 			if got, want := got, tc.want; !cmp.Equal(got, want) {
 				t.Errorf("ParseFloat() = %v, want %v", got, tc.want)
 			}
@@ -682,39 +611,131 @@ func TestParseFloat(t *testing.T) {
 func TestParseDecimal(t *testing.T) {
 	testCases := []struct {
 		name    string
-		input   *yaml.Node
+		input   []*yaml.Node
 		want    decimal.Decimal
 		wantErr error
 	}{
 		{
-			name:    "wrong kind",
-			input:   yamlconv.Sequence(),
-			wantErr: errs.ErrBadKind,
+			name:    "empty",
+			input:   []*yaml.Node{},
+			wantErr: errs.ErrNotSingleton,
 		}, {
-			name:    "wrong tag",
-			input:   yamlconv.String("foo"),
-			wantErr: errs.ErrBadTag,
+			name:    "more than one",
+			input:   yamlconv.Numbers(1, 2),
+			wantErr: errs.ErrNotSingleton,
 		}, {
-			name:  "integer",
-			input: yamlconv.Int(42),
+			name:  "single value, valid decimal",
+			input: yamlconv.Numbers(42),
 			want:  decimal.New(42, 0),
 		}, {
-			name:  "float",
-			input: yamlconv.Float(42.3),
-			want:  decimal.NewFromFloat(42.3),
+			name:    "single value, wrong kind",
+			input:   []*yaml.Node{yamlconv.Sequence()},
+			wantErr: errs.ErrBadKind,
+		}, {
+			name:    "single value, wrong tag",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			wantErr: errs.ErrBadTag,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := yamlconv.ParseDecimal(tc.input)
+			got, err := yamlconv.ParseDecimal(tc.input...)
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
-				t.Errorf("ParseDecimal() error = %v, want %v", err, tc.wantErr)
+				t.Fatalf("ParseDecimal() error = %v, want %v", err, tc.wantErr)
+			}
+			if got, want := got, tc.want; !cmp.Equal(got, want) {
+				t.Errorf("ParseDecimal() = %v, want %v", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestParseString(t *testing.T) {
+	testCases := []struct {
+		name    string
+		input   []*yaml.Node
+		want    string
+		wantErr error
+	}{
+		{
+			name:    "empty",
+			input:   []*yaml.Node{},
+			wantErr: errs.ErrNotSingleton,
+		}, {
+			name:    "more than one",
+			input:   yamlconv.Strings("foo", "bar"),
+			wantErr: errs.ErrNotSingleton,
+		}, {
+			name:  "single value, valid string",
+			input: yamlconv.Strings("hello"),
+			want:  "hello",
+		}, {
+			name:    "single value, wrong kind",
+			input:   []*yaml.Node{yamlconv.Sequence()},
+			wantErr: errs.ErrBadKind,
+		}, {
+			name:    "single value, wrong tag",
+			input:   []*yaml.Node{yamlconv.Int(42)},
+			wantErr: errs.ErrBadTag,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := yamlconv.ParseString(tc.input...)
+
+			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
+				t.Fatalf("ParseString() error = %v, want %v", err, tc.wantErr)
+			}
+			if got, want := got, tc.want; !cmp.Equal(got, want) {
+				t.Errorf("ParseString() = %v, want %v", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestParseBool(t *testing.T) {
+	testCases := []struct {
+		name    string
+		input   []*yaml.Node
+		want    bool
+		wantErr error
+	}{
+		{
+			name:    "empty",
+			input:   []*yaml.Node{},
+			wantErr: errs.ErrNotSingleton,
+		}, {
+			name:    "more than one",
+			input:   yamlconv.Bools(true, false),
+			wantErr: errs.ErrNotSingleton,
+		}, {
+			name:  "single value, valid bool",
+			input: yamlconv.Bools(true),
+			want:  true,
+		}, {
+			name:    "single value, wrong kind",
+			input:   []*yaml.Node{yamlconv.Sequence()},
+			wantErr: errs.ErrBadKind,
+		}, {
+			name:    "single value, wrong tag",
+			input:   []*yaml.Node{yamlconv.Int(42)},
+			wantErr: errs.ErrBadTag,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := yamlconv.ParseBool(tc.input...)
+
+			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
+				t.Errorf("ParseBool() error = %v, want %v", err, tc.wantErr)
 			}
 
 			if got, want := got, tc.want; !cmp.Equal(got, want) {
-				t.Errorf("ParseDecimal() = %v, want %v", got, tc.want)
+				t.Errorf("ParseBool() = %v, want %v", got, tc.want)
 			}
 		})
 	}

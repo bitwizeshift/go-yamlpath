@@ -48,7 +48,7 @@ func TestScriptExpr(t *testing.T) {
 			want:  []*yaml.Node{yamlconv.String("value")},
 		}, {
 			name:    "Expr returns invalid integer node",
-			expr:    exprtest.Return(yamlconv.RawNumber("foo")),
+			expr:    exprtest.Return(yamlconv.NumberString("foo")),
 			wantErr: errs.ErrEval,
 		}, {
 			name:    "Expr returns scalar boolean node",

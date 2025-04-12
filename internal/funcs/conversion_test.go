@@ -47,7 +47,7 @@ func TestToBoolean(t *testing.T) {
 			want:  []*yaml.Node{},
 		}, {
 			name:    "integer in bad representation",
-			input:   []*yaml.Node{yamlconv.RawNumber("whatever")},
+			input:   []*yaml.Node{yamlconv.NumberString("whatever")},
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:  "integer can convert to boolean true",
@@ -151,7 +151,7 @@ func TestToNumber(t *testing.T) {
 			want:  []*yaml.Node{yamlconv.Number(1)},
 		}, {
 			name:  "bad boolean value returns empty",
-			input: []*yaml.Node{yamlconv.RawBool("whatever")},
+			input: []*yaml.Node{yamlconv.BoolString("whatever")},
 			want:  []*yaml.Node{},
 		}, {
 			name:  "number returns input",

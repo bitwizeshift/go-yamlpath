@@ -224,7 +224,7 @@ func TestSelect(t *testing.T) {
 		}, {
 			name: "invalid integer definition",
 			params: []invocation.Parameter{
-				invocationtest.SuccessParameter(yamlconv.RawNumber("bad")),
+				invocationtest.SuccessParameter(yamlconv.NumberString("bad")),
 			},
 			input:   []*yaml.Node{yamltest.MustParseNode(`["hello", "world"]`)},
 			wantErr: errs.ErrEval,

@@ -43,13 +43,13 @@ func TestEqual(t *testing.T) {
 			want: true,
 		}, {
 			name: "Both nodes are equivalent numbers",
-			lhs:  yamlconv.RawNumber("42e0"),
+			lhs:  yamlconv.NumberString("42e0"),
 			rhs:  yamlconv.Number(42),
 			want: true,
 		}, {
 			name: "Both nodes are numbers with different precision",
 			lhs:  yamlconv.Number(42),
-			rhs:  yamlconv.RawNumber("42.0"),
+			rhs:  yamlconv.NumberString("42.0"),
 			want: false,
 		}, {
 			name: "Both nodes are different scalar kinds",
@@ -93,13 +93,13 @@ func TestEqual(t *testing.T) {
 			want: true,
 		}, {
 			name: "Equivalent but invalid number fields return true",
-			lhs:  yamlconv.RawNumber("hello"),
-			rhs:  yamlconv.RawNumber("hello"),
+			lhs:  yamlconv.NumberString("hello"),
+			rhs:  yamlconv.NumberString("hello"),
 			want: true,
 		}, {
 			name: "Different but invalid number fields return false",
-			lhs:  yamlconv.RawNumber("hello"),
-			rhs:  yamlconv.RawNumber("world"),
+			lhs:  yamlconv.NumberString("hello"),
+			rhs:  yamlconv.NumberString("world"),
 			want: false,
 		},
 	}

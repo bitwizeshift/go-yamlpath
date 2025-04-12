@@ -71,13 +71,13 @@ func TestArithmeticExpr(t *testing.T) {
 			wantErr: errs.ErrEval,
 		}, {
 			name:    "Left value is invalid number",
-			left:    exprtest.Return(yamlconv.RawNumber("foo")),
+			left:    exprtest.Return(yamlconv.NumberString("foo")),
 			right:   exprtest.Return(yamlconv.Number(42)),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Right value is invalid number",
 			left:    exprtest.Return(yamlconv.Number(42)),
-			right:   exprtest.Return(yamlconv.RawNumber("foo")),
+			right:   exprtest.Return(yamlconv.NumberString("foo")),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:      "operator '-' where left and right are ints",

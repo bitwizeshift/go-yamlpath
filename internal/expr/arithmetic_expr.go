@@ -83,7 +83,7 @@ func (e *ArithmeticExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	}
 	result := e.Operation(lv, rv)
 
-	return []*yaml.Node{yamlconv.RawNumber(result.String())}, nil
+	return []*yaml.Node{yamlconv.NumberString(result.String())}, nil
 }
 
 func (e *ArithmeticExpr) eval(ctx invocation.Context) ([]*yaml.Node, []*yaml.Node, error) {

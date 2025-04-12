@@ -80,13 +80,13 @@ func TestConcatExpr(t *testing.T) {
 			want:  []*yaml.Node{yamlconv.Number(84)},
 		}, {
 			name:    "Left and right are scalar ints, left has bad representation",
-			left:    exprtest.Return(yamlconv.RawNumber("hello")),
+			left:    exprtest.Return(yamlconv.NumberString("hello")),
 			right:   exprtest.Return(yamlconv.Number(42)),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Left and right are scalar ints, right has bad representation",
 			left:    exprtest.Return(yamlconv.Number(42)),
-			right:   exprtest.Return(yamlconv.RawNumber("hello")),
+			right:   exprtest.Return(yamlconv.NumberString("hello")),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:  "left and right are scalar string types",

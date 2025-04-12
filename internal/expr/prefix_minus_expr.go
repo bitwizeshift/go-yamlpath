@@ -31,9 +31,9 @@ func (e *PrefixMinusExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	switch node.Tag {
 	case "!!int", "!!float":
 		if node.Value[0] == '-' {
-			result = append(result, yamlconv.RawNumber(node.Value[1:]))
+			result = append(result, yamlconv.NumberString(node.Value[1:]))
 		} else {
-			result = append(result, yamlconv.RawNumber("-"+node.Value))
+			result = append(result, yamlconv.NumberString("-"+node.Value))
 		}
 	default:
 		return nil, errs.NewTagError("operator prefix '-'", node, "!!int", "!!float")

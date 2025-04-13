@@ -81,6 +81,9 @@ func TestNewTree(t *testing.T) {
 			name:  "function expression with correct amount of args",
 			input: `$.foo(1,2)`,
 		}, {
+			name:  "function with union subexpression",
+			input: "$.foo[(1 | 2)]",
+		}, {
 			name:    "function expression with too few args",
 			input:   `$.foo(1)`,
 			wantErr: arity.ErrBadArity,

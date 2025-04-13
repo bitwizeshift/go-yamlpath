@@ -29,6 +29,7 @@ subexpression
       | ('+' | '-') expression                                  # polaritySubexpression
       | subexpression ('*' | '/' | '%') subexpression           # multiplicativeSubexpression
       | subexpression ('+' | '-') subexpression                 # additiveSubexpression
+      | subexpression ('|' subexpression)+                      # unionSubexpression
       | subexpression ('<=' | '<' | '>' | '>=') subexpression   # inequalitySubexpression
       | subexpression ('==' | '!=') subexpression               # equalitySubexpression
       | subexpression '=~' regex                                # matchSubexpression

@@ -241,6 +241,8 @@ func (v *Visitor) visitSubexpression(ctx parser.ISubexpressionContext) (expr.Exp
 		return v.visitNegationSubexpression(ctx)
 	case *parser.LiteralSubexpressionContext:
 		return v.visitLiteral(ctx.Literal())
+	case *parser.UnionSubexpressionContext:
+		return v.visitUnionSubexpression(ctx)
 	case *parser.AggregationSubexpressionContext:
 		return v.visitAggregation(ctx.Aggregation())
 	case *parser.ParenthesisSubexpressionContext:
@@ -293,6 +295,19 @@ func (v *Visitor) visitAdditiveSubexpression(ctx *parser.AdditiveSubexpressionCo
 	}
 
 	return nil, ErrInternalf(ctx, "unhandled binary operator: %q", "")
+}
+
+func (v *Visitor) visitUnionSubexpression(ctx *parser.UnionSubexpressionContext) (expr.Expr, error) {
+	exprs := ctx.AllSubexpression()
+	union := make(expr.UnionExpr, 0, len(exprs))
+	for _, sub := range exprs {
+		e, err := v.visitSubexpression(sub)
+		if err != nil {
+			return nil, err
+		}
+		union = append(union, e)
+	}
+	return union, nil
 }
 
 func (v *Visitor) visitMultiplicativeSubexpression(ctx *parser.MultiplicativeSubexpressionContext) (expr.Expr, error) {

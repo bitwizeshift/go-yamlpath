@@ -7,10 +7,16 @@ grammar yamlpath;
 path: expression EOF ;
 
 expression
-      : ('$' | '@')                                       # rootExpression
+      : term                                              # termExpression
       | expression '..' (invocation)?                     # recursiveExpression
       | expression '.' invocation                         # fieldExpression
       | expression '[' indexParam ']'                     # indexExpression
+      ;
+
+term
+      : ('$' | '@')                                       # rootTerm
+      | invocation                                        # invocationTerm
+      | literal                                           # literalTerm
       ;
 
 indexParam
@@ -55,7 +61,6 @@ mapEntries
 
 invocation
       : identifier                                        # memberInvocation
-      | STRING                                            # quotedMemberInvocation
       | '*'                                               # wildcardInvocation
       | identifier '(' paramList? ')'                     # functionInvocation
       ;
@@ -65,7 +70,8 @@ paramList
       ;
 
 identifier
-      : IDENTIFIER
+      : IDENTIFIER                                        # plainIdentifier
+      | STRING                                            # quotedIdentifier
       ;
 
 regex
@@ -76,7 +82,7 @@ regex
   Lexer rules
 ******************************************************************************/
 
-IDENTIFIER     : [a-zA-Z_][a-zA-Z0-9_]* ;
+IDENTIFIER     : [a-zA-Z_][a-zA-Z0-9_-]*([a-zA-Z0-9_])?;
 NUMBER         : '-'? [0-9]+ ('.' [0-9]+)? ([eE] [+-]? [0-9]+)? ;
 STRING         : '"' (ESC | .)*? '"' ;
 REGEX          : '/' (ESC | .)*? '/' ;

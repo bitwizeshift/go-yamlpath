@@ -23,10 +23,6 @@ func TestNewTree(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name:    "Invalid root",
-			input:   `foo`,
-			wantErr: compile.ErrSyntax,
-		}, {
 			name:  "root expression",
 			input: `$`,
 		}, {
@@ -91,6 +87,27 @@ func TestNewTree(t *testing.T) {
 			name:    "function expression with too many args",
 			input:   `$.foo(1,2,3)`,
 			wantErr: arity.ErrBadArity,
+		}, {
+			name:  "numeric literal",
+			input: `1`,
+		}, {
+			name:  "string literal",
+			input: `"foo"`,
+		}, {
+			name:  "boolean literal",
+			input: `true`,
+		}, {
+			name:  "null literal",
+			input: `null`,
+		}, {
+			name:  "object literal",
+			input: `{"foo": "bar"}`,
+		}, {
+			name:  "array literal",
+			input: `["foo", "bar"]`,
+		}, {
+			name:  "delimited identifier",
+			input: `foo.bar-baz`,
 		},
 	}
 

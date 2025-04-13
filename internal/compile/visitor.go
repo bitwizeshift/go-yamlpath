@@ -30,8 +30,8 @@ func (v *Visitor) VisitRoot(ctx parser.IPathContext) (expr.Expr, error) {
 
 func (v *Visitor) visitExpression(ctx parser.IExpressionContext) (expr.Expr, error) {
 	switch ctx := ctx.(type) {
-	case *parser.RootExpressionContext:
-		return v.visitRootExpression(ctx)
+	case *parser.TermExpressionContext:
+		return v.visitTermExpression(ctx)
 	case *parser.FieldExpressionContext:
 		return v.visitFieldExpression(ctx)
 	case *parser.RecursiveExpressionContext:
@@ -42,7 +42,23 @@ func (v *Visitor) visitExpression(ctx parser.IExpressionContext) (expr.Expr, err
 	return nil, ErrInternalf(ctx, "unexpected expression type: %T", ctx)
 }
 
-func (v *Visitor) visitRootExpression(ctx *parser.RootExpressionContext) (expr.Expr, error) {
+func (v *Visitor) visitTermExpression(ctx *parser.TermExpressionContext) (expr.Expr, error) {
+	return v.visitTerm(ctx.Term())
+}
+
+func (v *Visitor) visitTerm(ctx parser.ITermContext) (expr.Expr, error) {
+	switch ctx := ctx.(type) {
+	case *parser.RootTermContext:
+		return v.visitRootTerm(ctx)
+	case *parser.LiteralTermContext:
+		return v.visitLiteral(ctx.Literal())
+	case *parser.InvocationTermContext:
+		return v.visitInvocation(ctx.Invocation())
+	}
+	return nil, ErrInternalf(ctx, "unexpected term type: %T", ctx)
+}
+
+func (v *Visitor) visitRootTerm(ctx *parser.RootTermContext) (expr.Expr, error) {
 	root := ctx.GetText()
 	switch root {
 	case "@", "$":
@@ -50,7 +66,7 @@ func (v *Visitor) visitRootExpression(ctx *parser.RootExpressionContext) (expr.E
 			Root: root,
 		}, nil
 	}
-	return nil, ErrInternalf(ctx, "unexpected root expression: %q", root)
+	return nil, ErrInternalf(ctx, "unexpected root term: %q", root)
 }
 
 func (v *Visitor) visitFieldExpression(ctx *parser.FieldExpressionContext) (expr.Expr, error) {
@@ -106,8 +122,6 @@ func (v *Visitor) visitInvocation(ctx parser.IInvocationContext) (expr.Expr, err
 	switch ctx := ctx.(type) {
 	case *parser.MemberInvocationContext:
 		return v.visitMemberInvocation(ctx)
-	case *parser.QuotedMemberInvocationContext:
-		return v.visitQuotedMemberInvocation(ctx)
 	case *parser.WildcardInvocationContext:
 		return v.visitWildcardInvocation(ctx)
 	case *parser.FunctionInvocationContext:
@@ -117,15 +131,32 @@ func (v *Visitor) visitInvocation(ctx parser.IInvocationContext) (expr.Expr, err
 }
 
 func (v *Visitor) visitMemberInvocation(ctx *parser.MemberInvocationContext) (expr.Expr, error) {
+	identifier, err := v.visitIdentifier(ctx.Identifier())
+	if err != nil {
+		return nil, err
+	}
 	return &expr.FieldExpr{
-		Fields: []string{ctx.GetText()},
+		Fields: []string{identifier},
 	}, nil
 }
 
-func (v *Visitor) visitQuotedMemberInvocation(ctx *parser.QuotedMemberInvocationContext) (expr.Expr, error) {
-	return &expr.FieldExpr{
-		Fields: []string{ctx.GetText()},
-	}, nil
+func (v *Visitor) visitIdentifier(ctx parser.IIdentifierContext) (string, error) {
+	switch ctx := ctx.(type) {
+	case *parser.PlainIdentifierContext:
+		return v.visitPlainIdentifier(ctx)
+	case *parser.QuotedIdentifierContext:
+		return v.visitQuotedIdentifier(ctx)
+	}
+	return "", ErrInternalf(ctx, "unexpected identifier type: %T", ctx)
+}
+
+func (v *Visitor) visitPlainIdentifier(ctx *parser.PlainIdentifierContext) (string, error) {
+	return ctx.GetText(), nil
+}
+
+func (v *Visitor) visitQuotedIdentifier(ctx *parser.QuotedIdentifierContext) (string, error) {
+	text := ctx.GetText()
+	return strconv.Unquote(text)
 }
 
 func (v *Visitor) visitWildcardInvocation(_ *parser.WildcardInvocationContext) (expr.Expr, error) {

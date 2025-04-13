@@ -820,3 +820,170 @@ Feature: Funcs - String
         """
       When the yamlpath `$.name.toChars()` is evaluated
       Then an error is raised
+
+  Rule: matches() checks if the string matches a regular expression
+
+    Shall return true if the string matches the regular expression. If the
+    value is not a string, or if there are more than one value in the collection,
+    an error is raised to the calling environment. If the 'regex' argument is
+    not a string, an error is raised to the calling environment. If the
+    collection is empty, this returns empty.
+
+    Scenario: Collection is empty
+
+      Given the yaml input:
+        """
+        people: []
+        """
+      When the yamlpath `$.people[*].matches("john")` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Collection contains string that does not match
+
+      Given the yaml input:
+        """
+        name: "hello world"
+        """
+      When the yamlpath `$.name.matches("john")` is evaluated
+      Then the evaluation result is:
+        """
+        false
+        """
+
+    Scenario: Collection contains string that does match
+
+      Given the yaml input:
+        """
+        name: "hello john"
+        """
+      When the yamlpath `$.name.matches("^h.*lo")` is evaluated
+      Then the evaluation result is:
+        """
+        true
+        """
+
+    Scenario: Collection contains more than one string
+
+      Collections containing more than one string element shall raise an error
+      to the calling environment
+
+      Given the yaml input:
+        """
+        people:
+          - name: "john"
+          - name: "jane"
+        """
+      When the yamlpath `$.people[*].matches("john")` is evaluated
+      Then an error is raised
+
+    Scenario: Collection contains non-string value
+
+      Collections containing non-string values shall raise an error to the
+      calling environment
+
+      Given the yaml input:
+        """
+        name: 123
+        """
+      When the yamlpath `$.name.matches("john")` is evaluated
+      Then an error is raised
+
+    Scenario: Regex argument is not a string
+
+      The regex argument must be a string. If it is not, an error is raised to
+      the calling environment.
+
+      Given the yaml input:
+        """
+        name: "john"
+        """
+      When the yamlpath `$.name.matches(123)` is evaluated
+      Then an error is raised
+
+  Rule: replaceMatches() replaces all occurrences of a pattern with a replacement
+
+    Shall return a string with all occurrences of the pattern replaced with the
+    replacement. If the value is not a string, or if there are more than one
+    value in the collection, an error is raised to the calling environment. If
+    the 'pattern' argument is not a string, an error is raised to the calling
+    environment. If the 'replacement' argument is not a string, an error is
+    raised to the calling environment. If the collection is empty, this returns
+    empty. If the pattern is not found, the original string is returned.
+
+    Scenario: Collection is empty
+
+      Given the yaml input:
+        """
+        people: []
+        """
+      When the yamlpath `$.people[*].replaceMatches("john", "jane")` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Collection contains string that does not match
+
+      Given the yaml input:
+        """
+        name: "hello world"
+        """
+      When the yamlpath `$.name.replaceMatches("john", "jane")` is evaluated
+      Then the evaluation result is:
+        """
+        "hello world"
+        """
+
+    Scenario: Collection contains string that does match
+      Given the yaml input:
+        """
+        name: "hello john"
+        """
+      When the yamlpath `$.name.replaceMatches("j.*n$", "jane")` is evaluated
+      Then the evaluation result is:
+        """
+        hello jane
+        """
+
+    Scenario: Collection contains more than one string
+      Collections containing more than one string element shall raise an error
+      to the calling environment
+
+      Given the yaml input:
+        """
+        people:
+          - name: "john"
+          - name: "jane"
+        """
+      When the yamlpath `$.people[*].replaceMatches("john", "jane")` is evaluated
+      Then an error is raised
+
+    Scenario: Collection contains non-string value
+      Collections containing non-string values shall raise an error to the
+      calling environment
+
+      Given the yaml input:
+        """
+        name: 123
+        """
+      When the yamlpath `$.name.replaceMatches("john", "jane")` is evaluated
+      Then an error is raised
+
+    Scenario: Pattern argument is not a string
+      The pattern argument must be a string. If it is not, an error is raised to
+      the calling environment.
+
+      Given the yaml input:
+        """
+        name: "john"
+        """
+      When the yamlpath `$.name.replaceMatches(123, "jane")` is evaluated
+      Then an error is raised
+
+    Scenario: Replacement argument is not a string
+      The replacement argument must be a string. If it is not, an error is
+      raised to the calling environment.
+
+      Given the yaml input:
+        """
+        name: "john"
+        """
+      When the yamlpath `$.name.replaceMatches("john", 123)` is evaluated
+      Then an error is raised

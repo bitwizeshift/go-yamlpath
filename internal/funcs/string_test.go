@@ -836,3 +836,198 @@ func TestToChars(t *testing.T) {
 		})
 	}
 }
+
+func TestMatches(t *testing.T) {
+	testErr := errors.New("test error")
+	testCases := []struct {
+		name    string
+		input   []*yaml.Node
+		arg     invocation.Parameter
+		want    []*yaml.Node
+		wantErr error
+	}{
+		{
+			name:  "Empty input",
+			input: []*yaml.Node{},
+			arg:   invocationtest.SuccessParameter(yamlconv.String("foo")),
+			want:  []*yaml.Node{},
+		}, {
+			name:  "Input matches regex",
+			input: []*yaml.Node{yamlconv.String("hello world")},
+			arg:   invocationtest.SuccessParameter(yamlconv.String("^h.*o")),
+			want:  []*yaml.Node{yamlconv.Bool(true)},
+		}, {
+			name:  "Input does not match regex",
+			input: []*yaml.Node{yamlconv.String("hello world")},
+			arg:   invocationtest.SuccessParameter(yamlconv.String("foo")),
+			want:  []*yaml.Node{yamlconv.Bool(false)},
+		}, {
+			name:    "Input is not scalar node",
+			input:   []*yaml.Node{yamltest.MustParseNode(`{"foo": "bar"}`)},
+			arg:     invocationtest.SuccessParameter(yamlconv.String("foo")),
+			wantErr: errs.ErrBadKind,
+		}, {
+			name:    "Input is non-string scalar node",
+			input:   []*yaml.Node{yamlconv.Bool(true)},
+			arg:     invocationtest.SuccessParameter(yamlconv.String("foo")),
+			wantErr: errs.ErrBadTag,
+		}, {
+			name:    "Input is not singleton",
+			input:   []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar")},
+			arg:     invocationtest.SuccessParameter(yamlconv.String("foo")),
+			wantErr: errs.ErrNotSingleton,
+		}, {
+			name:    "Pattern returns error",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			arg:     invocationtest.ErrorParameter(testErr),
+			wantErr: testErr,
+		}, {
+			name:    "Pattern is not a string",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			arg:     invocationtest.SuccessParameter(yamlconv.Bool(true)),
+			wantErr: errs.ErrBadTag,
+		}, {
+			name:    "Pattern is not a scalar",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			arg:     invocationtest.SuccessParameter(yamltest.MustParseNode(`{"foo": "bar"}`)),
+			wantErr: errs.ErrBadKind,
+		}, {
+			name:    "Pattern is not singleton",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			arg:     invocationtest.SuccessParameter(yamlconv.String("foo"), yamlconv.String("bar")),
+			wantErr: errs.ErrNotSingleton,
+		}, {
+			name:    "Pattern is invalid regex",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			arg:     invocationtest.SuccessParameter(yamlconv.String("[a-z")),
+			wantErr: cmpopts.AnyError,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := expr.NewContext(tc.input)
+
+			got, err := funcs.Matches(ctx, tc.arg)
+
+			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
+				t.Fatalf("Matches() error = %v, want %v", got, want)
+			}
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
+				t.Errorf("Matches() = diff (-got,+want):\n%s", cmp.Diff(got, want))
+			}
+		})
+	}
+}
+
+func TestReplaceMatches(t *testing.T) {
+	testErr := errors.New("test error")
+	testCases := []struct {
+		name    string
+		input   []*yaml.Node
+		args    []invocation.Parameter
+		want    []*yaml.Node
+		wantErr error
+	}{
+		{
+			name:  "Empty input",
+			input: []*yaml.Node{},
+			args:  []invocation.Parameter{invocationtest.String("foo"), invocationtest.String("bar")},
+			want:  []*yaml.Node{},
+		}, {
+			name:  "Input is string with match",
+			input: []*yaml.Node{yamlconv.String("hello world")},
+			args: []invocation.Parameter{
+				invocationtest.String("^h.*lo"),
+				invocationtest.String("foo"),
+			},
+			want: []*yaml.Node{yamlconv.String("foo world")},
+		}, {
+			name:  "Input is string without match",
+			input: []*yaml.Node{yamlconv.String("hello world")},
+			args: []invocation.Parameter{
+				invocationtest.String("foo"),
+				invocationtest.String("bar"),
+			},
+			want: []*yaml.Node{yamlconv.String("hello world")},
+		}, {
+			name:    "Input is not scalar node",
+			input:   []*yaml.Node{yamltest.MustParseNode(`{"foo": "bar"}`)},
+			args:    []invocation.Parameter{invocationtest.String("hello"), invocationtest.String("foo")},
+			wantErr: errs.ErrBadKind,
+		}, {
+			name:    "Input is non-string scalar node",
+			input:   []*yaml.Node{yamlconv.Bool(true)},
+			args:    []invocation.Parameter{invocationtest.String("hello"), invocationtest.String("foo")},
+			wantErr: errs.ErrBadTag,
+		}, {
+			name:    "Input contains multiple elements",
+			input:   []*yaml.Node{yamlconv.String("foo"), yamlconv.String("bar")},
+			args:    []invocation.Parameter{invocationtest.String("hello"), invocationtest.String("foo")},
+			wantErr: errs.ErrNotSingleton,
+		}, {
+			name:    "Pattern returns error",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			args:    []invocation.Parameter{invocationtest.ErrorParameter(testErr)},
+			wantErr: testErr,
+		}, {
+			name:    "Pattern is not a string",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			args:    []invocation.Parameter{invocationtest.Bool(true)},
+			wantErr: errs.ErrBadTag,
+		}, {
+			name:    "Pattern is not a scalar",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			args:    []invocation.Parameter{invocationtest.SuccessParameter(yamltest.MustParseNode(`{"foo": "bar"}`))},
+			wantErr: errs.ErrBadKind,
+		}, {
+			name:    "Pattern is not singleton",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			args:    []invocation.Parameter{invocationtest.Strings("foo", "bar"), invocationtest.String("bar")},
+			wantErr: errs.ErrNotSingleton,
+		}, {
+			name:  "Pattern is invalid regex",
+			input: []*yaml.Node{yamlconv.String("foo")},
+			args: []invocation.Parameter{
+				invocationtest.String("[a-z"),
+				invocationtest.String("bar"),
+			},
+			wantErr: cmpopts.AnyError,
+		}, {
+			name:    "Replacement is an error",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			args:    []invocation.Parameter{invocationtest.String("foo"), invocationtest.ErrorParameter(testErr)},
+			wantErr: testErr,
+		}, {
+			name:    "Replacement is not a string",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			args:    []invocation.Parameter{invocationtest.String("foo"), invocationtest.Bool(true)},
+			wantErr: errs.ErrBadTag,
+		}, {
+			name:    "Replacement is not a scalar",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			args:    []invocation.Parameter{invocationtest.String("foo"), invocationtest.SuccessParameter(yamltest.MustParseNode(`{"foo": "bar"}`))},
+			wantErr: errs.ErrBadKind,
+		}, {
+			name:    "Replacement is not singleton",
+			input:   []*yaml.Node{yamlconv.String("foo")},
+			args:    []invocation.Parameter{invocationtest.String("foo"), invocationtest.Strings("foo", "bar")},
+			wantErr: errs.ErrNotSingleton,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := expr.NewContext(tc.input)
+
+			got, err := funcs.ReplaceMatches(ctx, tc.args...)
+
+			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
+				t.Fatalf("ReplaceMatches() error = %v, want %v", got, want)
+			}
+			if got, want := got, tc.want; !cmp.Equal(got, want, cmpopts.EquateEmpty()) {
+				t.Errorf("ReplaceMatches() diff (-got,+want):\n%s", cmp.Diff(got, want))
+			}
+		})
+	}
+}

@@ -49,6 +49,8 @@ var tableV1 = sync.OnceValue(func() *invocation.Table {
 	table.Add("length", funcs.Length).SetArity(arity.None())
 	table.Add("split", funcs.Split).SetArity(arity.Exactly(1))
 	table.Add("toChars", funcs.ToChars).SetArity(arity.None())
+	table.Add("matches", funcs.Matches).SetArity(arity.Exactly(1))
+	table.Add("replaceMatches", funcs.ReplaceMatches).SetArity(arity.Exactly(2))
 
 	// Conversion functions
 	table.Add("toBoolean", funcs.ToBoolean).SetArity(arity.None())

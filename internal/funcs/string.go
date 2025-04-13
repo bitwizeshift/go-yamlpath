@@ -1,6 +1,7 @@
 package funcs
 
 import (
+	"regexp"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -314,4 +315,77 @@ func ToChars(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, e
 	}
 
 	return result, nil
+}
+
+// Matches checks if the input string matches a regular expression.
+//
+// This will return true if the input string matches the regular expression,
+// and false otherwise. Otherwise, the behavior is as follows:
+//
+//   - If the input collection is empty, the output is also empty.
+//   - If the input collection contains more than one element, an error is
+//     raised to the calling environment.
+//   - If the input collection is not a string node, an error is raised.
+//   - If the regex is not a string node, an error is raised.
+//   - If the regex is not a valid regular expression, an error is raised.
+func Matches(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Node, error) {
+	current := ctx.Current()
+	if len(current) == 0 {
+		return nil, nil
+	}
+
+	str, err := yamlconv.ParseString(current...)
+	if err != nil {
+		return nil, errs.IncludeSource(err, "matches(...)")
+	}
+	pattern, err := invocation.ParseString(ctx, params[0])
+	if err != nil {
+		return nil, errs.IncludeSource(err, "matches(pattern)")
+	}
+
+	result, err := regexp.MatchString(pattern, str)
+	if err != nil {
+		return nil, err
+	}
+	return []*yaml.Node{yamlconv.Bool(result)}, nil
+}
+
+// ReplaceMatches replaces all occurrences of a substring in the input string
+// that match a regular expression.
+//
+// This will return a string with all occurrences of the substring replaced
+// with the replacement string. Otherwise, the behavior is as follows:
+//
+//   - If the input collection is empty, the output is also empty.
+//   - If the input collection contains more than one element, an error is
+//     raised to the calling environment.
+//   - If the input collection is not a string node, an error is raised.
+//   - If the regex is not a string node, an error is raised.
+//   - If the regex is not a valid regular expression, an error is raised.
+//   - If the replacement string is not a string node, an error is raised.
+func ReplaceMatches(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Node, error) {
+	current := ctx.Current()
+	if len(current) == 0 {
+		return nil, nil
+	}
+
+	str, err := yamlconv.ParseString(current...)
+	if err != nil {
+		return nil, errs.IncludeSource(err, "replaceMatches(...)")
+	}
+	pattern, err := invocation.ParseString(ctx, params[0])
+	if err != nil {
+		return nil, errs.IncludeSource(err, "replaceMatches(pattern, ...)")
+	}
+	replacement, err := invocation.ParseString(ctx, params[1])
+	if err != nil {
+		return nil, errs.IncludeSource(err, "replaceMatches(..., replacement)")
+	}
+
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return nil, err
+	}
+	result := re.ReplaceAllString(str, replacement)
+	return []*yaml.Node{yamlconv.String(result)}, nil
 }

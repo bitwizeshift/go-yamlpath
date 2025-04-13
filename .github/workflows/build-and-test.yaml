@@ -89,7 +89,7 @@ jobs:
             echo "coverage-dir=${out_dir}" >> "${GITHUB_OUTPUT}"
           fi
 
-          go test -coverpkg rodusek.dev/pkg/yamlpath/... -cover -v ./... -args -test.gocoverdir="${out_dir}"
+          go test -coverpkg ./... -cover -v ./test/... -args -test.gocoverdir="${out_dir}"
 
       - name: Merge Coverage
         if: (success() || failure())

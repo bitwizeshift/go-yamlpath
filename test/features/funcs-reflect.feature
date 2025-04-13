@@ -30,6 +30,9 @@ Feature: Funcs - Reflection
         kind: scalar
         tag: '<tag>'
         value: <value>
+        source:
+          line: 1
+          column: 8
         """
 
       Examples:
@@ -57,9 +60,18 @@ Feature: Funcs - Reflection
         - kind: scalar
           tag: '!!str'
           value: 'John'
+          source:
+            line: 2
+            column: 5
         - kind: scalar
           tag: '!!str'
           value: 'Jane'
+          source:
+            line: 3
+            column: 5
+        source:
+          line: 2
+          column: 3
         """
 
     Scenario: Input is a mapping
@@ -81,9 +93,24 @@ Feature: Funcs - Reflection
               kind: scalar
               tag: '!!int'
               value: 30
+              source:
+                line: 2
+                column: 9
+            source:
+              line: 2
+              column: 3
           - key: Jane
             value:
               kind: scalar
               tag: '!!int'
               value: 25
+              source:
+                line: 3
+                column: 9
+            source:
+              line: 3
+              column: 3
+        source:
+          line: 2
+          column: 3
         """

@@ -41,6 +41,7 @@ func reflectNode(node *yaml.Node) (*yaml.Node, error) {
 			Kind:    "sequence",
 			Tag:     node.Tag,
 			Entries: nodes,
+			Source:  toSource(node),
 		})
 	case yaml.MappingNode:
 		var nodes []*yaml.Node
@@ -51,8 +52,9 @@ func reflectNode(node *yaml.Node) (*yaml.Node, error) {
 				return nil, err
 			}
 			entry := &mappingNodeEntry{
-				Key:   key.Value,
-				Value: value,
+				Key:    key.Value,
+				Value:  value,
+				Source: toSource(key),
 			}
 			node, err := toNode(entry)
 			if err != nil {
@@ -65,38 +67,59 @@ func reflectNode(node *yaml.Node) (*yaml.Node, error) {
 			Kind:    "mapping",
 			Tag:     node.Tag,
 			Entries: nodes,
+			Source:  toSource(node),
 		})
 	case yaml.ScalarNode:
 		return toNode(&scalarNode{
-			Kind:  "scalar",
-			Tag:   node.Tag,
-			Value: node,
+			Kind:   "scalar",
+			Tag:    node.Tag,
+			Value:  node,
+			Source: toSource(node),
 		})
 	}
 	return nil, fmt.Errorf("unknown node kind: %v", node.Kind)
 }
 
+func toSource(node *yaml.Node) *source {
+	if node == nil || node.Line == 0 {
+		return nil
+	}
+	return &source{
+		Line:   node.Line,
+		Column: node.Column,
+	}
+}
+
+type source struct {
+	Line   int `yaml:"line"`
+	Column int `yaml:"column"`
+}
+
 type scalarNode struct {
-	Kind  string     `yaml:"kind"`
-	Tag   string     `yaml:"tag"`
-	Value *yaml.Node `yaml:"value"`
+	Kind   string     `yaml:"kind"`
+	Tag    string     `yaml:"tag"`
+	Value  *yaml.Node `yaml:"value"`
+	Source *source    `yaml:"source,omitempty"`
 }
 
 type sequenceNode struct {
 	Kind    string       `yaml:"kind"`
 	Tag     string       `yaml:"tag"`
 	Entries []*yaml.Node `yaml:"entries"`
+	Source  *source      `yaml:"source,omitempty"`
 }
 
 type mappingNode struct {
 	Kind    string       `yaml:"kind"`
 	Tag     string       `yaml:"tag"`
 	Entries []*yaml.Node `yaml:"entries"`
+	Source  *source      `yaml:"source,omitempty"`
 }
 
 type mappingNodeEntry struct {
-	Key   string     `yaml:"key"`
-	Value *yaml.Node `yaml:"value"`
+	Key    string     `yaml:"key"`
+	Value  *yaml.Node `yaml:"value"`
+	Source *source    `yaml:"source,omitempty"`
 }
 
 func toNode[T any](v *T) (*yaml.Node, error) {

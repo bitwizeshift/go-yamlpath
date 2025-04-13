@@ -557,7 +557,16 @@ func (v *Visitor) visitYAMLText(str string) ([]*yaml.Node, error) {
 	if err := decoder.Decode(&node); err != nil {
 		return nil, err
 	}
-	return yamlconv.FlattenDocuments(&node), nil
+	return yamlconv.FlattenDocuments(v.stripSource(&node)), nil
+}
+
+func (v *Visitor) stripSource(node *yaml.Node) *yaml.Node {
+	node.Line = 0
+	node.Column = 0
+	for _, node := range node.Content {
+		v.stripSource(node)
+	}
+	return node
 }
 
 func (v *Visitor) getTreeText(tree antlr.Tree) string {

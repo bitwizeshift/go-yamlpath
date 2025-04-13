@@ -17,6 +17,7 @@ import (
 // Visitor is a visitor that walks the parse tree to generate an expression
 type Visitor struct {
 	FuncTable *invocation.Table
+	Constants map[string][]*yaml.Node
 }
 
 // VisitRoot visits the root of the parse tree
@@ -74,6 +75,8 @@ func (v *Visitor) visitTerm(ctx parser.ITermContext) (expr.Expr, error) {
 	switch ctx := ctx.(type) {
 	case *parser.RootTermContext:
 		return v.visitRootTerm(ctx)
+	case *parser.ExternalConstantTermContext:
+		return v.visitExternalConstantTerm(ctx)
 	case *parser.LiteralTermContext:
 		return v.visitLiteral(ctx.Literal())
 	case *parser.InvocationTermContext:
@@ -610,4 +613,22 @@ func (v *Visitor) visitRegex(ctx parser.IRegexContext) (*regexp.Regexp, error) {
 	}
 
 	return regex, nil
+}
+
+func (v *Visitor) visitExternalConstantTerm(ctx *parser.ExternalConstantTermContext) (expr.Expr, error) {
+	str, err := v.visitIdentifier(ctx.ExternalConstant().Identifier())
+	if err != nil {
+		return nil, err
+	}
+	if v.Constants == nil {
+		return nil, NewSemanticErrorf(ctx, "external constant %q not defined", str)
+	}
+	constant, ok := v.Constants[str]
+	if !ok {
+		return nil, NewSemanticErrorf(ctx, "external constant %q not defined", str)
+	}
+	expr := &expr.LiteralExpr{
+		Nodes: constant,
+	}
+	return expr, nil
 }

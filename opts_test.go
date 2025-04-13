@@ -9,6 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath"
 	"rodusek.dev/pkg/yamlpath/internal/errs"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 )
 
@@ -234,5 +235,88 @@ func TestWithFunction_ValidFunction(t *testing.T) {
 				t.Errorf("WithFunction() mismatch (-got +want):\n%s", diff)
 			}
 		})
+	}
+}
+
+func TestWithConstant(t *testing.T) {
+	testCases := []struct {
+		name string
+		opt  yamlpath.Option
+		want []*yaml.Node
+	}{
+		{
+			name: "string constant",
+			opt:  yamlpath.WithConstant("key", "value"),
+			want: yamlconv.Strings("value"),
+		}, {
+			name: "int constant",
+			opt:  yamlpath.WithConstant("key", 1),
+			want: yamlconv.Ints(1),
+		}, {
+			name: "uint constant",
+			opt:  yamlpath.WithConstant("key", uint(1)),
+			want: yamlconv.Ints(1),
+		}, {
+			name: "float constant",
+			opt:  yamlpath.WithConstant("key", 1.1),
+			want: yamlconv.Floats(1.1),
+		}, {
+			name: "bool constant",
+			opt:  yamlpath.WithConstant("key", true),
+			want: yamlconv.Bools(true),
+		}, {
+			name: "node value",
+			opt:  yamlpath.WithConstant("key", yamltest.MustParseNode(`{"foo": "bar"}`)),
+			want: []*yaml.Node{
+				yamltest.MustParseNode(`{"foo": "bar"}`),
+			},
+		}, {
+			name: "slice of nodes",
+			opt:  yamlpath.WithConstant("key", []*yaml.Node{yamltest.MustParseNode(`{"foo": "bar"}`)}),
+			want: []*yaml.Node{
+				yamltest.MustParseNode(`{"foo": "bar"}`),
+			},
+		}, {
+			name: "collection of nodes",
+			opt:  yamlpath.WithConstant("key", yamlpath.Collection{yamltest.MustParseNode(`{"foo": "bar"}`)}),
+			want: []*yaml.Node{
+				yamltest.MustParseNode(`{"foo": "bar"}`),
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Arrange
+			yp := yamlpath.MustCompile("%key", tc.opt)
+			want := yamlpath.Collection(tc.want)
+
+			// Act
+			got, err := yp.Match(nil)
+
+			// Assert
+			if got, want := err, (error)(nil); !cmp.Equal(got, want, cmpopts.EquateErrors()) {
+				t.Fatalf("WithExternalConstant() error = %v", err)
+			}
+			if diff := cmp.Diff(got, want, cmpopts.EquateEmpty()); diff != "" {
+				t.Errorf("WithExternalConstant() mismatch (-got +want):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestWithConstants_ConstantAlreadyDefined_ReturnsError(t *testing.T) {
+	opts := []yamlpath.Option{
+		yamlpath.WithConstant("key", "value"),
+		yamlpath.WithConstant("key", "value2"),
+	}
+
+	yp, err := yamlpath.Compile("%key", opts...)
+
+	if got, want := err, cmpopts.AnyError; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
+		t.Fatalf("WithExternalConstant() error = %v, want %v", got, want)
+	}
+	if got, want := yp, (*yamlpath.YAMLPath)(nil); !cmp.Equal(got, want) {
+		t.Fatalf("WithExternalConstant() yp = %v, want %v", got, want)
 	}
 }

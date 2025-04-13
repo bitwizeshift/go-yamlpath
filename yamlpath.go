@@ -119,6 +119,8 @@ func (yp *YAMLPath) MarshalText() ([]byte, error) {
 	return []byte(yp.path), nil
 }
 
+var _ encoding.TextMarshaler = (*YAMLPath)(nil)
+
 // Equal returns true if the two YAMLPath expressions are equal.
 //
 // Equality is determined by evaluating whether the two paths are equal. This
@@ -132,8 +134,6 @@ func (yp *YAMLPath) Equal(other *YAMLPath) bool {
 	}
 	return yp.path == other.path
 }
-
-var _ encoding.TextMarshaler = (*YAMLPath)(nil)
 
 // Match evaluates the YAMLPath expression against the given YAML node.
 func Match(path string, node *yaml.Node) (Collection, error) {

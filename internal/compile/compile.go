@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	antlr "github.com/antlr4-go/antlr/v4"
+	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/parser"
@@ -13,7 +14,8 @@ import (
 
 // Config provides compilation configuration to the [NewTree] function.
 type Config struct {
-	Table *invocation.Table
+	Table     *invocation.Table
+	Constants map[string][]*yaml.Node
 }
 
 // NewTree converts a string FHIRPath expression into the proper Expression
@@ -51,5 +53,6 @@ func NewTreeFromReader(r io.Reader, cfg *Config) (expr.Expr, error) {
 
 	var visitor Visitor
 	visitor.FuncTable = cfg.Table
+	visitor.Constants = cfg.Constants
 	return visitor.VisitRoot(path)
 }

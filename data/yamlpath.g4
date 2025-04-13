@@ -27,9 +27,14 @@ expression
 
 term
       : ('$' | '@')                                       # rootTerm
+      | externalConstant                                  # externalConstantTerm
       | literal                                           # literalTerm
       | invocation                                        # invocationTerm
       ;
+
+externalConstant
+        : '%' identifier
+        ;
 
 indexParam
       : '*'                                               # wildcardIndex

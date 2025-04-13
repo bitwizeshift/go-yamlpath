@@ -14,7 +14,7 @@ type ErrorListener struct {
 }
 
 // SyntaxError is called when a syntax error is encountered during parsing.
-func (c *ErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol any, line, column int, msg string, e antlr.RecognitionException) {
+func (c *ErrorListener) SyntaxError(_ antlr.Recognizer, _ any, line, column int, msg string, _ antlr.RecognitionException) {
 	c.Errors = append(c.Errors, &CompileError{
 		Message: msg,
 		Line:    line,

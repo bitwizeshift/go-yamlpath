@@ -58,8 +58,7 @@ are provided in the same way. The follow features are supported:
 * ✅ String concatenation with `key + "string"`
 * ✅ Function support (including custom user-defined functions!)
 * ✅ Dynamic subexpressions; any expression can be used as inputs to functions[^3]
-* 🚧 Custom environment variables with `%<var>`, specified by the calling
-     environment at runtime.
+* ✅ External constants that can be provided at compile-time
 
 [^1]: These are optional in YAMLPath definitions. The path is always assumed to
       be the "current" context path if unspecified; but can be provided for
@@ -67,10 +66,9 @@ are provided in the same way. The follow features are supported:
 [^2]: In YAMLPath, only indices are selected with the index operator. Fields are
       selected with the `.` operator. To select fields with a string value, the
       `select` function may be used (e.g. `$.select("some key")`).
-[^3]: This, along with custom environment variables, provide feature-parity with
-      JSONPath "script" execution without needing to provide a way to call out
-      to JavaScript or other languages. This allows the calling language (Go) to
-      dynamically determine data and feed it back into YAMLPath.
+[^3]: Dynamic subexpressions along with external constants provide rough
+      feature-parity with JSONPath's "script" functinality, since it enables the
+      calling language to provide data dynamically to YAMLPath expressions.
 
 ## Example Use
 

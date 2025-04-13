@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"reflect"
 
+	"golang.org/x/exp/constraints"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/compile"
 	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/invocation/arity"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // Option is a configuration option that may be specified during compilation to
@@ -30,6 +32,66 @@ var _ Option = (*option)(nil)
 var (
 	collectionType = reflect.TypeFor[Collection]()
 )
+
+// ExternalConstant is a type constraint for values that can be used as external
+// constants in YAMLPath expressions. It includes all types that can be
+// represented as a YAML node, such as integers, floats, strings, and
+// collections of YAML nodes. The type must also be convertible to a YAML node
+// or a slice of YAML nodes.
+type ExternalConstant interface {
+	constraints.Float | constraints.Integer | ~bool | ~string | *yaml.Node | []*yaml.Node |
+		Collection
+}
+
+// WithConstant is an [Option] that adds an external constant to the
+// YAMLPath expression. The constant can be used in the expression by
+// referencing it with the name provided.
+func WithConstant[T ExternalConstant](name string, value T) Option {
+	return option(func(c *compile.Config) error {
+		if c.Constants == nil {
+			c.Constants = make(map[string][]*yaml.Node)
+		}
+		return setExternalConstant(c.Constants, name, value)
+	})
+}
+
+func setExternalConstant[T ExternalConstant](constants map[string][]*yaml.Node, name string, value T) error {
+	if _, ok := constants[name]; ok {
+		return fmt.Errorf("constant %q already defined", name)
+	}
+
+	set := false
+	switch v := any(value).(type) {
+	case *yaml.Node:
+		constants[name] = []*yaml.Node{v}
+		set = true
+	case []*yaml.Node:
+		constants[name] = v
+		set = true
+	case Collection:
+		constants[name] = v
+		set = true
+	}
+	if set {
+		return nil
+	}
+
+	rv := reflect.ValueOf(value)
+	switch rv.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		constants[name] = yamlconv.Ints(rv.Int())
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		constants[name] = yamlconv.Ints(rv.Uint())
+	case reflect.Float32, reflect.Float64:
+		constants[name] = yamlconv.Floats(rv.Float())
+	case reflect.Bool:
+		constants[name] = yamlconv.Bools(rv.Bool())
+	case reflect.String:
+		constants[name] = yamlconv.Strings(rv.String())
+	}
+
+	return nil
+}
 
 // WithFunction is an option that adds a custom function for the YAMLPath
 // evaluation to be able to call. The specified function must have the following

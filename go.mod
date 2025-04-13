@@ -2,7 +2,7 @@ module rodusek.dev/pkg/yamlpath
 
 go 1.22.0
 
-toolchain go1.23.1
+toolchain go1.23.8
 
 // Direct Dependencies
 require (

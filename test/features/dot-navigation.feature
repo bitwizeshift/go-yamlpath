@@ -37,6 +37,18 @@ Feature: Dot path navigation
         baz: "hello"
         """
 
+    Scenario: Field name is complex, exists and specifies a value
+
+      Given the yaml input:
+        """
+        "foo bar baz": 42
+        """
+      When the yamlpath `$."foo bar baz"` is evaluated
+      Then the evaluation result is:
+        """
+        42
+        """
+
     Scenario: Fields do not exist and return empty input
 
       Given the yaml input:

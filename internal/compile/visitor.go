@@ -557,14 +557,15 @@ func (v *Visitor) visitYAMLText(str string) ([]*yaml.Node, error) {
 	if err := decoder.Decode(&node); err != nil {
 		return nil, err
 	}
-	return yamlconv.FlattenDocuments(v.stripSource(&node)), nil
+	return yamlconv.FlattenDocuments(v.setDefaults(&node)), nil
 }
 
-func (v *Visitor) stripSource(node *yaml.Node) *yaml.Node {
+func (v *Visitor) setDefaults(node *yaml.Node) *yaml.Node {
 	node.Line = 0
 	node.Column = 0
+	node.Style = 0
 	for _, node := range node.Content {
-		v.stripSource(node)
+		v.setDefaults(node)
 	}
 	return node
 }

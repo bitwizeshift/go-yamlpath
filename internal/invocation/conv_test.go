@@ -1,55 +1,17 @@
 package invocation_test
 
 import (
-	"context"
 	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/shopspring/decimal"
-	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/expr"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/invocation/invocationtest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
-
-type testContext struct {
-	err   error
-	nodes []*yaml.Node
-}
-
-func (c *testContext) Root() []*yaml.Node {
-	return c.nodes
-}
-func (c *testContext) Current() []*yaml.Node {
-	return c.nodes
-}
-func (c *testContext) NewContext([]*yaml.Node) invocation.Context {
-	return &testContext{
-		nodes: c.nodes,
-		err:   c.err,
-	}
-}
-func (c *testContext) WithContext(context.Context) invocation.Context {
-	return nil
-}
-func (c *testContext) Context() context.Context {
-	return nil
-}
-func goodContext(nodes ...*yaml.Node) invocation.Context {
-	return &testContext{
-		nodes: nodes,
-	}
-}
-
-func errContext(err error) invocation.Context {
-	return &testContext{
-		err: err,
-	}
-}
-
-var _ invocation.Context = (*testContext)(nil)
 
 func TestParseString(t *testing.T) {
 	testErr := errors.New("test error")
@@ -62,17 +24,17 @@ func TestParseString(t *testing.T) {
 	}{
 		{
 			name:    "Parameter contains string",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.String("Hello"),
 			want:    "Hello",
 		}, {
 			name:    "Parameter contains non-string",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.Int(0),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Parameter contains error",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		},
@@ -103,17 +65,17 @@ func TestParseInt(t *testing.T) {
 	}{
 		{
 			name:    "Parameter contains int",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.Int(1),
 			want:    1,
 		}, {
 			name:    "Parameter contains non-int",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.String("foo"),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Parameter contains error",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		},
@@ -144,17 +106,17 @@ func TestParseBool(t *testing.T) {
 	}{
 		{
 			name:    "Parameter contains bool",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.Bool(true),
 			want:    true,
 		}, {
 			name:    "Parameter contains non-bool",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.String("foo"),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Parameter contains error",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		},
@@ -185,17 +147,17 @@ func TestParseFloat(t *testing.T) {
 	}{
 		{
 			name:    "Parameter contains float",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.Float(1.0),
 			want:    1.0,
 		}, {
 			name:    "Parameter contains non-float",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.String("foo"),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Parameter contains error",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		},
@@ -226,17 +188,17 @@ func TestParseDecimal(t *testing.T) {
 	}{
 		{
 			name:    "Parameter contains decimal",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.Int(1),
 			want:    decimal.New(1, 0),
 		}, {
 			name:    "Parameter contains non-decimal",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.String("foo"),
 			wantErr: cmpopts.AnyError,
 		}, {
 			name:    "Parameter contains error",
-			context: goodContext(yamlconv.String("test")),
+			context: expr.NewContext(yamlconv.Strings("test")),
 			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		},

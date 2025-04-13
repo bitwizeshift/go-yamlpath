@@ -119,8 +119,8 @@ func yamlpathParserInit() {
 		0, 0, 132, 140, 5, 6, 0, 0, 133, 135, 5, 36, 0, 0, 134, 136, 3, 14, 7,
 		0, 135, 134, 1, 0, 0, 0, 135, 136, 1, 0, 0, 0, 136, 137, 1, 0, 0, 0, 137,
 		140, 5, 37, 0, 0, 138, 140, 3, 8, 4, 0, 139, 128, 1, 0, 0, 0, 139, 133,
-		1, 0, 0, 0, 139, 138, 1, 0, 0, 0, 140, 11, 1, 0, 0, 0, 141, 146, 3, 8,
-		4, 0, 142, 143, 5, 7, 0, 0, 143, 145, 3, 8, 4, 0, 144, 142, 1, 0, 0, 0,
+		1, 0, 0, 0, 139, 138, 1, 0, 0, 0, 140, 11, 1, 0, 0, 0, 141, 146, 3, 10,
+		5, 0, 142, 143, 5, 7, 0, 0, 143, 145, 3, 10, 5, 0, 144, 142, 1, 0, 0, 0,
 		145, 148, 1, 0, 0, 0, 146, 144, 1, 0, 0, 0, 146, 147, 1, 0, 0, 0, 147,
 		13, 1, 0, 0, 0, 148, 146, 1, 0, 0, 0, 149, 150, 5, 43, 0, 0, 150, 151,
 		5, 9, 0, 0, 151, 158, 3, 10, 5, 0, 152, 153, 5, 7, 0, 0, 153, 154, 5, 43,
@@ -2636,7 +2636,7 @@ func (p *yamlpathParser) Aggregation() (localctx IAggregationContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&13254269075456) != 0 {
+		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&13322988552224) != 0 {
 			{
 				p.SetState(129)
 				p.ListEntries()
@@ -2720,8 +2720,8 @@ type IListEntriesContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	AllLiteral() []ILiteralContext
-	Literal(i int) ILiteralContext
+	AllAggregation() []IAggregationContext
+	Aggregation(i int) IAggregationContext
 
 	// IsListEntriesContext differentiates from other interfaces.
 	IsListEntriesContext()
@@ -2759,20 +2759,20 @@ func NewListEntriesContext(parser antlr.Parser, parent antlr.ParserRuleContext, 
 
 func (s *ListEntriesContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *ListEntriesContext) AllLiteral() []ILiteralContext {
+func (s *ListEntriesContext) AllAggregation() []IAggregationContext {
 	children := s.GetChildren()
 	len := 0
 	for _, ctx := range children {
-		if _, ok := ctx.(ILiteralContext); ok {
+		if _, ok := ctx.(IAggregationContext); ok {
 			len++
 		}
 	}
 
-	tst := make([]ILiteralContext, len)
+	tst := make([]IAggregationContext, len)
 	i := 0
 	for _, ctx := range children {
-		if t, ok := ctx.(ILiteralContext); ok {
-			tst[i] = t.(ILiteralContext)
+		if t, ok := ctx.(IAggregationContext); ok {
+			tst[i] = t.(IAggregationContext)
 			i++
 		}
 	}
@@ -2780,11 +2780,11 @@ func (s *ListEntriesContext) AllLiteral() []ILiteralContext {
 	return tst
 }
 
-func (s *ListEntriesContext) Literal(i int) ILiteralContext {
+func (s *ListEntriesContext) Aggregation(i int) IAggregationContext {
 	var t antlr.RuleContext
 	j := 0
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ILiteralContext); ok {
+		if _, ok := ctx.(IAggregationContext); ok {
 			if j == i {
 				t = ctx.(antlr.RuleContext)
 				break
@@ -2797,7 +2797,7 @@ func (s *ListEntriesContext) Literal(i int) ILiteralContext {
 		return nil
 	}
 
-	return t.(ILiteralContext)
+	return t.(IAggregationContext)
 }
 
 func (s *ListEntriesContext) GetRuleContext() antlr.RuleContext {
@@ -2816,7 +2816,7 @@ func (p *yamlpathParser) ListEntries() (localctx IListEntriesContext) {
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(141)
-		p.Literal()
+		p.Aggregation()
 	}
 
 	p.SetState(146)
@@ -2837,7 +2837,7 @@ func (p *yamlpathParser) ListEntries() (localctx IListEntriesContext) {
 		}
 		{
 			p.SetState(143)
-			p.Literal()
+			p.Aggregation()
 		}
 
 		p.SetState(148)

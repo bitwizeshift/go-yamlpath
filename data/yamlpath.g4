@@ -52,7 +52,7 @@ aggregation
       ;
 
 listEntries
-      : (literal) (',' literal)*
+      : (aggregation) (',' aggregation)*
       ;
 
 mapEntries

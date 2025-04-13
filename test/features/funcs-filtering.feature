@@ -21,6 +21,33 @@ Feature: Funcs - Filtering
       When the yamlpath `$.people[*].where(@.name == "John")` is evaluated
       Then the evaluation result is empty
 
+    Scenario: Criteria matches a true boolean element
+
+      Given the yaml input:
+        """
+        foo:
+          bar:
+            enable: true
+          baz:
+            enable: false
+        """
+      When the yamlpath `$.foo.*.where(@.enable)` is evaluated
+      Then the evaluation result is:
+        """
+        enable: true
+        """
+
+    Scenario: Criteria matches a false boolean element
+
+      Given the yaml input:
+        """
+        foo:
+          baz:
+            enable: false
+        """
+      When the yamlpath `$.foo.baz.where(@.enable)` is evaluated
+      Then the evaluation result is empty
+
     Scenario: Criteria matches some elements
 
       Given the yaml input:

@@ -13,7 +13,7 @@ Feature: Multiplicative Operators
         """
         number: <left>
         """
-      When the yamlpath `$[?($.number * <right> == <result>)]` is evaluated
+      When the yamlpath `$.where($.number * <right> == <result>)` is evaluated
       Then the evaluation result is:
         """
         number: <left>
@@ -34,7 +34,7 @@ Feature: Multiplicative Operators
         """
         number: <left>
         """
-      When the yamlpath `$[?($.number / <right> == <result>)]` is evaluated
+      When the yamlpath `$.where($.number / <right> == <result>)` is evaluated
       Then the evaluation result is:
         """
         number: <left>

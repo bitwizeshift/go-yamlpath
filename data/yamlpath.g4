@@ -17,7 +17,6 @@ bracketParam
       : NUMBER (',' (NUMBER))*                            # unionNumberBracket
       | '*'                                               # wildcardBracket
       | (NUMBER)? ':' (NUMBER)? (':' NUMBER)?             # sliceBracket
-      | '?' '(' subexpression ')'                         # filterBracket
       | '(' subexpression ')'                             # scriptBracket
       ;
 

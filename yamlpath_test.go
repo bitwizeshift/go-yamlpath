@@ -132,11 +132,6 @@ func TestYAMLPath_Match(t *testing.T) {
 				yamlconv.String("Alice"),
 				yamlconv.String("Bob"),
 			},
-		}, {
-			name:    "Evaluation error surfaces error",
-			path:    yamlpath.MustCompile("$[?(@.age > 32)]"),
-			input:   yamltest.MustParseNode(`{"age": "foo"}`),
-			wantErr: cmpopts.AnyError,
 		},
 	}
 

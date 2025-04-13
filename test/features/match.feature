@@ -15,7 +15,7 @@ Feature: Regex match comparison
         - name: "John Doe"
         - name: "Jane Doe"
       """
-    When the yamlpath `$.people[*][?(@.name =~ /John Doe/)]` is evaluated
+    When the yamlpath `$.people[*].where(@.name =~ /John Doe/)` is evaluated
     Then the evaluation result is:
       """
       name: "John Doe"
@@ -28,7 +28,7 @@ Feature: Regex match comparison
         - name: "John Doe"
         - name: "Jane Doe"
       """
-    When the yamlpath `$.people[*][?(@.name =~ /john doe/i)]` is evaluated
+    When the yamlpath `$.people[*].where(@.name =~ /john doe/i)` is evaluated
     Then the evaluation result is:
       """
       name: "John Doe"

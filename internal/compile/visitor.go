@@ -171,8 +171,6 @@ func (v *Visitor) visitBracketParam(ctx parser.IBracketParamContext) (expr.Expr,
 		return v.visitWildcardBracket(ctx)
 	case *parser.SliceBracketContext:
 		return v.visitSliceBracket(ctx)
-	case *parser.FilterBracketContext:
-		return v.visitFilterBracket(ctx)
 	case *parser.ScriptBracketContext:
 		return v.visitScriptBracket(ctx)
 	}
@@ -204,16 +202,6 @@ func (v *Visitor) visitSliceBracket(ctx *parser.SliceBracketContext) (expr.Expr,
 	}
 	return &expr.SliceExpr{
 		Slice: s,
-	}, nil
-}
-
-func (v *Visitor) visitFilterBracket(ctx *parser.FilterBracketContext) (expr.Expr, error) {
-	e, err := v.visitSubexpression(ctx.Subexpression())
-	if err != nil {
-		return nil, err
-	}
-	return &expr.FilterExpr{
-		Expr: e,
 	}, nil
 }
 

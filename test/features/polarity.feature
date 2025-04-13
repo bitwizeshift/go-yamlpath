@@ -13,7 +13,7 @@ Feature: Unary prefix polarity operators
         """
         number: 42
         """
-      When the yamlpath `$[?(+$.number == 42)]` is evaluated
+      When the yamlpath `$.where(+$.number == 42)` is evaluated
       Then the evaluation result is:
         """
         number: 42
@@ -27,7 +27,7 @@ Feature: Unary prefix polarity operators
         """
         number: 42
         """
-      When the yamlpath `$[?(-$.number == -42)]` is evaluated
+      When the yamlpath `$.where(-$.number == -42)` is evaluated
       Then the evaluation result is:
         """
         number: 42
@@ -39,7 +39,7 @@ Feature: Unary prefix polarity operators
         """
         number: 42.69
         """
-      When the yamlpath `$[?(-$.number == -42.69)]` is evaluated
+      When the yamlpath `$.where(-$.number == -42.69)` is evaluated
       Then the evaluation result is:
         """
         number: 42.69

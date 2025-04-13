@@ -14,7 +14,7 @@ Feature: Aggregations within YAMLPath expressions
         - name: "Alice"
           gender: "N/A"
         """
-      When the yamlpath `$[*][?(@.gender in ["M", "F"])]` is evaluated
+      When the yamlpath `$[*].where(@.gender in ["M", "F"])` is evaluated
       Then the evaluation result is:
         """
         name: "Bjoern"
@@ -29,7 +29,7 @@ Feature: Aggregations within YAMLPath expressions
         name: "Bjoern"
         age: 42
         """
-      When the yamlpath `$[?($ == { "name": "Bjoern", "age": 42 })]` is evaluated
+      When the yamlpath `$.where($ == { "name": "Bjoern", "age": 42 })` is evaluated
       Then the evaluation result is:
         """
         name: "Bjoern"

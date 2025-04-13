@@ -11,18 +11,6 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 )
 
-type anyYAMLPath struct{}
-
-func (anyYAMLPath) Equal(rhs any) bool {
-	if rhs == nil {
-		return false
-	}
-	_, ok := rhs.(anyYAMLPath)
-	return ok
-}
-
-var AnyYAMLPath anyYAMLPath
-
 func TestCompile(t *testing.T) {
 	testCases := []struct {
 		name      string
@@ -278,4 +266,65 @@ func TestYAMLPath_Equal(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMatch(t *testing.T) {
+	testCases := []struct {
+		name    string
+		path    string
+		input   *yaml.Node
+		want    yamlpath.Collection
+		wantErr error
+	}{
+		{
+			name:  "Valid path returns matching collection",
+			path:  "name",
+			input: yamltest.MustParseNode(`{"name": "Alice", "age": 30}`),
+			want: yamlpath.Collection{
+				yamlconv.String("Alice"),
+			},
+		}, {
+			name:    "Invalid path returns error",
+			path:    "$$",
+			input:   yamltest.MustParseNode(`{"name": "Alice", "age": 30}`),
+			wantErr: yamlpath.ErrSyntax,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := yamlpath.Match(tc.path, tc.input)
+
+			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
+				t.Errorf("yamlpath.Match() error = %v, want %v", got, want)
+			}
+			if got, want := got, tc.want; !cmp.Equal(got, want) {
+				t.Errorf("yamlpath.Match() = %v, want %v", got, want)
+			}
+		})
+	}
+}
+
+func TestMustMatch(t *testing.T) {
+	want := yamlpath.Collection{
+		yamlconv.String("Alice"),
+	}
+	input := yamltest.MustParseNode(`{"name": "Alice", "age": 30}`)
+
+	got := yamlpath.MustMatch("name", input)
+
+	if got, want := got, want; !cmp.Equal(got, want) {
+		t.Errorf("yamlpath.MustMatch() = %v, want %v", got, want)
+	}
+}
+
+func TestMustMatch_PanicsIfErrorOccurs(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("MustMatch() did not panic")
+		}
+	}()
+
+	input := yamltest.MustParseNode(`{"name": "Alice", "age": 30}`)
+	_ = yamlpath.MustMatch("$$", input)
 }

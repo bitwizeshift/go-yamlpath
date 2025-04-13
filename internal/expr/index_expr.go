@@ -2,7 +2,9 @@ package expr
 
 import (
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 // IndexExpr is a representation of the indexing operator `[...]` in YAMLPath
@@ -14,7 +16,7 @@ import (
 //
 // Negative indices allow selecting from the reverse side.
 type IndexExpr struct {
-	Indices []int64
+	Indices Expr
 }
 
 // Eval evaluates the index expression against the given nodes.
@@ -22,11 +24,25 @@ func (i *IndexExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes := ctx.Current()
-	for _, n := range nodes {
-		if n.Kind != yaml.SequenceNode {
-			continue
+
+	next, err := i.Indices.Eval(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var indices []int64
+	for _, n := range next {
+		index, err := yamlconv.ParseInt(n)
+		if err != nil {
+			return nil, errs.IncludeSource(err, "index expression")
 		}
-		for _, index := range i.Indices {
+		indices = append(indices, index)
+	}
+
+	for _, n := range nodes {
+		for _, index := range indices {
+			if n.Kind != yaml.SequenceNode {
+				continue
+			}
 			if index < 0 {
 				index += int64(len(n.Content))
 			}

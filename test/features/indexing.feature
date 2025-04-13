@@ -1,10 +1,18 @@
-Feature: Bracket path navigation
+Feature: Index navigation
 
-  The JSONPath specification defines how fields should be accessed.
-  Fields are specified between dots, which are used to navigate the
-  JSON (in this case, YAML) structure.
+  The YAMLPath specification defines that `[...]` shall be used for indexing,
+  where the contents of the brackets are evaluated as different forms of
+  indexing expressions.
 
-  Rule: Wildcards shall match all fields
+  The behavior is as follows:
+
+  - `[*]` matches all elements in a sequence
+  - `[<expr>]` matches any numeric indices of a sequence node, where `<expr>`
+    evaluates as a subexpression that returns number(s).
+  - `[<slice>]` matches a slice of elements in a sequence node, where
+    `<slice>` is defined as `<start>:[<end>][:<step>]`.
+
+  Rule: Wildcards shall match all fields of a sequence
 
     Wildcards shall match all sequence fields in the collection.
     Mapping nodes shall be left untouched.
@@ -25,9 +33,12 @@ Feature: Bracket path navigation
         baz: "world"
         """
 
-  Rule: Index shall match the nth element
+  Rule: Expressions yielding indices shall match the corresponding sequence element
 
-    Indexes shall match the nth element in the YAML structure.
+    Expression yielding indices shall match each of the corresponding elements
+    from a sequence node. Non-sequence nodes shall be left untouched.
+    If a negative index is evaluated, it shall be treated as an index from the
+    end of the sequence.
 
     Scenario: Index matches the nth element
 
@@ -66,6 +77,23 @@ Feature: Bracket path navigation
       Then the evaluation result is:
         """
         bar: "world"
+        """
+
+    Scenario: Multiple indices are provided
+
+      Given the yaml input:
+        """
+        foo:
+          - bar: "hello"
+          - bar: "world"
+          - bar: "goodbye"
+        """
+      When the yamlpath `$.foo[0 | 2]` is evaluated
+      Then the evaluation result is:
+        """
+        bar: "hello"
+        ---
+        bar: "goodbye"
         """
 
   Rule: Slices shall match a range of elements
@@ -171,25 +199,4 @@ Feature: Bracket path navigation
         bar: 1
         ---
         bar: 3
-        """
-
-  Rule: Unions shall provide each matching element
-
-    Unions shall provide each matching sequence element in the YAML structure.
-
-    Scenario: Union index matches multiple indices
-
-      Given the yaml input:
-        """
-        foo:
-          - bar: "hello"
-          - bar: "world"
-          - bar: "goodbye"
-        """
-      When the yamlpath `$.foo[0, 2]` is evaluated
-      Then the evaluation result is:
-        """
-        bar: "hello"
-        ---
-        bar: "goodbye"
         """

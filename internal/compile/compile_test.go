@@ -70,7 +70,7 @@ func TestNewTree(t *testing.T) {
 			input: `$[::2]`,
 		}, {
 			name:  "bracket union index expression",
-			input: `$[0,1]`,
+			input: `$[0|1]`,
 		}, {
 			name:  "bracket script expression with current node",
 			input: `$[(@)]`,

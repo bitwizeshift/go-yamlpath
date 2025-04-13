@@ -1,50 +1,64 @@
 package expr_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
+	"rodusek.dev/pkg/yamlpath/internal/errs"
 	"rodusek.dev/pkg/yamlpath/internal/expr"
+	"rodusek.dev/pkg/yamlpath/internal/expr/exprtest"
 	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
 	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 )
 
 func TestIndexExpr(t *testing.T) {
+	testErr := errors.New("test error")
 	testCases := []struct {
 		name    string
-		indices []int64
+		indices expr.Expr
 		input   []*yaml.Node
 		want    []*yaml.Node
 		wantErr error
 	}{
 		{
 			name:    "empty nodes select nothing",
-			indices: []int64{},
+			indices: toIndices(),
 			input:   []*yaml.Node{},
 			want:    []*yaml.Node{},
 		}, {
 			name:    "negative index selects from end of the sequence",
-			indices: []int64{-1},
+			indices: toIndices(-1),
 			input:   []*yaml.Node{yamltest.MustParseNode(`["hello", "world"]`)},
 			want:    []*yaml.Node{yamlconv.String("world")},
 		}, {
 			name:    "index out of range returns empty",
-			indices: []int64{2},
+			indices: toIndices(2),
 			input:   []*yaml.Node{yamltest.MustParseNode(`["hello", "world"]`)},
 			want:    []*yaml.Node{},
 		}, {
 			name:    "multiple indices select multiple nodes",
-			indices: []int64{1, 2},
+			indices: toIndices(1, 2),
 			input:   []*yaml.Node{yamltest.MustParseNode(`["foo", "bar", "baz", "buz"]`)},
 			want:    []*yaml.Node{yamlconv.String("bar"), yamlconv.String("baz")},
 		}, {
 			name:    "Non-sequence nodes are ignored",
-			indices: []int64{0},
+			indices: toIndices(0),
 			input:   []*yaml.Node{yamlconv.String("hello")},
 			want:    []*yaml.Node{},
+		}, {
+			name: "non-integer indices nodes return an error",
+			indices: exprtest.Return(
+				yamlconv.String("foo"),
+			),
+			wantErr: errs.ErrBadTag,
+		}, {
+			name:    "expression returns an error",
+			indices: exprtest.Error(testErr),
+			wantErr: testErr,
 		},
 	}
 
@@ -64,4 +78,8 @@ func TestIndexExpr(t *testing.T) {
 			}
 		})
 	}
+}
+
+func toIndices(indices ...int64) expr.Expr {
+	return exprtest.Return(yamlconv.Ints(indices...)...)
 }

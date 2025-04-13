@@ -10,14 +10,13 @@ expression
       : ('$' | '@')                                       # rootExpression
       | expression '..' (invocation)?                     # recursiveExpression
       | expression '.' invocation                         # fieldExpression
-      | expression '[' bracketParam ']'                   # indexExpression
+      | expression '[' indexParam ']'                     # indexExpression
       ;
 
-bracketParam
-      : NUMBER (',' (NUMBER))*                            # unionNumberBracket
-      | '*'                                               # wildcardBracket
-      | (NUMBER)? ':' (NUMBER)? (':' NUMBER)?             # sliceBracket
-      | '(' subexpression ')'                             # scriptBracket
+indexParam
+      : '*'                                               # wildcardIndex
+      | (NUMBER)? ':' (NUMBER)? (':' NUMBER)?             # sliceIndex
+      | subexpression                                     # expressionIndex
       ;
 
 subexpression

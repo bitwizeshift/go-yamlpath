@@ -90,7 +90,7 @@ func (v *Visitor) visitIndexExpression(ctx *parser.IndexExpressionContext) (expr
 	}
 	result.Append(left)
 
-	right, err := v.visitBracketParam(ctx.BracketParam())
+	right, err := v.visitBracketParam(ctx.IndexParam())
 	if err != nil {
 		return nil, err
 	}
@@ -163,39 +163,23 @@ var _ invocation.Parameter = (*parameter)(nil)
 // BracketParams
 //------------------------------------------------------------------------------
 
-func (v *Visitor) visitBracketParam(ctx parser.IBracketParamContext) (expr.Expr, error) {
+func (v *Visitor) visitBracketParam(ctx parser.IIndexParamContext) (expr.Expr, error) {
 	switch ctx := ctx.(type) {
-	case *parser.UnionNumberBracketContext:
-		return v.visitUnionNumberBracket(ctx)
-	case *parser.WildcardBracketContext:
-		return v.visitWildcardBracket(ctx)
-	case *parser.SliceBracketContext:
-		return v.visitSliceBracket(ctx)
-	case *parser.ScriptBracketContext:
-		return v.visitScriptBracket(ctx)
+	case *parser.WildcardIndexContext:
+		return v.visitWildcardIndex(ctx)
+	case *parser.SliceIndexContext:
+		return v.visitSliceIndex(ctx)
+	case *parser.ExpressionIndexContext:
+		return v.visitExpressionIndex(ctx)
 	}
 	return nil, ErrInternalf(ctx, "unexpected bracket param type: %T", ctx)
 }
 
-func (v *Visitor) visitUnionNumberBracket(ctx *parser.UnionNumberBracketContext) (expr.Expr, error) {
-	var indicies []int64
-	for _, num := range ctx.AllNUMBER() {
-		i, err := strconv.ParseInt(num.GetText(), 10, 64)
-		if err != nil {
-			return nil, NewSemanticErrorf(num, "number: %s", num.GetText())
-		}
-		indicies = append(indicies, i)
-	}
-	return &expr.IndexExpr{
-		Indices: indicies,
-	}, nil
-}
-
-func (v *Visitor) visitWildcardBracket(_ *parser.WildcardBracketContext) (expr.Expr, error) {
+func (v *Visitor) visitWildcardIndex(_ *parser.WildcardIndexContext) (expr.Expr, error) {
 	return &expr.WildcardBracketExpr{}, nil
 }
 
-func (v *Visitor) visitSliceBracket(ctx *parser.SliceBracketContext) (expr.Expr, error) {
+func (v *Visitor) visitSliceIndex(ctx *parser.SliceIndexContext) (expr.Expr, error) {
 	s, err := expr.ParseSlice(ctx.GetText())
 	if err != nil {
 		return nil, NewSemanticErrorf(ctx, "slice: %s", ctx.GetText())
@@ -205,13 +189,13 @@ func (v *Visitor) visitSliceBracket(ctx *parser.SliceBracketContext) (expr.Expr,
 	}, nil
 }
 
-func (v *Visitor) visitScriptBracket(ctx *parser.ScriptBracketContext) (expr.Expr, error) {
+func (v *Visitor) visitExpressionIndex(ctx *parser.ExpressionIndexContext) (expr.Expr, error) {
 	e, err := v.visitSubexpression(ctx.Subexpression())
 	if err != nil {
 		return nil, err
 	}
-	return &expr.ScriptExpr{
-		Expr: e,
+	return &expr.IndexExpr{
+		Indices: e,
 	}, nil
 }
 

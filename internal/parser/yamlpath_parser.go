@@ -33,11 +33,11 @@ var YamlpathParserStaticData struct {
 func yamlpathParserInit() {
 	staticData := &YamlpathParserStaticData
 	staticData.LiteralNames = []string{
-		"", "'..'", "'.'", "'['", "']'", "'$'", "'@'", "'*'", "':'", "'('",
-		"')'", "'!'", "'not'", "'+'", "'-'", "'/'", "'%'", "'|'", "'<='", "'<'",
-		"'>'", "'>='", "'=='", "'!='", "'=~'", "'in'", "'nin'", "'subsetof'",
-		"'&&'", "'and'", "'||'", "'or'", "'true'", "'false'", "'null'", "'{'",
-		"'}'", "','", "'i'", "'m'", "'s'",
+		"", "'..'", "'.'", "'['", "']'", "'('", "')'", "'!'", "'not'", "'+'",
+		"'-'", "'*'", "'/'", "'%'", "'|'", "'<='", "'<'", "'>'", "'>='", "'=='",
+		"'!='", "'=~'", "'in'", "'nin'", "'subsetof'", "'&&'", "'and'", "'||'",
+		"'or'", "'$'", "'@'", "':'", "'true'", "'false'", "'null'", "'{'", "'}'",
+		"','", "'i'", "'m'", "'s'",
 	}
 	staticData.SymbolicNames = []string{
 		"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
@@ -46,97 +46,91 @@ func yamlpathParserInit() {
 		"WS", "COMMENT",
 	}
 	staticData.RuleNames = []string{
-		"path", "expression", "term", "indexParam", "subexpression", "literal",
-		"listEntries", "mapEntries", "invocation", "paramList", "identifier",
-		"regex",
+		"path", "expression", "term", "indexParam", "literal", "listEntries",
+		"mapEntries", "invocation", "paramList", "identifier", "regex",
 	}
 	staticData.PredictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
-		4, 1, 46, 184, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
+		4, 1, 46, 173, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
 		4, 2, 5, 7, 5, 2, 6, 7, 6, 2, 7, 7, 7, 2, 8, 7, 8, 2, 9, 7, 9, 2, 10, 7,
-		10, 2, 11, 7, 11, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		3, 1, 34, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1, 44,
-		8, 1, 10, 1, 12, 1, 47, 9, 1, 1, 2, 1, 2, 1, 2, 3, 2, 52, 8, 2, 1, 3, 1,
-		3, 3, 3, 56, 8, 3, 1, 3, 1, 3, 3, 3, 60, 8, 3, 1, 3, 1, 3, 3, 3, 64, 8,
-		3, 1, 3, 3, 3, 67, 8, 3, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4,
-		1, 4, 1, 4, 1, 4, 3, 4, 80, 8, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1,
-		4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1,
-		4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 4, 4, 106, 8, 4, 11, 4, 12, 4, 107, 1,
-		4, 1, 4, 1, 4, 5, 4, 113, 8, 4, 10, 4, 12, 4, 116, 9, 4, 1, 5, 1, 5, 1,
-		5, 1, 5, 1, 5, 1, 5, 3, 5, 124, 8, 5, 1, 5, 1, 5, 1, 5, 3, 5, 129, 8, 5,
-		1, 5, 3, 5, 132, 8, 5, 1, 6, 1, 6, 1, 6, 5, 6, 137, 8, 6, 10, 6, 12, 6,
-		140, 9, 6, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 5, 7, 149, 8, 7, 10,
-		7, 12, 7, 152, 9, 7, 1, 8, 1, 8, 1, 8, 1, 8, 1, 8, 3, 8, 159, 8, 8, 1,
-		8, 1, 8, 3, 8, 163, 8, 8, 1, 9, 1, 9, 1, 9, 5, 9, 168, 8, 9, 10, 9, 12,
-		9, 171, 9, 9, 1, 10, 1, 10, 3, 10, 175, 8, 10, 1, 11, 1, 11, 5, 11, 179,
-		8, 11, 10, 11, 12, 11, 182, 9, 11, 1, 11, 1, 180, 2, 2, 8, 12, 0, 2, 4,
-		6, 8, 10, 12, 14, 16, 18, 20, 22, 0, 11, 1, 0, 5, 6, 1, 0, 11, 12, 1, 0,
-		13, 14, 2, 0, 7, 7, 15, 16, 1, 0, 18, 21, 1, 0, 22, 23, 1, 0, 25, 27, 1,
-		0, 28, 29, 1, 0, 30, 31, 1, 0, 32, 33, 1, 0, 38, 40, 211, 0, 24, 1, 0,
-		0, 0, 2, 27, 1, 0, 0, 0, 4, 51, 1, 0, 0, 0, 6, 66, 1, 0, 0, 0, 8, 79, 1,
-		0, 0, 0, 10, 131, 1, 0, 0, 0, 12, 133, 1, 0, 0, 0, 14, 141, 1, 0, 0, 0,
-		16, 162, 1, 0, 0, 0, 18, 164, 1, 0, 0, 0, 20, 174, 1, 0, 0, 0, 22, 176,
-		1, 0, 0, 0, 24, 25, 3, 2, 1, 0, 25, 26, 5, 0, 0, 1, 26, 1, 1, 0, 0, 0,
-		27, 28, 6, 1, -1, 0, 28, 29, 3, 4, 2, 0, 29, 45, 1, 0, 0, 0, 30, 31, 10,
-		3, 0, 0, 31, 33, 5, 1, 0, 0, 32, 34, 3, 16, 8, 0, 33, 32, 1, 0, 0, 0, 33,
-		34, 1, 0, 0, 0, 34, 44, 1, 0, 0, 0, 35, 36, 10, 2, 0, 0, 36, 37, 5, 2,
-		0, 0, 37, 44, 3, 16, 8, 0, 38, 39, 10, 1, 0, 0, 39, 40, 5, 3, 0, 0, 40,
-		41, 3, 6, 3, 0, 41, 42, 5, 4, 0, 0, 42, 44, 1, 0, 0, 0, 43, 30, 1, 0, 0,
-		0, 43, 35, 1, 0, 0, 0, 43, 38, 1, 0, 0, 0, 44, 47, 1, 0, 0, 0, 45, 43,
-		1, 0, 0, 0, 45, 46, 1, 0, 0, 0, 46, 3, 1, 0, 0, 0, 47, 45, 1, 0, 0, 0,
-		48, 52, 7, 0, 0, 0, 49, 52, 3, 16, 8, 0, 50, 52, 3, 10, 5, 0, 51, 48, 1,
-		0, 0, 0, 51, 49, 1, 0, 0, 0, 51, 50, 1, 0, 0, 0, 52, 5, 1, 0, 0, 0, 53,
-		67, 5, 7, 0, 0, 54, 56, 5, 42, 0, 0, 55, 54, 1, 0, 0, 0, 55, 56, 1, 0,
-		0, 0, 56, 57, 1, 0, 0, 0, 57, 59, 5, 8, 0, 0, 58, 60, 5, 42, 0, 0, 59,
-		58, 1, 0, 0, 0, 59, 60, 1, 0, 0, 0, 60, 63, 1, 0, 0, 0, 61, 62, 5, 8, 0,
-		0, 62, 64, 5, 42, 0, 0, 63, 61, 1, 0, 0, 0, 63, 64, 1, 0, 0, 0, 64, 67,
-		1, 0, 0, 0, 65, 67, 3, 8, 4, 0, 66, 53, 1, 0, 0, 0, 66, 55, 1, 0, 0, 0,
-		66, 65, 1, 0, 0, 0, 67, 7, 1, 0, 0, 0, 68, 69, 6, 4, -1, 0, 69, 80, 3,
-		2, 1, 0, 70, 80, 3, 10, 5, 0, 71, 72, 5, 9, 0, 0, 72, 73, 3, 8, 4, 0, 73,
-		74, 5, 10, 0, 0, 74, 80, 1, 0, 0, 0, 75, 76, 7, 1, 0, 0, 76, 80, 3, 8,
-		4, 11, 77, 78, 7, 2, 0, 0, 78, 80, 3, 2, 1, 0, 79, 68, 1, 0, 0, 0, 79,
-		70, 1, 0, 0, 0, 79, 71, 1, 0, 0, 0, 79, 75, 1, 0, 0, 0, 79, 77, 1, 0, 0,
-		0, 80, 114, 1, 0, 0, 0, 81, 82, 10, 9, 0, 0, 82, 83, 7, 3, 0, 0, 83, 113,
-		3, 8, 4, 10, 84, 85, 10, 8, 0, 0, 85, 86, 7, 2, 0, 0, 86, 113, 3, 8, 4,
-		9, 87, 88, 10, 6, 0, 0, 88, 89, 7, 4, 0, 0, 89, 113, 3, 8, 4, 7, 90, 91,
-		10, 5, 0, 0, 91, 92, 7, 5, 0, 0, 92, 113, 3, 8, 4, 6, 93, 94, 10, 3, 0,
-		0, 94, 95, 7, 6, 0, 0, 95, 113, 3, 8, 4, 4, 96, 97, 10, 2, 0, 0, 97, 98,
-		7, 7, 0, 0, 98, 113, 3, 8, 4, 3, 99, 100, 10, 1, 0, 0, 100, 101, 7, 8,
-		0, 0, 101, 113, 3, 8, 4, 2, 102, 105, 10, 7, 0, 0, 103, 104, 5, 17, 0,
-		0, 104, 106, 3, 8, 4, 0, 105, 103, 1, 0, 0, 0, 106, 107, 1, 0, 0, 0, 107,
-		105, 1, 0, 0, 0, 107, 108, 1, 0, 0, 0, 108, 113, 1, 0, 0, 0, 109, 110,
-		10, 4, 0, 0, 110, 111, 5, 24, 0, 0, 111, 113, 3, 22, 11, 0, 112, 81, 1,
-		0, 0, 0, 112, 84, 1, 0, 0, 0, 112, 87, 1, 0, 0, 0, 112, 90, 1, 0, 0, 0,
-		112, 93, 1, 0, 0, 0, 112, 96, 1, 0, 0, 0, 112, 99, 1, 0, 0, 0, 112, 102,
-		1, 0, 0, 0, 112, 109, 1, 0, 0, 0, 113, 116, 1, 0, 0, 0, 114, 112, 1, 0,
-		0, 0, 114, 115, 1, 0, 0, 0, 115, 9, 1, 0, 0, 0, 116, 114, 1, 0, 0, 0, 117,
-		132, 5, 43, 0, 0, 118, 132, 5, 42, 0, 0, 119, 132, 7, 9, 0, 0, 120, 132,
-		5, 34, 0, 0, 121, 123, 5, 3, 0, 0, 122, 124, 3, 12, 6, 0, 123, 122, 1,
-		0, 0, 0, 123, 124, 1, 0, 0, 0, 124, 125, 1, 0, 0, 0, 125, 132, 5, 4, 0,
-		0, 126, 128, 5, 35, 0, 0, 127, 129, 3, 14, 7, 0, 128, 127, 1, 0, 0, 0,
-		128, 129, 1, 0, 0, 0, 129, 130, 1, 0, 0, 0, 130, 132, 5, 36, 0, 0, 131,
-		117, 1, 0, 0, 0, 131, 118, 1, 0, 0, 0, 131, 119, 1, 0, 0, 0, 131, 120,
-		1, 0, 0, 0, 131, 121, 1, 0, 0, 0, 131, 126, 1, 0, 0, 0, 132, 11, 1, 0,
-		0, 0, 133, 138, 3, 10, 5, 0, 134, 135, 5, 37, 0, 0, 135, 137, 3, 10, 5,
-		0, 136, 134, 1, 0, 0, 0, 137, 140, 1, 0, 0, 0, 138, 136, 1, 0, 0, 0, 138,
-		139, 1, 0, 0, 0, 139, 13, 1, 0, 0, 0, 140, 138, 1, 0, 0, 0, 141, 142, 5,
-		43, 0, 0, 142, 143, 5, 8, 0, 0, 143, 150, 3, 10, 5, 0, 144, 145, 5, 37,
-		0, 0, 145, 146, 5, 43, 0, 0, 146, 147, 5, 8, 0, 0, 147, 149, 3, 10, 5,
-		0, 148, 144, 1, 0, 0, 0, 149, 152, 1, 0, 0, 0, 150, 148, 1, 0, 0, 0, 150,
-		151, 1, 0, 0, 0, 151, 15, 1, 0, 0, 0, 152, 150, 1, 0, 0, 0, 153, 163, 3,
-		20, 10, 0, 154, 163, 5, 7, 0, 0, 155, 156, 3, 20, 10, 0, 156, 158, 5, 9,
-		0, 0, 157, 159, 3, 18, 9, 0, 158, 157, 1, 0, 0, 0, 158, 159, 1, 0, 0, 0,
-		159, 160, 1, 0, 0, 0, 160, 161, 5, 10, 0, 0, 161, 163, 1, 0, 0, 0, 162,
-		153, 1, 0, 0, 0, 162, 154, 1, 0, 0, 0, 162, 155, 1, 0, 0, 0, 163, 17, 1,
-		0, 0, 0, 164, 169, 3, 8, 4, 0, 165, 166, 5, 37, 0, 0, 166, 168, 3, 8, 4,
-		0, 167, 165, 1, 0, 0, 0, 168, 171, 1, 0, 0, 0, 169, 167, 1, 0, 0, 0, 169,
-		170, 1, 0, 0, 0, 170, 19, 1, 0, 0, 0, 171, 169, 1, 0, 0, 0, 172, 175, 5,
-		41, 0, 0, 173, 175, 5, 43, 0, 0, 174, 172, 1, 0, 0, 0, 174, 173, 1, 0,
-		0, 0, 175, 21, 1, 0, 0, 0, 176, 180, 5, 44, 0, 0, 177, 179, 7, 10, 0, 0,
-		178, 177, 1, 0, 0, 0, 179, 182, 1, 0, 0, 0, 180, 181, 1, 0, 0, 0, 180,
-		178, 1, 0, 0, 0, 181, 23, 1, 0, 0, 0, 182, 180, 1, 0, 0, 0, 22, 33, 43,
-		45, 51, 55, 59, 63, 66, 79, 107, 112, 114, 123, 128, 131, 138, 150, 158,
-		162, 169, 174, 180,
+		10, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 3, 1, 36, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 62, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 75, 8, 1, 11, 1, 12, 1, 76, 1, 1,
+		1, 1, 1, 1, 5, 1, 82, 8, 1, 10, 1, 12, 1, 85, 9, 1, 1, 2, 1, 2, 1, 2, 3,
+		2, 90, 8, 2, 1, 3, 1, 3, 3, 3, 94, 8, 3, 1, 3, 1, 3, 3, 3, 98, 8, 3, 1,
+		3, 1, 3, 3, 3, 102, 8, 3, 1, 3, 3, 3, 105, 8, 3, 1, 4, 1, 4, 1, 4, 1, 4,
+		1, 4, 1, 4, 3, 4, 113, 8, 4, 1, 4, 1, 4, 1, 4, 3, 4, 118, 8, 4, 1, 4, 3,
+		4, 121, 8, 4, 1, 5, 1, 5, 1, 5, 5, 5, 126, 8, 5, 10, 5, 12, 5, 129, 9,
+		5, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 5, 6, 138, 8, 6, 10, 6, 12,
+		6, 141, 9, 6, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 3, 7, 148, 8, 7, 1, 7, 1, 7,
+		3, 7, 152, 8, 7, 1, 8, 1, 8, 1, 8, 5, 8, 157, 8, 8, 10, 8, 12, 8, 160,
+		9, 8, 1, 9, 1, 9, 3, 9, 164, 8, 9, 1, 10, 1, 10, 5, 10, 168, 8, 10, 10,
+		10, 12, 10, 171, 9, 10, 1, 10, 1, 169, 1, 2, 11, 0, 2, 4, 6, 8, 10, 12,
+		14, 16, 18, 20, 0, 11, 1, 0, 7, 8, 1, 0, 9, 10, 1, 0, 11, 13, 1, 0, 15,
+		18, 1, 0, 19, 20, 1, 0, 22, 24, 1, 0, 25, 26, 1, 0, 27, 28, 1, 0, 29, 30,
+		1, 0, 32, 33, 1, 0, 38, 40, 200, 0, 22, 1, 0, 0, 0, 2, 35, 1, 0, 0, 0,
+		4, 89, 1, 0, 0, 0, 6, 104, 1, 0, 0, 0, 8, 120, 1, 0, 0, 0, 10, 122, 1,
+		0, 0, 0, 12, 130, 1, 0, 0, 0, 14, 151, 1, 0, 0, 0, 16, 153, 1, 0, 0, 0,
+		18, 163, 1, 0, 0, 0, 20, 165, 1, 0, 0, 0, 22, 23, 3, 2, 1, 0, 23, 24, 5,
+		0, 0, 1, 24, 1, 1, 0, 0, 0, 25, 26, 6, 1, -1, 0, 26, 36, 3, 4, 2, 0, 27,
+		28, 5, 5, 0, 0, 28, 29, 3, 2, 1, 0, 29, 30, 5, 6, 0, 0, 30, 36, 1, 0, 0,
+		0, 31, 32, 7, 0, 0, 0, 32, 36, 3, 2, 1, 11, 33, 34, 7, 1, 0, 0, 34, 36,
+		3, 2, 1, 10, 35, 25, 1, 0, 0, 0, 35, 27, 1, 0, 0, 0, 35, 31, 1, 0, 0, 0,
+		35, 33, 1, 0, 0, 0, 36, 83, 1, 0, 0, 0, 37, 38, 10, 9, 0, 0, 38, 39, 7,
+		2, 0, 0, 39, 82, 3, 2, 1, 10, 40, 41, 10, 8, 0, 0, 41, 42, 7, 1, 0, 0,
+		42, 82, 3, 2, 1, 9, 43, 44, 10, 6, 0, 0, 44, 45, 7, 3, 0, 0, 45, 82, 3,
+		2, 1, 7, 46, 47, 10, 5, 0, 0, 47, 48, 7, 4, 0, 0, 48, 82, 3, 2, 1, 6, 49,
+		50, 10, 3, 0, 0, 50, 51, 7, 5, 0, 0, 51, 82, 3, 2, 1, 4, 52, 53, 10, 2,
+		0, 0, 53, 54, 7, 6, 0, 0, 54, 82, 3, 2, 1, 3, 55, 56, 10, 1, 0, 0, 56,
+		57, 7, 7, 0, 0, 57, 82, 3, 2, 1, 2, 58, 59, 10, 15, 0, 0, 59, 61, 5, 1,
+		0, 0, 60, 62, 3, 14, 7, 0, 61, 60, 1, 0, 0, 0, 61, 62, 1, 0, 0, 0, 62,
+		82, 1, 0, 0, 0, 63, 64, 10, 14, 0, 0, 64, 65, 5, 2, 0, 0, 65, 82, 3, 14,
+		7, 0, 66, 67, 10, 13, 0, 0, 67, 68, 5, 3, 0, 0, 68, 69, 3, 6, 3, 0, 69,
+		70, 5, 4, 0, 0, 70, 82, 1, 0, 0, 0, 71, 74, 10, 7, 0, 0, 72, 73, 5, 14,
+		0, 0, 73, 75, 3, 2, 1, 0, 74, 72, 1, 0, 0, 0, 75, 76, 1, 0, 0, 0, 76, 74,
+		1, 0, 0, 0, 76, 77, 1, 0, 0, 0, 77, 82, 1, 0, 0, 0, 78, 79, 10, 4, 0, 0,
+		79, 80, 5, 21, 0, 0, 80, 82, 3, 20, 10, 0, 81, 37, 1, 0, 0, 0, 81, 40,
+		1, 0, 0, 0, 81, 43, 1, 0, 0, 0, 81, 46, 1, 0, 0, 0, 81, 49, 1, 0, 0, 0,
+		81, 52, 1, 0, 0, 0, 81, 55, 1, 0, 0, 0, 81, 58, 1, 0, 0, 0, 81, 63, 1,
+		0, 0, 0, 81, 66, 1, 0, 0, 0, 81, 71, 1, 0, 0, 0, 81, 78, 1, 0, 0, 0, 82,
+		85, 1, 0, 0, 0, 83, 81, 1, 0, 0, 0, 83, 84, 1, 0, 0, 0, 84, 3, 1, 0, 0,
+		0, 85, 83, 1, 0, 0, 0, 86, 90, 7, 8, 0, 0, 87, 90, 3, 8, 4, 0, 88, 90,
+		3, 14, 7, 0, 89, 86, 1, 0, 0, 0, 89, 87, 1, 0, 0, 0, 89, 88, 1, 0, 0, 0,
+		90, 5, 1, 0, 0, 0, 91, 105, 5, 11, 0, 0, 92, 94, 5, 42, 0, 0, 93, 92, 1,
+		0, 0, 0, 93, 94, 1, 0, 0, 0, 94, 95, 1, 0, 0, 0, 95, 97, 5, 31, 0, 0, 96,
+		98, 5, 42, 0, 0, 97, 96, 1, 0, 0, 0, 97, 98, 1, 0, 0, 0, 98, 101, 1, 0,
+		0, 0, 99, 100, 5, 31, 0, 0, 100, 102, 5, 42, 0, 0, 101, 99, 1, 0, 0, 0,
+		101, 102, 1, 0, 0, 0, 102, 105, 1, 0, 0, 0, 103, 105, 3, 2, 1, 0, 104,
+		91, 1, 0, 0, 0, 104, 93, 1, 0, 0, 0, 104, 103, 1, 0, 0, 0, 105, 7, 1, 0,
+		0, 0, 106, 121, 5, 43, 0, 0, 107, 121, 5, 42, 0, 0, 108, 121, 7, 9, 0,
+		0, 109, 121, 5, 34, 0, 0, 110, 112, 5, 3, 0, 0, 111, 113, 3, 10, 5, 0,
+		112, 111, 1, 0, 0, 0, 112, 113, 1, 0, 0, 0, 113, 114, 1, 0, 0, 0, 114,
+		121, 5, 4, 0, 0, 115, 117, 5, 35, 0, 0, 116, 118, 3, 12, 6, 0, 117, 116,
+		1, 0, 0, 0, 117, 118, 1, 0, 0, 0, 118, 119, 1, 0, 0, 0, 119, 121, 5, 36,
+		0, 0, 120, 106, 1, 0, 0, 0, 120, 107, 1, 0, 0, 0, 120, 108, 1, 0, 0, 0,
+		120, 109, 1, 0, 0, 0, 120, 110, 1, 0, 0, 0, 120, 115, 1, 0, 0, 0, 121,
+		9, 1, 0, 0, 0, 122, 127, 3, 8, 4, 0, 123, 124, 5, 37, 0, 0, 124, 126, 3,
+		8, 4, 0, 125, 123, 1, 0, 0, 0, 126, 129, 1, 0, 0, 0, 127, 125, 1, 0, 0,
+		0, 127, 128, 1, 0, 0, 0, 128, 11, 1, 0, 0, 0, 129, 127, 1, 0, 0, 0, 130,
+		131, 5, 43, 0, 0, 131, 132, 5, 31, 0, 0, 132, 139, 3, 8, 4, 0, 133, 134,
+		5, 37, 0, 0, 134, 135, 5, 43, 0, 0, 135, 136, 5, 31, 0, 0, 136, 138, 3,
+		8, 4, 0, 137, 133, 1, 0, 0, 0, 138, 141, 1, 0, 0, 0, 139, 137, 1, 0, 0,
+		0, 139, 140, 1, 0, 0, 0, 140, 13, 1, 0, 0, 0, 141, 139, 1, 0, 0, 0, 142,
+		152, 3, 18, 9, 0, 143, 152, 5, 11, 0, 0, 144, 145, 3, 18, 9, 0, 145, 147,
+		5, 5, 0, 0, 146, 148, 3, 16, 8, 0, 147, 146, 1, 0, 0, 0, 147, 148, 1, 0,
+		0, 0, 148, 149, 1, 0, 0, 0, 149, 150, 5, 6, 0, 0, 150, 152, 1, 0, 0, 0,
+		151, 142, 1, 0, 0, 0, 151, 143, 1, 0, 0, 0, 151, 144, 1, 0, 0, 0, 152,
+		15, 1, 0, 0, 0, 153, 158, 3, 2, 1, 0, 154, 155, 5, 37, 0, 0, 155, 157,
+		3, 2, 1, 0, 156, 154, 1, 0, 0, 0, 157, 160, 1, 0, 0, 0, 158, 156, 1, 0,
+		0, 0, 158, 159, 1, 0, 0, 0, 159, 17, 1, 0, 0, 0, 160, 158, 1, 0, 0, 0,
+		161, 164, 5, 41, 0, 0, 162, 164, 5, 43, 0, 0, 163, 161, 1, 0, 0, 0, 163,
+		162, 1, 0, 0, 0, 164, 19, 1, 0, 0, 0, 165, 169, 5, 44, 0, 0, 166, 168,
+		7, 10, 0, 0, 167, 166, 1, 0, 0, 0, 168, 171, 1, 0, 0, 0, 169, 170, 1, 0,
+		0, 0, 169, 167, 1, 0, 0, 0, 170, 21, 1, 0, 0, 0, 171, 169, 1, 0, 0, 0,
+		20, 35, 61, 76, 81, 83, 89, 93, 97, 101, 104, 112, 117, 120, 127, 139,
+		147, 151, 158, 163, 169,
 	}
 	deserializer := antlr.NewATNDeserializer(nil)
 	staticData.atn = deserializer.Deserialize(staticData.serializedATN)
@@ -225,18 +219,17 @@ const (
 
 // yamlpathParser rules.
 const (
-	yamlpathParserRULE_path          = 0
-	yamlpathParserRULE_expression    = 1
-	yamlpathParserRULE_term          = 2
-	yamlpathParserRULE_indexParam    = 3
-	yamlpathParserRULE_subexpression = 4
-	yamlpathParserRULE_literal       = 5
-	yamlpathParserRULE_listEntries   = 6
-	yamlpathParserRULE_mapEntries    = 7
-	yamlpathParserRULE_invocation    = 8
-	yamlpathParserRULE_paramList     = 9
-	yamlpathParserRULE_identifier    = 10
-	yamlpathParserRULE_regex         = 11
+	yamlpathParserRULE_path        = 0
+	yamlpathParserRULE_expression  = 1
+	yamlpathParserRULE_term        = 2
+	yamlpathParserRULE_indexParam  = 3
+	yamlpathParserRULE_literal     = 4
+	yamlpathParserRULE_listEntries = 5
+	yamlpathParserRULE_mapEntries  = 6
+	yamlpathParserRULE_invocation  = 7
+	yamlpathParserRULE_paramList   = 8
+	yamlpathParserRULE_identifier  = 9
+	yamlpathParserRULE_regex       = 10
 )
 
 // IPathContext is an interface to support dynamic dispatch.
@@ -319,11 +312,11 @@ func (p *yamlpathParser) Path() (localctx IPathContext) {
 	p.EnterRule(localctx, 0, yamlpathParserRULE_path)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(24)
+		p.SetState(22)
 		p.expression(0)
 	}
 	{
-		p.SetState(25)
+		p.SetState(23)
 		p.Match(yamlpathParserEOF)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -396,6 +389,680 @@ func (s *ExpressionContext) GetRuleContext() antlr.RuleContext {
 
 func (s *ExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+type NegationExpressionContext struct {
+	ExpressionContext
+}
+
+func NewNegationExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *NegationExpressionContext {
+	var p = new(NegationExpressionContext)
+
+	InitEmptyExpressionContext(&p.ExpressionContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *NegationExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *NegationExpressionContext) Expression() IExpressionContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExpressionContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
+}
+
+type MatchExpressionContext struct {
+	ExpressionContext
+}
+
+func NewMatchExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *MatchExpressionContext {
+	var p = new(MatchExpressionContext)
+
+	InitEmptyExpressionContext(&p.ExpressionContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *MatchExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *MatchExpressionContext) Expression() IExpressionContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExpressionContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
+}
+
+func (s *MatchExpressionContext) Regex() IRegexContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IRegexContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IRegexContext)
+}
+
+type PolarityExpressionContext struct {
+	ExpressionContext
+}
+
+func NewPolarityExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *PolarityExpressionContext {
+	var p = new(PolarityExpressionContext)
+
+	InitEmptyExpressionContext(&p.ExpressionContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *PolarityExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *PolarityExpressionContext) Expression() IExpressionContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExpressionContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
+}
+
+type AdditiveExpressionContext struct {
+	ExpressionContext
+}
+
+func NewAdditiveExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *AdditiveExpressionContext {
+	var p = new(AdditiveExpressionContext)
+
+	InitEmptyExpressionContext(&p.ExpressionContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *AdditiveExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *AdditiveExpressionContext) AllExpression() []IExpressionContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExpressionContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExpressionContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExpressionContext); ok {
+			tst[i] = t.(IExpressionContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *AdditiveExpressionContext) Expression(i int) IExpressionContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExpressionContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
+}
+
+type ParenthesisExpressionContext struct {
+	ExpressionContext
+}
+
+func NewParenthesisExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ParenthesisExpressionContext {
+	var p = new(ParenthesisExpressionContext)
+
+	InitEmptyExpressionContext(&p.ExpressionContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *ParenthesisExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ParenthesisExpressionContext) Expression() IExpressionContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExpressionContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
+}
+
+type MultiplicativeExpressionContext struct {
+	ExpressionContext
+}
+
+func NewMultiplicativeExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *MultiplicativeExpressionContext {
+	var p = new(MultiplicativeExpressionContext)
+
+	InitEmptyExpressionContext(&p.ExpressionContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *MultiplicativeExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *MultiplicativeExpressionContext) AllExpression() []IExpressionContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExpressionContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExpressionContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExpressionContext); ok {
+			tst[i] = t.(IExpressionContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *MultiplicativeExpressionContext) Expression(i int) IExpressionContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExpressionContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
+}
+
+type RecursiveExpressionContext struct {
+	ExpressionContext
+}
+
+func NewRecursiveExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *RecursiveExpressionContext {
+	var p = new(RecursiveExpressionContext)
+
+	InitEmptyExpressionContext(&p.ExpressionContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *RecursiveExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *RecursiveExpressionContext) Expression() IExpressionContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExpressionContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
+}
+
+func (s *RecursiveExpressionContext) Invocation() IInvocationContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IInvocationContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IInvocationContext)
+}
+
+type UnionExpressionContext struct {
+	ExpressionContext
+}
+
+func NewUnionExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *UnionExpressionContext {
+	var p = new(UnionExpressionContext)
+
+	InitEmptyExpressionContext(&p.ExpressionContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *UnionExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *UnionExpressionContext) AllExpression() []IExpressionContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExpressionContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExpressionContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExpressionContext); ok {
+			tst[i] = t.(IExpressionContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *UnionExpressionContext) Expression(i int) IExpressionContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExpressionContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
+}
+
+type OrExpressionContext struct {
+	ExpressionContext
+}
+
+func NewOrExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *OrExpressionContext {
+	var p = new(OrExpressionContext)
+
+	InitEmptyExpressionContext(&p.ExpressionContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *OrExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *OrExpressionContext) AllExpression() []IExpressionContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExpressionContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExpressionContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExpressionContext); ok {
+			tst[i] = t.(IExpressionContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *OrExpressionContext) Expression(i int) IExpressionContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExpressionContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
+}
+
+type AndExpressionContext struct {
+	ExpressionContext
+}
+
+func NewAndExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *AndExpressionContext {
+	var p = new(AndExpressionContext)
+
+	InitEmptyExpressionContext(&p.ExpressionContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *AndExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *AndExpressionContext) AllExpression() []IExpressionContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExpressionContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExpressionContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExpressionContext); ok {
+			tst[i] = t.(IExpressionContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *AndExpressionContext) Expression(i int) IExpressionContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExpressionContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
+}
+
+type MembershipExpressionContext struct {
+	ExpressionContext
+}
+
+func NewMembershipExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *MembershipExpressionContext {
+	var p = new(MembershipExpressionContext)
+
+	InitEmptyExpressionContext(&p.ExpressionContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *MembershipExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *MembershipExpressionContext) AllExpression() []IExpressionContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExpressionContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExpressionContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExpressionContext); ok {
+			tst[i] = t.(IExpressionContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *MembershipExpressionContext) Expression(i int) IExpressionContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExpressionContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
+}
+
+type InequalityExpressionContext struct {
+	ExpressionContext
+}
+
+func NewInequalityExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *InequalityExpressionContext {
+	var p = new(InequalityExpressionContext)
+
+	InitEmptyExpressionContext(&p.ExpressionContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *InequalityExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *InequalityExpressionContext) AllExpression() []IExpressionContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExpressionContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExpressionContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExpressionContext); ok {
+			tst[i] = t.(IExpressionContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *InequalityExpressionContext) Expression(i int) IExpressionContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExpressionContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
+}
+
+type EqualityExpressionContext struct {
+	ExpressionContext
+}
+
+func NewEqualityExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *EqualityExpressionContext {
+	var p = new(EqualityExpressionContext)
+
+	InitEmptyExpressionContext(&p.ExpressionContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExpressionContext))
+
+	return p
+}
+
+func (s *EqualityExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *EqualityExpressionContext) AllExpression() []IExpressionContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExpressionContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExpressionContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExpressionContext); ok {
+			tst[i] = t.(IExpressionContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *EqualityExpressionContext) Expression(i int) IExpressionContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExpressionContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
 }
 
 type FieldExpressionContext struct {
@@ -498,56 +1165,6 @@ func (s *IndexExpressionContext) IndexParam() IIndexParamContext {
 	return t.(IIndexParamContext)
 }
 
-type RecursiveExpressionContext struct {
-	ExpressionContext
-}
-
-func NewRecursiveExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *RecursiveExpressionContext {
-	var p = new(RecursiveExpressionContext)
-
-	InitEmptyExpressionContext(&p.ExpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*ExpressionContext))
-
-	return p
-}
-
-func (s *RecursiveExpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *RecursiveExpressionContext) Expression() IExpressionContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IExpressionContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IExpressionContext)
-}
-
-func (s *RecursiveExpressionContext) Invocation() IInvocationContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IInvocationContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IInvocationContext)
-}
-
 type TermExpressionContext struct {
 	ExpressionContext
 }
@@ -595,25 +1212,104 @@ func (p *yamlpathParser) expression(_p int) (localctx IExpressionContext) {
 	var _ antlr.ParserRuleContext = _prevctx // TODO: To prevent unused variable warning.
 	_startState := 2
 	p.EnterRecursionRule(localctx, 2, yamlpathParserRULE_expression, _p)
+	var _la int
+
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
-	localctx = NewTermExpressionContext(p, localctx)
-	p.SetParserRuleContext(localctx)
-	_prevctx = localctx
-
-	{
-		p.SetState(28)
-		p.Term()
-	}
-
-	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
-	p.SetState(45)
+	p.SetState(35)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
 	}
-	_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 2, p.GetParserRuleContext())
+
+	switch p.GetTokenStream().LA(1) {
+	case yamlpathParserT__2, yamlpathParserT__10, yamlpathParserT__28, yamlpathParserT__29, yamlpathParserT__31, yamlpathParserT__32, yamlpathParserT__33, yamlpathParserT__34, yamlpathParserIDENTIFIER, yamlpathParserNUMBER, yamlpathParserSTRING:
+		localctx = NewTermExpressionContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
+
+		{
+			p.SetState(26)
+			p.Term()
+		}
+
+	case yamlpathParserT__4:
+		localctx = NewParenthesisExpressionContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
+		{
+			p.SetState(27)
+			p.Match(yamlpathParserT__4)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+		{
+			p.SetState(28)
+			p.expression(0)
+		}
+		{
+			p.SetState(29)
+			p.Match(yamlpathParserT__5)
+			if p.HasError() {
+				// Recognition error - abort rule
+				goto errorExit
+			}
+		}
+
+	case yamlpathParserT__6, yamlpathParserT__7:
+		localctx = NewNegationExpressionContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
+		{
+			p.SetState(31)
+			_la = p.GetTokenStream().LA(1)
+
+			if !(_la == yamlpathParserT__6 || _la == yamlpathParserT__7) {
+				p.GetErrorHandler().RecoverInline(p)
+			} else {
+				p.GetErrorHandler().ReportMatch(p)
+				p.Consume()
+			}
+		}
+		{
+			p.SetState(32)
+			p.expression(11)
+		}
+
+	case yamlpathParserT__8, yamlpathParserT__9:
+		localctx = NewPolarityExpressionContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
+		{
+			p.SetState(33)
+			_la = p.GetTokenStream().LA(1)
+
+			if !(_la == yamlpathParserT__8 || _la == yamlpathParserT__9) {
+				p.GetErrorHandler().RecoverInline(p)
+			} else {
+				p.GetErrorHandler().ReportMatch(p)
+				p.Consume()
+			}
+		}
+		{
+			p.SetState(34)
+			p.expression(10)
+		}
+
+	default:
+		p.SetError(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
+		goto errorExit
+	}
+	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
+	p.SetState(83)
+	p.GetErrorHandler().Sync(p)
+	if p.HasError() {
+		goto errorExit
+	}
+	_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 4, p.GetParserRuleContext())
 	if p.HasError() {
 		goto errorExit
 	}
@@ -623,36 +1319,211 @@ func (p *yamlpathParser) expression(_p int) (localctx IExpressionContext) {
 				p.TriggerExitRuleEvent()
 			}
 			_prevctx = localctx
-			p.SetState(43)
+			p.SetState(81)
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
 			}
 
-			switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 1, p.GetParserRuleContext()) {
+			switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 3, p.GetParserRuleContext()) {
 			case 1:
-				localctx = NewRecursiveExpressionContext(p, NewExpressionContext(p, _parentctx, _parentState))
+				localctx = NewMultiplicativeExpressionContext(p, NewExpressionContext(p, _parentctx, _parentState))
 				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_expression)
-				p.SetState(30)
+				p.SetState(37)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 9)) {
+					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 9)", ""))
+					goto errorExit
+				}
+				{
+					p.SetState(38)
+					_la = p.GetTokenStream().LA(1)
+
+					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&14336) != 0) {
+						p.GetErrorHandler().RecoverInline(p)
+					} else {
+						p.GetErrorHandler().ReportMatch(p)
+						p.Consume()
+					}
+				}
+				{
+					p.SetState(39)
+					p.expression(10)
+				}
+
+			case 2:
+				localctx = NewAdditiveExpressionContext(p, NewExpressionContext(p, _parentctx, _parentState))
+				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_expression)
+				p.SetState(40)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 8)) {
+					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 8)", ""))
+					goto errorExit
+				}
+				{
+					p.SetState(41)
+					_la = p.GetTokenStream().LA(1)
+
+					if !(_la == yamlpathParserT__8 || _la == yamlpathParserT__9) {
+						p.GetErrorHandler().RecoverInline(p)
+					} else {
+						p.GetErrorHandler().ReportMatch(p)
+						p.Consume()
+					}
+				}
+				{
+					p.SetState(42)
+					p.expression(9)
+				}
+
+			case 3:
+				localctx = NewInequalityExpressionContext(p, NewExpressionContext(p, _parentctx, _parentState))
+				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_expression)
+				p.SetState(43)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 6)) {
+					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 6)", ""))
+					goto errorExit
+				}
+				{
+					p.SetState(44)
+					_la = p.GetTokenStream().LA(1)
+
+					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&491520) != 0) {
+						p.GetErrorHandler().RecoverInline(p)
+					} else {
+						p.GetErrorHandler().ReportMatch(p)
+						p.Consume()
+					}
+				}
+				{
+					p.SetState(45)
+					p.expression(7)
+				}
+
+			case 4:
+				localctx = NewEqualityExpressionContext(p, NewExpressionContext(p, _parentctx, _parentState))
+				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_expression)
+				p.SetState(46)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 5)) {
+					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 5)", ""))
+					goto errorExit
+				}
+				{
+					p.SetState(47)
+					_la = p.GetTokenStream().LA(1)
+
+					if !(_la == yamlpathParserT__18 || _la == yamlpathParserT__19) {
+						p.GetErrorHandler().RecoverInline(p)
+					} else {
+						p.GetErrorHandler().ReportMatch(p)
+						p.Consume()
+					}
+				}
+				{
+					p.SetState(48)
+					p.expression(6)
+				}
+
+			case 5:
+				localctx = NewMembershipExpressionContext(p, NewExpressionContext(p, _parentctx, _parentState))
+				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_expression)
+				p.SetState(49)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 3)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 3)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(31)
+					p.SetState(50)
+					_la = p.GetTokenStream().LA(1)
+
+					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&29360128) != 0) {
+						p.GetErrorHandler().RecoverInline(p)
+					} else {
+						p.GetErrorHandler().ReportMatch(p)
+						p.Consume()
+					}
+				}
+				{
+					p.SetState(51)
+					p.expression(4)
+				}
+
+			case 6:
+				localctx = NewAndExpressionContext(p, NewExpressionContext(p, _parentctx, _parentState))
+				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_expression)
+				p.SetState(52)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 2)) {
+					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 2)", ""))
+					goto errorExit
+				}
+				{
+					p.SetState(53)
+					_la = p.GetTokenStream().LA(1)
+
+					if !(_la == yamlpathParserT__24 || _la == yamlpathParserT__25) {
+						p.GetErrorHandler().RecoverInline(p)
+					} else {
+						p.GetErrorHandler().ReportMatch(p)
+						p.Consume()
+					}
+				}
+				{
+					p.SetState(54)
+					p.expression(3)
+				}
+
+			case 7:
+				localctx = NewOrExpressionContext(p, NewExpressionContext(p, _parentctx, _parentState))
+				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_expression)
+				p.SetState(55)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 1)) {
+					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 1)", ""))
+					goto errorExit
+				}
+				{
+					p.SetState(56)
+					_la = p.GetTokenStream().LA(1)
+
+					if !(_la == yamlpathParserT__26 || _la == yamlpathParserT__27) {
+						p.GetErrorHandler().RecoverInline(p)
+					} else {
+						p.GetErrorHandler().ReportMatch(p)
+						p.Consume()
+					}
+				}
+				{
+					p.SetState(57)
+					p.expression(2)
+				}
+
+			case 8:
+				localctx = NewRecursiveExpressionContext(p, NewExpressionContext(p, _parentctx, _parentState))
+				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_expression)
+				p.SetState(58)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 15)) {
+					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 15)", ""))
+					goto errorExit
+				}
+				{
+					p.SetState(59)
 					p.Match(yamlpathParserT__0)
 					if p.HasError() {
 						// Recognition error - abort rule
 						goto errorExit
 					}
 				}
-				p.SetState(33)
+				p.SetState(61)
 				p.GetErrorHandler().Sync(p)
 
-				if p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 0, p.GetParserRuleContext()) == 1 {
+				if p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 1, p.GetParserRuleContext()) == 1 {
 					{
-						p.SetState(32)
+						p.SetState(60)
 						p.Invocation()
 					}
 
@@ -660,17 +1531,17 @@ func (p *yamlpathParser) expression(_p int) (localctx IExpressionContext) {
 					goto errorExit
 				}
 
-			case 2:
+			case 9:
 				localctx = NewFieldExpressionContext(p, NewExpressionContext(p, _parentctx, _parentState))
 				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_expression)
-				p.SetState(35)
+				p.SetState(63)
 
-				if !(p.Precpred(p.GetParserRuleContext(), 2)) {
-					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 2)", ""))
+				if !(p.Precpred(p.GetParserRuleContext(), 14)) {
+					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 14)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(36)
+					p.SetState(64)
 					p.Match(yamlpathParserT__1)
 					if p.HasError() {
 						// Recognition error - abort rule
@@ -678,21 +1549,21 @@ func (p *yamlpathParser) expression(_p int) (localctx IExpressionContext) {
 					}
 				}
 				{
-					p.SetState(37)
+					p.SetState(65)
 					p.Invocation()
 				}
 
-			case 3:
+			case 10:
 				localctx = NewIndexExpressionContext(p, NewExpressionContext(p, _parentctx, _parentState))
 				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_expression)
-				p.SetState(38)
+				p.SetState(66)
 
-				if !(p.Precpred(p.GetParserRuleContext(), 1)) {
-					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 1)", ""))
+				if !(p.Precpred(p.GetParserRuleContext(), 13)) {
+					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 13)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(39)
+					p.SetState(67)
 					p.Match(yamlpathParserT__2)
 					if p.HasError() {
 						// Recognition error - abort rule
@@ -700,11 +1571,11 @@ func (p *yamlpathParser) expression(_p int) (localctx IExpressionContext) {
 					}
 				}
 				{
-					p.SetState(40)
+					p.SetState(68)
 					p.IndexParam()
 				}
 				{
-					p.SetState(41)
+					p.SetState(69)
 					p.Match(yamlpathParserT__3)
 					if p.HasError() {
 						// Recognition error - abort rule
@@ -712,17 +1583,83 @@ func (p *yamlpathParser) expression(_p int) (localctx IExpressionContext) {
 					}
 				}
 
+			case 11:
+				localctx = NewUnionExpressionContext(p, NewExpressionContext(p, _parentctx, _parentState))
+				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_expression)
+				p.SetState(71)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 7)) {
+					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 7)", ""))
+					goto errorExit
+				}
+				p.SetState(74)
+				p.GetErrorHandler().Sync(p)
+				if p.HasError() {
+					goto errorExit
+				}
+				_alt = 1
+				for ok := true; ok; ok = _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
+					switch _alt {
+					case 1:
+						{
+							p.SetState(72)
+							p.Match(yamlpathParserT__13)
+							if p.HasError() {
+								// Recognition error - abort rule
+								goto errorExit
+							}
+						}
+						{
+							p.SetState(73)
+							p.expression(0)
+						}
+
+					default:
+						p.SetError(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
+						goto errorExit
+					}
+
+					p.SetState(76)
+					p.GetErrorHandler().Sync(p)
+					_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 2, p.GetParserRuleContext())
+					if p.HasError() {
+						goto errorExit
+					}
+				}
+
+			case 12:
+				localctx = NewMatchExpressionContext(p, NewExpressionContext(p, _parentctx, _parentState))
+				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_expression)
+				p.SetState(78)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 4)) {
+					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 4)", ""))
+					goto errorExit
+				}
+				{
+					p.SetState(79)
+					p.Match(yamlpathParserT__20)
+					if p.HasError() {
+						// Recognition error - abort rule
+						goto errorExit
+					}
+				}
+				{
+					p.SetState(80)
+					p.Regex()
+				}
+
 			case antlr.ATNInvalidAltNumber:
 				goto errorExit
 			}
 
 		}
-		p.SetState(47)
+		p.SetState(85)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
 		}
-		_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 2, p.GetParserRuleContext())
+		_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 4, p.GetParserRuleContext())
 		if p.HasError() {
 			goto errorExit
 		}
@@ -886,21 +1823,21 @@ func (p *yamlpathParser) Term() (localctx ITermContext) {
 	p.EnterRule(localctx, 4, yamlpathParserRULE_term)
 	var _la int
 
-	p.SetState(51)
+	p.SetState(89)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
 	}
 
-	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 3, p.GetParserRuleContext()) {
+	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 5, p.GetParserRuleContext()) {
 	case 1:
 		localctx = NewRootTermContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(48)
+			p.SetState(86)
 			_la = p.GetTokenStream().LA(1)
 
-			if !(_la == yamlpathParserT__4 || _la == yamlpathParserT__5) {
+			if !(_la == yamlpathParserT__28 || _la == yamlpathParserT__29) {
 				p.GetErrorHandler().RecoverInline(p)
 			} else {
 				p.GetErrorHandler().ReportMatch(p)
@@ -909,19 +1846,19 @@ func (p *yamlpathParser) Term() (localctx ITermContext) {
 		}
 
 	case 2:
-		localctx = NewInvocationTermContext(p, localctx)
+		localctx = NewLiteralTermContext(p, localctx)
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(49)
-			p.Invocation()
+			p.SetState(87)
+			p.Literal()
 		}
 
 	case 3:
-		localctx = NewLiteralTermContext(p, localctx)
+		localctx = NewInvocationTermContext(p, localctx)
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(50)
-			p.Literal()
+			p.SetState(88)
+			p.Invocation()
 		}
 
 	case antlr.ATNInvalidAltNumber:
@@ -1039,10 +1976,10 @@ func (s *ExpressionIndexContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
 
-func (s *ExpressionIndexContext) Subexpression() ISubexpressionContext {
+func (s *ExpressionIndexContext) Expression() IExpressionContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ISubexpressionContext); ok {
+		if _, ok := ctx.(IExpressionContext); ok {
 			t = ctx.(antlr.RuleContext)
 			break
 		}
@@ -1052,7 +1989,7 @@ func (s *ExpressionIndexContext) Subexpression() ISubexpressionContext {
 		return nil
 	}
 
-	return t.(ISubexpressionContext)
+	return t.(IExpressionContext)
 }
 
 type WildcardIndexContext struct {
@@ -1078,19 +2015,19 @@ func (p *yamlpathParser) IndexParam() (localctx IIndexParamContext) {
 	p.EnterRule(localctx, 6, yamlpathParserRULE_indexParam)
 	var _la int
 
-	p.SetState(66)
+	p.SetState(104)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
 	}
 
-	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 7, p.GetParserRuleContext()) {
+	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 9, p.GetParserRuleContext()) {
 	case 1:
 		localctx = NewWildcardIndexContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(53)
-			p.Match(yamlpathParserT__6)
+			p.SetState(91)
+			p.Match(yamlpathParserT__10)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -1100,7 +2037,7 @@ func (p *yamlpathParser) IndexParam() (localctx IIndexParamContext) {
 	case 2:
 		localctx = NewSliceIndexContext(p, localctx)
 		p.EnterOuterAlt(localctx, 2)
-		p.SetState(55)
+		p.SetState(93)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -1109,7 +2046,7 @@ func (p *yamlpathParser) IndexParam() (localctx IIndexParamContext) {
 
 		if _la == yamlpathParserNUMBER {
 			{
-				p.SetState(54)
+				p.SetState(92)
 				p.Match(yamlpathParserNUMBER)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -1119,14 +2056,14 @@ func (p *yamlpathParser) IndexParam() (localctx IIndexParamContext) {
 
 		}
 		{
-			p.SetState(57)
-			p.Match(yamlpathParserT__7)
+			p.SetState(95)
+			p.Match(yamlpathParserT__30)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
-		p.SetState(59)
+		p.SetState(97)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -1135,7 +2072,7 @@ func (p *yamlpathParser) IndexParam() (localctx IIndexParamContext) {
 
 		if _la == yamlpathParserNUMBER {
 			{
-				p.SetState(58)
+				p.SetState(96)
 				p.Match(yamlpathParserNUMBER)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -1144,24 +2081,24 @@ func (p *yamlpathParser) IndexParam() (localctx IIndexParamContext) {
 			}
 
 		}
-		p.SetState(63)
+		p.SetState(101)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		if _la == yamlpathParserT__7 {
+		if _la == yamlpathParserT__30 {
 			{
-				p.SetState(61)
-				p.Match(yamlpathParserT__7)
+				p.SetState(99)
+				p.Match(yamlpathParserT__30)
 				if p.HasError() {
 					// Recognition error - abort rule
 					goto errorExit
 				}
 			}
 			{
-				p.SetState(62)
+				p.SetState(100)
 				p.Match(yamlpathParserNUMBER)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -1175,8 +2112,8 @@ func (p *yamlpathParser) IndexParam() (localctx IIndexParamContext) {
 		localctx = NewExpressionIndexContext(p, localctx)
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(65)
-			p.subexpression(0)
+			p.SetState(103)
+			p.expression(0)
 		}
 
 	case antlr.ATNInvalidAltNumber:
@@ -1192,1157 +2129,6 @@ errorExit:
 		p.SetError(nil)
 	}
 	p.ExitRule()
-	return localctx
-	goto errorExit // Trick to prevent compiler error if the label is not used
-}
-
-// ISubexpressionContext is an interface to support dynamic dispatch.
-type ISubexpressionContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-	// IsSubexpressionContext differentiates from other interfaces.
-	IsSubexpressionContext()
-}
-
-type SubexpressionContext struct {
-	antlr.BaseParserRuleContext
-	parser antlr.Parser
-}
-
-func NewEmptySubexpressionContext() *SubexpressionContext {
-	var p = new(SubexpressionContext)
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = yamlpathParserRULE_subexpression
-	return p
-}
-
-func InitEmptySubexpressionContext(p *SubexpressionContext) {
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = yamlpathParserRULE_subexpression
-}
-
-func (*SubexpressionContext) IsSubexpressionContext() {}
-
-func NewSubexpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *SubexpressionContext {
-	var p = new(SubexpressionContext)
-
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
-
-	p.parser = parser
-	p.RuleIndex = yamlpathParserRULE_subexpression
-
-	return p
-}
-
-func (s *SubexpressionContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *SubexpressionContext) CopyAll(ctx *SubexpressionContext) {
-	s.CopyFrom(&ctx.BaseParserRuleContext)
-}
-
-func (s *SubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *SubexpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-type EqualitySubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewEqualitySubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *EqualitySubexpressionContext {
-	var p = new(EqualitySubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *EqualitySubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *EqualitySubexpressionContext) AllSubexpression() []ISubexpressionContext {
-	children := s.GetChildren()
-	len := 0
-	for _, ctx := range children {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			len++
-		}
-	}
-
-	tst := make([]ISubexpressionContext, len)
-	i := 0
-	for _, ctx := range children {
-		if t, ok := ctx.(ISubexpressionContext); ok {
-			tst[i] = t.(ISubexpressionContext)
-			i++
-		}
-	}
-
-	return tst
-}
-
-func (s *EqualitySubexpressionContext) Subexpression(i int) ISubexpressionContext {
-	var t antlr.RuleContext
-	j := 0
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			if j == i {
-				t = ctx.(antlr.RuleContext)
-				break
-			}
-			j++
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ISubexpressionContext)
-}
-
-type ParenthesisSubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewParenthesisSubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ParenthesisSubexpressionContext {
-	var p = new(ParenthesisSubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *ParenthesisSubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *ParenthesisSubexpressionContext) Subexpression() ISubexpressionContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ISubexpressionContext)
-}
-
-type AndSubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewAndSubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *AndSubexpressionContext {
-	var p = new(AndSubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *AndSubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *AndSubexpressionContext) AllSubexpression() []ISubexpressionContext {
-	children := s.GetChildren()
-	len := 0
-	for _, ctx := range children {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			len++
-		}
-	}
-
-	tst := make([]ISubexpressionContext, len)
-	i := 0
-	for _, ctx := range children {
-		if t, ok := ctx.(ISubexpressionContext); ok {
-			tst[i] = t.(ISubexpressionContext)
-			i++
-		}
-	}
-
-	return tst
-}
-
-func (s *AndSubexpressionContext) Subexpression(i int) ISubexpressionContext {
-	var t antlr.RuleContext
-	j := 0
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			if j == i {
-				t = ctx.(antlr.RuleContext)
-				break
-			}
-			j++
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ISubexpressionContext)
-}
-
-type NegationSubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewNegationSubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *NegationSubexpressionContext {
-	var p = new(NegationSubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *NegationSubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *NegationSubexpressionContext) Subexpression() ISubexpressionContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ISubexpressionContext)
-}
-
-type PolaritySubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewPolaritySubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *PolaritySubexpressionContext {
-	var p = new(PolaritySubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *PolaritySubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *PolaritySubexpressionContext) Expression() IExpressionContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IExpressionContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IExpressionContext)
-}
-
-type UnionSubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewUnionSubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *UnionSubexpressionContext {
-	var p = new(UnionSubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *UnionSubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *UnionSubexpressionContext) AllSubexpression() []ISubexpressionContext {
-	children := s.GetChildren()
-	len := 0
-	for _, ctx := range children {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			len++
-		}
-	}
-
-	tst := make([]ISubexpressionContext, len)
-	i := 0
-	for _, ctx := range children {
-		if t, ok := ctx.(ISubexpressionContext); ok {
-			tst[i] = t.(ISubexpressionContext)
-			i++
-		}
-	}
-
-	return tst
-}
-
-func (s *UnionSubexpressionContext) Subexpression(i int) ISubexpressionContext {
-	var t antlr.RuleContext
-	j := 0
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			if j == i {
-				t = ctx.(antlr.RuleContext)
-				break
-			}
-			j++
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ISubexpressionContext)
-}
-
-type MatchSubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewMatchSubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *MatchSubexpressionContext {
-	var p = new(MatchSubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *MatchSubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *MatchSubexpressionContext) Subexpression() ISubexpressionContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ISubexpressionContext)
-}
-
-func (s *MatchSubexpressionContext) Regex() IRegexContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IRegexContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IRegexContext)
-}
-
-type RootSubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewRootSubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *RootSubexpressionContext {
-	var p = new(RootSubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *RootSubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *RootSubexpressionContext) Expression() IExpressionContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IExpressionContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IExpressionContext)
-}
-
-type LiteralSubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewLiteralSubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *LiteralSubexpressionContext {
-	var p = new(LiteralSubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *LiteralSubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *LiteralSubexpressionContext) Literal() ILiteralContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ILiteralContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ILiteralContext)
-}
-
-type OrSubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewOrSubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *OrSubexpressionContext {
-	var p = new(OrSubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *OrSubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *OrSubexpressionContext) AllSubexpression() []ISubexpressionContext {
-	children := s.GetChildren()
-	len := 0
-	for _, ctx := range children {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			len++
-		}
-	}
-
-	tst := make([]ISubexpressionContext, len)
-	i := 0
-	for _, ctx := range children {
-		if t, ok := ctx.(ISubexpressionContext); ok {
-			tst[i] = t.(ISubexpressionContext)
-			i++
-		}
-	}
-
-	return tst
-}
-
-func (s *OrSubexpressionContext) Subexpression(i int) ISubexpressionContext {
-	var t antlr.RuleContext
-	j := 0
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			if j == i {
-				t = ctx.(antlr.RuleContext)
-				break
-			}
-			j++
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ISubexpressionContext)
-}
-
-type MembershipSubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewMembershipSubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *MembershipSubexpressionContext {
-	var p = new(MembershipSubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *MembershipSubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *MembershipSubexpressionContext) AllSubexpression() []ISubexpressionContext {
-	children := s.GetChildren()
-	len := 0
-	for _, ctx := range children {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			len++
-		}
-	}
-
-	tst := make([]ISubexpressionContext, len)
-	i := 0
-	for _, ctx := range children {
-		if t, ok := ctx.(ISubexpressionContext); ok {
-			tst[i] = t.(ISubexpressionContext)
-			i++
-		}
-	}
-
-	return tst
-}
-
-func (s *MembershipSubexpressionContext) Subexpression(i int) ISubexpressionContext {
-	var t antlr.RuleContext
-	j := 0
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			if j == i {
-				t = ctx.(antlr.RuleContext)
-				break
-			}
-			j++
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ISubexpressionContext)
-}
-
-type InequalitySubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewInequalitySubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *InequalitySubexpressionContext {
-	var p = new(InequalitySubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *InequalitySubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *InequalitySubexpressionContext) AllSubexpression() []ISubexpressionContext {
-	children := s.GetChildren()
-	len := 0
-	for _, ctx := range children {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			len++
-		}
-	}
-
-	tst := make([]ISubexpressionContext, len)
-	i := 0
-	for _, ctx := range children {
-		if t, ok := ctx.(ISubexpressionContext); ok {
-			tst[i] = t.(ISubexpressionContext)
-			i++
-		}
-	}
-
-	return tst
-}
-
-func (s *InequalitySubexpressionContext) Subexpression(i int) ISubexpressionContext {
-	var t antlr.RuleContext
-	j := 0
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			if j == i {
-				t = ctx.(antlr.RuleContext)
-				break
-			}
-			j++
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ISubexpressionContext)
-}
-
-type AdditiveSubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewAdditiveSubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *AdditiveSubexpressionContext {
-	var p = new(AdditiveSubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *AdditiveSubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *AdditiveSubexpressionContext) AllSubexpression() []ISubexpressionContext {
-	children := s.GetChildren()
-	len := 0
-	for _, ctx := range children {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			len++
-		}
-	}
-
-	tst := make([]ISubexpressionContext, len)
-	i := 0
-	for _, ctx := range children {
-		if t, ok := ctx.(ISubexpressionContext); ok {
-			tst[i] = t.(ISubexpressionContext)
-			i++
-		}
-	}
-
-	return tst
-}
-
-func (s *AdditiveSubexpressionContext) Subexpression(i int) ISubexpressionContext {
-	var t antlr.RuleContext
-	j := 0
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			if j == i {
-				t = ctx.(antlr.RuleContext)
-				break
-			}
-			j++
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ISubexpressionContext)
-}
-
-type MultiplicativeSubexpressionContext struct {
-	SubexpressionContext
-}
-
-func NewMultiplicativeSubexpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *MultiplicativeSubexpressionContext {
-	var p = new(MultiplicativeSubexpressionContext)
-
-	InitEmptySubexpressionContext(&p.SubexpressionContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*SubexpressionContext))
-
-	return p
-}
-
-func (s *MultiplicativeSubexpressionContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *MultiplicativeSubexpressionContext) AllSubexpression() []ISubexpressionContext {
-	children := s.GetChildren()
-	len := 0
-	for _, ctx := range children {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			len++
-		}
-	}
-
-	tst := make([]ISubexpressionContext, len)
-	i := 0
-	for _, ctx := range children {
-		if t, ok := ctx.(ISubexpressionContext); ok {
-			tst[i] = t.(ISubexpressionContext)
-			i++
-		}
-	}
-
-	return tst
-}
-
-func (s *MultiplicativeSubexpressionContext) Subexpression(i int) ISubexpressionContext {
-	var t antlr.RuleContext
-	j := 0
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ISubexpressionContext); ok {
-			if j == i {
-				t = ctx.(antlr.RuleContext)
-				break
-			}
-			j++
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ISubexpressionContext)
-}
-
-func (p *yamlpathParser) Subexpression() (localctx ISubexpressionContext) {
-	return p.subexpression(0)
-}
-
-func (p *yamlpathParser) subexpression(_p int) (localctx ISubexpressionContext) {
-	var _parentctx antlr.ParserRuleContext = p.GetParserRuleContext()
-
-	_parentState := p.GetState()
-	localctx = NewSubexpressionContext(p, p.GetParserRuleContext(), _parentState)
-	var _prevctx ISubexpressionContext = localctx
-	var _ antlr.ParserRuleContext = _prevctx // TODO: To prevent unused variable warning.
-	_startState := 8
-	p.EnterRecursionRule(localctx, 8, yamlpathParserRULE_subexpression, _p)
-	var _la int
-
-	var _alt int
-
-	p.EnterOuterAlt(localctx, 1)
-	p.SetState(79)
-	p.GetErrorHandler().Sync(p)
-	if p.HasError() {
-		goto errorExit
-	}
-
-	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 8, p.GetParserRuleContext()) {
-	case 1:
-		localctx = NewRootSubexpressionContext(p, localctx)
-		p.SetParserRuleContext(localctx)
-		_prevctx = localctx
-
-		{
-			p.SetState(69)
-			p.expression(0)
-		}
-
-	case 2:
-		localctx = NewLiteralSubexpressionContext(p, localctx)
-		p.SetParserRuleContext(localctx)
-		_prevctx = localctx
-		{
-			p.SetState(70)
-			p.Literal()
-		}
-
-	case 3:
-		localctx = NewParenthesisSubexpressionContext(p, localctx)
-		p.SetParserRuleContext(localctx)
-		_prevctx = localctx
-		{
-			p.SetState(71)
-			p.Match(yamlpathParserT__8)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-		{
-			p.SetState(72)
-			p.subexpression(0)
-		}
-		{
-			p.SetState(73)
-			p.Match(yamlpathParserT__9)
-			if p.HasError() {
-				// Recognition error - abort rule
-				goto errorExit
-			}
-		}
-
-	case 4:
-		localctx = NewNegationSubexpressionContext(p, localctx)
-		p.SetParserRuleContext(localctx)
-		_prevctx = localctx
-		{
-			p.SetState(75)
-			_la = p.GetTokenStream().LA(1)
-
-			if !(_la == yamlpathParserT__10 || _la == yamlpathParserT__11) {
-				p.GetErrorHandler().RecoverInline(p)
-			} else {
-				p.GetErrorHandler().ReportMatch(p)
-				p.Consume()
-			}
-		}
-		{
-			p.SetState(76)
-			p.subexpression(11)
-		}
-
-	case 5:
-		localctx = NewPolaritySubexpressionContext(p, localctx)
-		p.SetParserRuleContext(localctx)
-		_prevctx = localctx
-		{
-			p.SetState(77)
-			_la = p.GetTokenStream().LA(1)
-
-			if !(_la == yamlpathParserT__12 || _la == yamlpathParserT__13) {
-				p.GetErrorHandler().RecoverInline(p)
-			} else {
-				p.GetErrorHandler().ReportMatch(p)
-				p.Consume()
-			}
-		}
-		{
-			p.SetState(78)
-			p.expression(0)
-		}
-
-	case antlr.ATNInvalidAltNumber:
-		goto errorExit
-	}
-	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
-	p.SetState(114)
-	p.GetErrorHandler().Sync(p)
-	if p.HasError() {
-		goto errorExit
-	}
-	_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 11, p.GetParserRuleContext())
-	if p.HasError() {
-		goto errorExit
-	}
-	for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
-		if _alt == 1 {
-			if p.GetParseListeners() != nil {
-				p.TriggerExitRuleEvent()
-			}
-			_prevctx = localctx
-			p.SetState(112)
-			p.GetErrorHandler().Sync(p)
-			if p.HasError() {
-				goto errorExit
-			}
-
-			switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 10, p.GetParserRuleContext()) {
-			case 1:
-				localctx = NewMultiplicativeSubexpressionContext(p, NewSubexpressionContext(p, _parentctx, _parentState))
-				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_subexpression)
-				p.SetState(81)
-
-				if !(p.Precpred(p.GetParserRuleContext(), 9)) {
-					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 9)", ""))
-					goto errorExit
-				}
-				{
-					p.SetState(82)
-					_la = p.GetTokenStream().LA(1)
-
-					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&98432) != 0) {
-						p.GetErrorHandler().RecoverInline(p)
-					} else {
-						p.GetErrorHandler().ReportMatch(p)
-						p.Consume()
-					}
-				}
-				{
-					p.SetState(83)
-					p.subexpression(10)
-				}
-
-			case 2:
-				localctx = NewAdditiveSubexpressionContext(p, NewSubexpressionContext(p, _parentctx, _parentState))
-				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_subexpression)
-				p.SetState(84)
-
-				if !(p.Precpred(p.GetParserRuleContext(), 8)) {
-					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 8)", ""))
-					goto errorExit
-				}
-				{
-					p.SetState(85)
-					_la = p.GetTokenStream().LA(1)
-
-					if !(_la == yamlpathParserT__12 || _la == yamlpathParserT__13) {
-						p.GetErrorHandler().RecoverInline(p)
-					} else {
-						p.GetErrorHandler().ReportMatch(p)
-						p.Consume()
-					}
-				}
-				{
-					p.SetState(86)
-					p.subexpression(9)
-				}
-
-			case 3:
-				localctx = NewInequalitySubexpressionContext(p, NewSubexpressionContext(p, _parentctx, _parentState))
-				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_subexpression)
-				p.SetState(87)
-
-				if !(p.Precpred(p.GetParserRuleContext(), 6)) {
-					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 6)", ""))
-					goto errorExit
-				}
-				{
-					p.SetState(88)
-					_la = p.GetTokenStream().LA(1)
-
-					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&3932160) != 0) {
-						p.GetErrorHandler().RecoverInline(p)
-					} else {
-						p.GetErrorHandler().ReportMatch(p)
-						p.Consume()
-					}
-				}
-				{
-					p.SetState(89)
-					p.subexpression(7)
-				}
-
-			case 4:
-				localctx = NewEqualitySubexpressionContext(p, NewSubexpressionContext(p, _parentctx, _parentState))
-				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_subexpression)
-				p.SetState(90)
-
-				if !(p.Precpred(p.GetParserRuleContext(), 5)) {
-					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 5)", ""))
-					goto errorExit
-				}
-				{
-					p.SetState(91)
-					_la = p.GetTokenStream().LA(1)
-
-					if !(_la == yamlpathParserT__21 || _la == yamlpathParserT__22) {
-						p.GetErrorHandler().RecoverInline(p)
-					} else {
-						p.GetErrorHandler().ReportMatch(p)
-						p.Consume()
-					}
-				}
-				{
-					p.SetState(92)
-					p.subexpression(6)
-				}
-
-			case 5:
-				localctx = NewMembershipSubexpressionContext(p, NewSubexpressionContext(p, _parentctx, _parentState))
-				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_subexpression)
-				p.SetState(93)
-
-				if !(p.Precpred(p.GetParserRuleContext(), 3)) {
-					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 3)", ""))
-					goto errorExit
-				}
-				{
-					p.SetState(94)
-					_la = p.GetTokenStream().LA(1)
-
-					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&234881024) != 0) {
-						p.GetErrorHandler().RecoverInline(p)
-					} else {
-						p.GetErrorHandler().ReportMatch(p)
-						p.Consume()
-					}
-				}
-				{
-					p.SetState(95)
-					p.subexpression(4)
-				}
-
-			case 6:
-				localctx = NewAndSubexpressionContext(p, NewSubexpressionContext(p, _parentctx, _parentState))
-				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_subexpression)
-				p.SetState(96)
-
-				if !(p.Precpred(p.GetParserRuleContext(), 2)) {
-					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 2)", ""))
-					goto errorExit
-				}
-				{
-					p.SetState(97)
-					_la = p.GetTokenStream().LA(1)
-
-					if !(_la == yamlpathParserT__27 || _la == yamlpathParserT__28) {
-						p.GetErrorHandler().RecoverInline(p)
-					} else {
-						p.GetErrorHandler().ReportMatch(p)
-						p.Consume()
-					}
-				}
-				{
-					p.SetState(98)
-					p.subexpression(3)
-				}
-
-			case 7:
-				localctx = NewOrSubexpressionContext(p, NewSubexpressionContext(p, _parentctx, _parentState))
-				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_subexpression)
-				p.SetState(99)
-
-				if !(p.Precpred(p.GetParserRuleContext(), 1)) {
-					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 1)", ""))
-					goto errorExit
-				}
-				{
-					p.SetState(100)
-					_la = p.GetTokenStream().LA(1)
-
-					if !(_la == yamlpathParserT__29 || _la == yamlpathParserT__30) {
-						p.GetErrorHandler().RecoverInline(p)
-					} else {
-						p.GetErrorHandler().ReportMatch(p)
-						p.Consume()
-					}
-				}
-				{
-					p.SetState(101)
-					p.subexpression(2)
-				}
-
-			case 8:
-				localctx = NewUnionSubexpressionContext(p, NewSubexpressionContext(p, _parentctx, _parentState))
-				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_subexpression)
-				p.SetState(102)
-
-				if !(p.Precpred(p.GetParserRuleContext(), 7)) {
-					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 7)", ""))
-					goto errorExit
-				}
-				p.SetState(105)
-				p.GetErrorHandler().Sync(p)
-				if p.HasError() {
-					goto errorExit
-				}
-				_alt = 1
-				for ok := true; ok; ok = _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
-					switch _alt {
-					case 1:
-						{
-							p.SetState(103)
-							p.Match(yamlpathParserT__16)
-							if p.HasError() {
-								// Recognition error - abort rule
-								goto errorExit
-							}
-						}
-						{
-							p.SetState(104)
-							p.subexpression(0)
-						}
-
-					default:
-						p.SetError(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
-						goto errorExit
-					}
-
-					p.SetState(107)
-					p.GetErrorHandler().Sync(p)
-					_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 9, p.GetParserRuleContext())
-					if p.HasError() {
-						goto errorExit
-					}
-				}
-
-			case 9:
-				localctx = NewMatchSubexpressionContext(p, NewSubexpressionContext(p, _parentctx, _parentState))
-				p.PushNewRecursionContext(localctx, _startState, yamlpathParserRULE_subexpression)
-				p.SetState(109)
-
-				if !(p.Precpred(p.GetParserRuleContext(), 4)) {
-					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 4)", ""))
-					goto errorExit
-				}
-				{
-					p.SetState(110)
-					p.Match(yamlpathParserT__23)
-					if p.HasError() {
-						// Recognition error - abort rule
-						goto errorExit
-					}
-				}
-				{
-					p.SetState(111)
-					p.Regex()
-				}
-
-			case antlr.ATNInvalidAltNumber:
-				goto errorExit
-			}
-
-		}
-		p.SetState(116)
-		p.GetErrorHandler().Sync(p)
-		if p.HasError() {
-			goto errorExit
-		}
-		_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 11, p.GetParserRuleContext())
-		if p.HasError() {
-			goto errorExit
-		}
-	}
-
-errorExit:
-	if p.HasError() {
-		v := p.GetError()
-		localctx.SetException(v)
-		p.GetErrorHandler().ReportError(p, v)
-		p.GetErrorHandler().Recover(p, v)
-		p.SetError(nil)
-	}
-	p.UnrollRecursionContexts(_parentctx)
 	return localctx
 	goto errorExit // Trick to prevent compiler error if the label is not used
 }
@@ -2551,10 +2337,10 @@ func (s *NumberLiteralContext) NUMBER() antlr.TerminalNode {
 
 func (p *yamlpathParser) Literal() (localctx ILiteralContext) {
 	localctx = NewLiteralContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 10, yamlpathParserRULE_literal)
+	p.EnterRule(localctx, 8, yamlpathParserRULE_literal)
 	var _la int
 
-	p.SetState(131)
+	p.SetState(120)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -2565,7 +2351,7 @@ func (p *yamlpathParser) Literal() (localctx ILiteralContext) {
 		localctx = NewStringLiteralContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(117)
+			p.SetState(106)
 			p.Match(yamlpathParserSTRING)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -2577,7 +2363,7 @@ func (p *yamlpathParser) Literal() (localctx ILiteralContext) {
 		localctx = NewNumberLiteralContext(p, localctx)
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(118)
+			p.SetState(107)
 			p.Match(yamlpathParserNUMBER)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -2589,7 +2375,7 @@ func (p *yamlpathParser) Literal() (localctx ILiteralContext) {
 		localctx = NewBooleanLiteralContext(p, localctx)
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(119)
+			p.SetState(108)
 			_la = p.GetTokenStream().LA(1)
 
 			if !(_la == yamlpathParserT__31 || _la == yamlpathParserT__32) {
@@ -2604,7 +2390,7 @@ func (p *yamlpathParser) Literal() (localctx ILiteralContext) {
 		localctx = NewNullLiteralContext(p, localctx)
 		p.EnterOuterAlt(localctx, 4)
 		{
-			p.SetState(120)
+			p.SetState(109)
 			p.Match(yamlpathParserT__33)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -2616,14 +2402,14 @@ func (p *yamlpathParser) Literal() (localctx ILiteralContext) {
 		localctx = NewListLiteralContext(p, localctx)
 		p.EnterOuterAlt(localctx, 5)
 		{
-			p.SetState(121)
+			p.SetState(110)
 			p.Match(yamlpathParserT__2)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
-		p.SetState(123)
+		p.SetState(112)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -2632,13 +2418,13 @@ func (p *yamlpathParser) Literal() (localctx ILiteralContext) {
 
 		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&13258564042760) != 0 {
 			{
-				p.SetState(122)
+				p.SetState(111)
 				p.ListEntries()
 			}
 
 		}
 		{
-			p.SetState(125)
+			p.SetState(114)
 			p.Match(yamlpathParserT__3)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -2650,14 +2436,14 @@ func (p *yamlpathParser) Literal() (localctx ILiteralContext) {
 		localctx = NewMapLiteralContext(p, localctx)
 		p.EnterOuterAlt(localctx, 6)
 		{
-			p.SetState(126)
+			p.SetState(115)
 			p.Match(yamlpathParserT__34)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
-		p.SetState(128)
+		p.SetState(117)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -2666,13 +2452,13 @@ func (p *yamlpathParser) Literal() (localctx ILiteralContext) {
 
 		if _la == yamlpathParserSTRING {
 			{
-				p.SetState(127)
+				p.SetState(116)
 				p.MapEntries()
 			}
 
 		}
 		{
-			p.SetState(130)
+			p.SetState(119)
 			p.Match(yamlpathParserT__35)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -2796,16 +2582,16 @@ func (s *ListEntriesContext) ToStringTree(ruleNames []string, recog antlr.Recogn
 
 func (p *yamlpathParser) ListEntries() (localctx IListEntriesContext) {
 	localctx = NewListEntriesContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 12, yamlpathParserRULE_listEntries)
+	p.EnterRule(localctx, 10, yamlpathParserRULE_listEntries)
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(133)
+		p.SetState(122)
 		p.Literal()
 	}
 
-	p.SetState(138)
+	p.SetState(127)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -2814,7 +2600,7 @@ func (p *yamlpathParser) ListEntries() (localctx IListEntriesContext) {
 
 	for _la == yamlpathParserT__36 {
 		{
-			p.SetState(134)
+			p.SetState(123)
 			p.Match(yamlpathParserT__36)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -2822,11 +2608,11 @@ func (p *yamlpathParser) ListEntries() (localctx IListEntriesContext) {
 			}
 		}
 		{
-			p.SetState(135)
+			p.SetState(124)
 			p.Literal()
 		}
 
-		p.SetState(140)
+		p.SetState(129)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -2955,12 +2741,12 @@ func (s *MapEntriesContext) ToStringTree(ruleNames []string, recog antlr.Recogni
 
 func (p *yamlpathParser) MapEntries() (localctx IMapEntriesContext) {
 	localctx = NewMapEntriesContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 14, yamlpathParserRULE_mapEntries)
+	p.EnterRule(localctx, 12, yamlpathParserRULE_mapEntries)
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(141)
+		p.SetState(130)
 		p.Match(yamlpathParserSTRING)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2968,18 +2754,18 @@ func (p *yamlpathParser) MapEntries() (localctx IMapEntriesContext) {
 		}
 	}
 	{
-		p.SetState(142)
-		p.Match(yamlpathParserT__7)
+		p.SetState(131)
+		p.Match(yamlpathParserT__30)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
 	{
-		p.SetState(143)
+		p.SetState(132)
 		p.Literal()
 	}
-	p.SetState(150)
+	p.SetState(139)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -2988,7 +2774,7 @@ func (p *yamlpathParser) MapEntries() (localctx IMapEntriesContext) {
 
 	for _la == yamlpathParserT__36 {
 		{
-			p.SetState(144)
+			p.SetState(133)
 			p.Match(yamlpathParserT__36)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -2996,7 +2782,7 @@ func (p *yamlpathParser) MapEntries() (localctx IMapEntriesContext) {
 			}
 		}
 		{
-			p.SetState(145)
+			p.SetState(134)
 			p.Match(yamlpathParserSTRING)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3004,19 +2790,19 @@ func (p *yamlpathParser) MapEntries() (localctx IMapEntriesContext) {
 			}
 		}
 		{
-			p.SetState(146)
-			p.Match(yamlpathParserT__7)
+			p.SetState(135)
+			p.Match(yamlpathParserT__30)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
 		{
-			p.SetState(147)
+			p.SetState(136)
 			p.Literal()
 		}
 
-		p.SetState(152)
+		p.SetState(141)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -3195,21 +2981,21 @@ func (s *MemberInvocationContext) Identifier() IIdentifierContext {
 
 func (p *yamlpathParser) Invocation() (localctx IInvocationContext) {
 	localctx = NewInvocationContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 16, yamlpathParserRULE_invocation)
+	p.EnterRule(localctx, 14, yamlpathParserRULE_invocation)
 	var _la int
 
-	p.SetState(162)
+	p.SetState(151)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
 	}
 
-	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 18, p.GetParserRuleContext()) {
+	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 16, p.GetParserRuleContext()) {
 	case 1:
 		localctx = NewMemberInvocationContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(153)
+			p.SetState(142)
 			p.Identifier()
 		}
 
@@ -3217,8 +3003,8 @@ func (p *yamlpathParser) Invocation() (localctx IInvocationContext) {
 		localctx = NewWildcardInvocationContext(p, localctx)
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(154)
-			p.Match(yamlpathParserT__6)
+			p.SetState(143)
+			p.Match(yamlpathParserT__10)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -3229,34 +3015,34 @@ func (p *yamlpathParser) Invocation() (localctx IInvocationContext) {
 		localctx = NewFunctionInvocationContext(p, localctx)
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(155)
+			p.SetState(144)
 			p.Identifier()
 		}
 		{
-			p.SetState(156)
-			p.Match(yamlpathParserT__8)
+			p.SetState(145)
+			p.Match(yamlpathParserT__4)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
-		p.SetState(158)
+		p.SetState(147)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&15457587329768) != 0 {
+		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&15459197915048) != 0 {
 			{
-				p.SetState(157)
+				p.SetState(146)
 				p.ParamList()
 			}
 
 		}
 		{
-			p.SetState(160)
-			p.Match(yamlpathParserT__9)
+			p.SetState(149)
+			p.Match(yamlpathParserT__5)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -3288,8 +3074,8 @@ type IParamListContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	AllSubexpression() []ISubexpressionContext
-	Subexpression(i int) ISubexpressionContext
+	AllExpression() []IExpressionContext
+	Expression(i int) IExpressionContext
 
 	// IsParamListContext differentiates from other interfaces.
 	IsParamListContext()
@@ -3327,20 +3113,20 @@ func NewParamListContext(parser antlr.Parser, parent antlr.ParserRuleContext, in
 
 func (s *ParamListContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *ParamListContext) AllSubexpression() []ISubexpressionContext {
+func (s *ParamListContext) AllExpression() []IExpressionContext {
 	children := s.GetChildren()
 	len := 0
 	for _, ctx := range children {
-		if _, ok := ctx.(ISubexpressionContext); ok {
+		if _, ok := ctx.(IExpressionContext); ok {
 			len++
 		}
 	}
 
-	tst := make([]ISubexpressionContext, len)
+	tst := make([]IExpressionContext, len)
 	i := 0
 	for _, ctx := range children {
-		if t, ok := ctx.(ISubexpressionContext); ok {
-			tst[i] = t.(ISubexpressionContext)
+		if t, ok := ctx.(IExpressionContext); ok {
+			tst[i] = t.(IExpressionContext)
 			i++
 		}
 	}
@@ -3348,11 +3134,11 @@ func (s *ParamListContext) AllSubexpression() []ISubexpressionContext {
 	return tst
 }
 
-func (s *ParamListContext) Subexpression(i int) ISubexpressionContext {
+func (s *ParamListContext) Expression(i int) IExpressionContext {
 	var t antlr.RuleContext
 	j := 0
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(ISubexpressionContext); ok {
+		if _, ok := ctx.(IExpressionContext); ok {
 			if j == i {
 				t = ctx.(antlr.RuleContext)
 				break
@@ -3365,7 +3151,7 @@ func (s *ParamListContext) Subexpression(i int) ISubexpressionContext {
 		return nil
 	}
 
-	return t.(ISubexpressionContext)
+	return t.(IExpressionContext)
 }
 
 func (s *ParamListContext) GetRuleContext() antlr.RuleContext {
@@ -3378,15 +3164,15 @@ func (s *ParamListContext) ToStringTree(ruleNames []string, recog antlr.Recogniz
 
 func (p *yamlpathParser) ParamList() (localctx IParamListContext) {
 	localctx = NewParamListContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 18, yamlpathParserRULE_paramList)
+	p.EnterRule(localctx, 16, yamlpathParserRULE_paramList)
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(164)
-		p.subexpression(0)
+		p.SetState(153)
+		p.expression(0)
 	}
-	p.SetState(169)
+	p.SetState(158)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -3395,7 +3181,7 @@ func (p *yamlpathParser) ParamList() (localctx IParamListContext) {
 
 	for _la == yamlpathParserT__36 {
 		{
-			p.SetState(165)
+			p.SetState(154)
 			p.Match(yamlpathParserT__36)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3403,11 +3189,11 @@ func (p *yamlpathParser) ParamList() (localctx IParamListContext) {
 			}
 		}
 		{
-			p.SetState(166)
-			p.subexpression(0)
+			p.SetState(155)
+			p.expression(0)
 		}
 
-		p.SetState(171)
+		p.SetState(160)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -3528,8 +3314,8 @@ func (s *QuotedIdentifierContext) STRING() antlr.TerminalNode {
 
 func (p *yamlpathParser) Identifier() (localctx IIdentifierContext) {
 	localctx = NewIdentifierContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 20, yamlpathParserRULE_identifier)
-	p.SetState(174)
+	p.EnterRule(localctx, 18, yamlpathParserRULE_identifier)
+	p.SetState(163)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -3540,7 +3326,7 @@ func (p *yamlpathParser) Identifier() (localctx IIdentifierContext) {
 		localctx = NewPlainIdentifierContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(172)
+			p.SetState(161)
 			p.Match(yamlpathParserIDENTIFIER)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3552,7 +3338,7 @@ func (p *yamlpathParser) Identifier() (localctx IIdentifierContext) {
 		localctx = NewQuotedIdentifierContext(p, localctx)
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(173)
+			p.SetState(162)
 			p.Match(yamlpathParserSTRING)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3638,33 +3424,33 @@ func (s *RegexContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) 
 
 func (p *yamlpathParser) Regex() (localctx IRegexContext) {
 	localctx = NewRegexContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 22, yamlpathParserRULE_regex)
+	p.EnterRule(localctx, 20, yamlpathParserRULE_regex)
 	var _la int
 
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(176)
+		p.SetState(165)
 		p.Match(yamlpathParserREGEX)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
-	p.SetState(180)
+	p.SetState(169)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
 	}
-	_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 21, p.GetParserRuleContext())
+	_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 19, p.GetParserRuleContext())
 	if p.HasError() {
 		goto errorExit
 	}
 	for _alt != 1 && _alt != antlr.ATNInvalidAltNumber {
 		if _alt == 1+1 {
 			{
-				p.SetState(177)
+				p.SetState(166)
 				_la = p.GetTokenStream().LA(1)
 
 				if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1924145348608) != 0) {
@@ -3676,12 +3462,12 @@ func (p *yamlpathParser) Regex() (localctx IRegexContext) {
 			}
 
 		}
-		p.SetState(182)
+		p.SetState(171)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
 		}
-		_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 21, p.GetParserRuleContext())
+		_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 19, p.GetParserRuleContext())
 		if p.HasError() {
 			goto errorExit
 		}
@@ -3709,13 +3495,6 @@ func (p *yamlpathParser) Sempred(localctx antlr.RuleContext, ruleIndex, predInde
 		}
 		return p.Expression_Sempred(t, predIndex)
 
-	case 4:
-		var t *SubexpressionContext = nil
-		if localctx != nil {
-			t = localctx.(*SubexpressionContext)
-		}
-		return p.Subexpression_Sempred(t, predIndex)
-
 	default:
 		panic("No predicate with index: " + fmt.Sprint(ruleIndex))
 	}
@@ -3724,41 +3503,34 @@ func (p *yamlpathParser) Sempred(localctx antlr.RuleContext, ruleIndex, predInde
 func (p *yamlpathParser) Expression_Sempred(localctx antlr.RuleContext, predIndex int) bool {
 	switch predIndex {
 	case 0:
-		return p.Precpred(p.GetParserRuleContext(), 3)
-
-	case 1:
-		return p.Precpred(p.GetParserRuleContext(), 2)
-
-	case 2:
-		return p.Precpred(p.GetParserRuleContext(), 1)
-
-	default:
-		panic("No predicate with index: " + fmt.Sprint(predIndex))
-	}
-}
-
-func (p *yamlpathParser) Subexpression_Sempred(localctx antlr.RuleContext, predIndex int) bool {
-	switch predIndex {
-	case 3:
 		return p.Precpred(p.GetParserRuleContext(), 9)
 
-	case 4:
+	case 1:
 		return p.Precpred(p.GetParserRuleContext(), 8)
 
-	case 5:
+	case 2:
 		return p.Precpred(p.GetParserRuleContext(), 6)
 
-	case 6:
+	case 3:
 		return p.Precpred(p.GetParserRuleContext(), 5)
 
-	case 7:
+	case 4:
 		return p.Precpred(p.GetParserRuleContext(), 3)
 
-	case 8:
+	case 5:
 		return p.Precpred(p.GetParserRuleContext(), 2)
 
-	case 9:
+	case 6:
 		return p.Precpred(p.GetParserRuleContext(), 1)
+
+	case 7:
+		return p.Precpred(p.GetParserRuleContext(), 15)
+
+	case 8:
+		return p.Precpred(p.GetParserRuleContext(), 14)
+
+	case 9:
+		return p.Precpred(p.GetParserRuleContext(), 13)
 
 	case 10:
 		return p.Precpred(p.GetParserRuleContext(), 7)

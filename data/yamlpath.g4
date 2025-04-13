@@ -11,35 +11,30 @@ expression
       | expression '..' (invocation)?                     # recursiveExpression
       | expression '.' invocation                         # fieldExpression
       | expression '[' indexParam ']'                     # indexExpression
+      | '(' expression ')'                                # parenthesisExpression
+      | ('!' | 'not') expression                          # negationExpression
+      | ('+' | '-') expression                            # polarityExpression
+      | expression ('*' | '/' | '%') expression           # multiplicativeExpression
+      | expression ('+' | '-') expression                 # additiveExpression
+      | expression ('|' expression)+                      # unionExpression
+      | expression ('<=' | '<' | '>' | '>=') expression   # inequalityExpression
+      | expression ('==' | '!=') expression               # equalityExpression
+      | expression '=~' regex                             # matchExpression
+      | expression ('in' | 'nin' | 'subsetof') expression # membershipExpression
+      | expression ('&&' | 'and') expression              # andExpression
+      | expression ('||' | 'or') expression               # orExpression
       ;
 
 term
       : ('$' | '@')                                       # rootTerm
-      | invocation                                        # invocationTerm
       | literal                                           # literalTerm
+      | invocation                                        # invocationTerm
       ;
 
 indexParam
       : '*'                                               # wildcardIndex
       | (NUMBER)? ':' (NUMBER)? (':' NUMBER)?             # sliceIndex
-      | subexpression                                     # expressionIndex
-      ;
-
-subexpression
-      : expression                                              # rootSubexpression
-      | literal                                                 # literalSubexpression
-      | '(' subexpression ')'                                   # parenthesisSubexpression
-      | ('!' | 'not') subexpression                             # negationSubexpression
-      | ('+' | '-') expression                                  # polaritySubexpression
-      | subexpression ('*' | '/' | '%') subexpression           # multiplicativeSubexpression
-      | subexpression ('+' | '-') subexpression                 # additiveSubexpression
-      | subexpression ('|' subexpression)+                      # unionSubexpression
-      | subexpression ('<=' | '<' | '>' | '>=') subexpression   # inequalitySubexpression
-      | subexpression ('==' | '!=') subexpression               # equalitySubexpression
-      | subexpression '=~' regex                                # matchSubexpression
-      | subexpression ('in' | 'nin' | 'subsetof') subexpression # membershipSubexpression
-      | subexpression ('&&' | 'and') subexpression              # andSubexpression
-      | subexpression ('||' | 'or') subexpression               # orSubexpression
+      | expression                                        # expressionIndex
       ;
 
 literal
@@ -66,7 +61,7 @@ invocation
       ;
 
 paramList
-      : subexpression (',' subexpression)*
+      : expression (',' expression)*
       ;
 
 identifier

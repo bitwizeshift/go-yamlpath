@@ -38,6 +38,30 @@ func (v *Visitor) visitExpression(ctx parser.IExpressionContext) (expr.Expr, err
 		return v.visitRecursiveExpression(ctx)
 	case *parser.IndexExpressionContext:
 		return v.visitIndexExpression(ctx)
+	case *parser.AdditiveExpressionContext:
+		return v.visitAdditiveExpression(ctx)
+	case *parser.MultiplicativeExpressionContext:
+		return v.visitMultiplicativeExpression(ctx)
+	case *parser.InequalityExpressionContext:
+		return v.visitInequalityExpression(ctx)
+	case *parser.EqualityExpressionContext:
+		return v.visitEqualityExpression(ctx)
+	case *parser.MatchExpressionContext:
+		return v.visitMatchExpression(ctx)
+	case *parser.MembershipExpressionContext:
+		return v.visitMembershipExpression(ctx)
+	case *parser.AndExpressionContext:
+		return v.visitAndExpression(ctx)
+	case *parser.OrExpressionContext:
+		return v.visitOrExpression(ctx)
+	case *parser.NegationExpressionContext:
+		return v.visitNegationExpression(ctx)
+	case *parser.UnionExpressionContext:
+		return v.visitUnionExpression(ctx)
+	case *parser.ParenthesisExpressionContext:
+		return v.visitExpression(ctx.Expression())
+	case *parser.PolarityExpressionContext:
+		return v.visitPolarityExpression(ctx)
 	}
 	return nil, ErrInternalf(ctx, "unexpected expression type: %T", ctx)
 }
@@ -221,7 +245,7 @@ func (v *Visitor) visitSliceIndex(ctx *parser.SliceIndexContext) (expr.Expr, err
 }
 
 func (v *Visitor) visitExpressionIndex(ctx *parser.ExpressionIndexContext) (expr.Expr, error) {
-	e, err := v.visitSubexpression(ctx.Subexpression())
+	e, err := v.visitExpression(ctx.Expression())
 	if err != nil {
 		return nil, err
 	}
@@ -230,45 +254,7 @@ func (v *Visitor) visitExpressionIndex(ctx *parser.ExpressionIndexContext) (expr
 	}, nil
 }
 
-//------------------------------------------------------------------------------
-// Subexpressions
-//------------------------------------------------------------------------------
-
-func (v *Visitor) visitSubexpression(ctx parser.ISubexpressionContext) (expr.Expr, error) {
-	switch ctx := ctx.(type) {
-	case *parser.AdditiveSubexpressionContext:
-		return v.visitAdditiveSubexpression(ctx)
-	case *parser.MultiplicativeSubexpressionContext:
-		return v.visitMultiplicativeSubexpression(ctx)
-	case *parser.InequalitySubexpressionContext:
-		return v.visitInequalitySubexpression(ctx)
-	case *parser.EqualitySubexpressionContext:
-		return v.visitEqualitySubexpression(ctx)
-	case *parser.MatchSubexpressionContext:
-		return v.visitMatchSubexpression(ctx)
-	case *parser.MembershipSubexpressionContext:
-		return v.visitMembershipSubexpression(ctx)
-	case *parser.AndSubexpressionContext:
-		return v.visitAndSubexpression(ctx)
-	case *parser.OrSubexpressionContext:
-		return v.visitOrSubexpression(ctx)
-	case *parser.NegationSubexpressionContext:
-		return v.visitNegationSubexpression(ctx)
-	case *parser.LiteralSubexpressionContext:
-		return v.visitLiteral(ctx.Literal())
-	case *parser.UnionSubexpressionContext:
-		return v.visitUnionSubexpression(ctx)
-	case *parser.ParenthesisSubexpressionContext:
-		return v.visitSubexpression(ctx.Subexpression())
-	case *parser.RootSubexpressionContext:
-		return v.visitExpression(ctx.Expression())
-	case *parser.PolaritySubexpressionContext:
-		return v.visitPolaritySubexpression(ctx)
-	}
-	return nil, ErrInternalf(ctx, "unexpected expression: %q", ctx.GetText())
-}
-
-func (v *Visitor) visitPolaritySubexpression(ctx *parser.PolaritySubexpressionContext) (expr.Expr, error) {
+func (v *Visitor) visitPolarityExpression(ctx *parser.PolarityExpressionContext) (expr.Expr, error) {
 	e, err := v.visitExpression(ctx.Expression())
 	if err != nil {
 		return nil, err
@@ -287,7 +273,7 @@ func (v *Visitor) visitPolaritySubexpression(ctx *parser.PolaritySubexpressionCo
 	return nil, ErrInternalf(ctx, "unknown polarity operator: %q", op)
 }
 
-func (v *Visitor) visitAdditiveSubexpression(ctx *parser.AdditiveSubexpressionContext) (expr.Expr, error) {
+func (v *Visitor) visitAdditiveExpression(ctx *parser.AdditiveExpressionContext) (expr.Expr, error) {
 	lhs, rhs, err := v.visitBinaryExpression(ctx)
 	if err != nil {
 		return nil, err
@@ -310,11 +296,11 @@ func (v *Visitor) visitAdditiveSubexpression(ctx *parser.AdditiveSubexpressionCo
 	return nil, ErrInternalf(ctx, "unhandled binary operator: %q", "")
 }
 
-func (v *Visitor) visitUnionSubexpression(ctx *parser.UnionSubexpressionContext) (expr.Expr, error) {
-	exprs := ctx.AllSubexpression()
+func (v *Visitor) visitUnionExpression(ctx *parser.UnionExpressionContext) (expr.Expr, error) {
+	exprs := ctx.AllExpression()
 	union := make(expr.UnionExpr, 0, len(exprs))
 	for _, sub := range exprs {
-		e, err := v.visitSubexpression(sub)
+		e, err := v.visitExpression(sub)
 		if err != nil {
 			return nil, err
 		}
@@ -323,7 +309,7 @@ func (v *Visitor) visitUnionSubexpression(ctx *parser.UnionSubexpressionContext)
 	return union, nil
 }
 
-func (v *Visitor) visitMultiplicativeSubexpression(ctx *parser.MultiplicativeSubexpressionContext) (expr.Expr, error) {
+func (v *Visitor) visitMultiplicativeExpression(ctx *parser.MultiplicativeExpressionContext) (expr.Expr, error) {
 	lhs, rhs, err := v.visitBinaryExpression(ctx)
 	if err != nil {
 		return nil, err
@@ -347,7 +333,7 @@ func (v *Visitor) visitMultiplicativeSubexpression(ctx *parser.MultiplicativeSub
 	}, nil
 }
 
-func (v *Visitor) visitInequalitySubexpression(ctx *parser.InequalitySubexpressionContext) (expr.Expr, error) {
+func (v *Visitor) visitInequalityExpression(ctx *parser.InequalityExpressionContext) (expr.Expr, error) {
 	lhs, rhs, err := v.visitBinaryExpression(ctx)
 	if err != nil {
 		return nil, err
@@ -373,7 +359,7 @@ func (v *Visitor) visitInequalitySubexpression(ctx *parser.InequalitySubexpressi
 	}, nil
 }
 
-func (v *Visitor) visitEqualitySubexpression(ctx *parser.EqualitySubexpressionContext) (expr.Expr, error) {
+func (v *Visitor) visitEqualityExpression(ctx *parser.EqualityExpressionContext) (expr.Expr, error) {
 	lhs, rhs, err := v.visitBinaryExpression(ctx)
 	if err != nil {
 		return nil, err
@@ -397,8 +383,8 @@ func (v *Visitor) visitEqualitySubexpression(ctx *parser.EqualitySubexpressionCo
 	return nil, ErrInternalf(ctx, "unknown binary operator %q", op)
 }
 
-func (v *Visitor) visitMatchSubexpression(ctx *parser.MatchSubexpressionContext) (expr.Expr, error) {
-	e, err := v.visitSubexpression(ctx.Subexpression())
+func (v *Visitor) visitMatchExpression(ctx *parser.MatchExpressionContext) (expr.Expr, error) {
+	e, err := v.visitExpression(ctx.Expression())
 	if err != nil {
 		return nil, err
 	}
@@ -413,7 +399,7 @@ func (v *Visitor) visitMatchSubexpression(ctx *parser.MatchSubexpressionContext)
 	}, nil
 }
 
-func (v *Visitor) visitMembershipSubexpression(ctx *parser.MembershipSubexpressionContext) (expr.Expr, error) {
+func (v *Visitor) visitMembershipExpression(ctx *parser.MembershipExpressionContext) (expr.Expr, error) {
 	lhs, rhs, err := v.visitBinaryExpression(ctx)
 	if err != nil {
 		return nil, err
@@ -442,7 +428,7 @@ func (v *Visitor) visitMembershipSubexpression(ctx *parser.MembershipSubexpressi
 	return nil, ErrInternalf(ctx, "unknown binary operator %q", op)
 }
 
-func (v *Visitor) visitAndSubexpression(ctx *parser.AndSubexpressionContext) (expr.Expr, error) {
+func (v *Visitor) visitAndExpression(ctx *parser.AndExpressionContext) (expr.Expr, error) {
 	lhs, rhs, err := v.visitBinaryExpression(ctx)
 	if err != nil {
 		return nil, err
@@ -454,7 +440,7 @@ func (v *Visitor) visitAndSubexpression(ctx *parser.AndSubexpressionContext) (ex
 	}, nil
 }
 
-func (v *Visitor) visitOrSubexpression(ctx *parser.OrSubexpressionContext) (expr.Expr, error) {
+func (v *Visitor) visitOrExpression(ctx *parser.OrExpressionContext) (expr.Expr, error) {
 	lhs, rhs, err := v.visitBinaryExpression(ctx)
 	if err != nil {
 		return nil, err
@@ -467,15 +453,15 @@ func (v *Visitor) visitOrSubexpression(ctx *parser.OrSubexpressionContext) (expr
 }
 
 type binaryExpressionContext interface {
-	Subexpression(int) parser.ISubexpressionContext
+	Expression(int) parser.IExpressionContext
 }
 
 func (v *Visitor) visitBinaryExpression(ctx binaryExpressionContext) (expr.Expr, expr.Expr, error) {
-	lhs, err := v.visitSubexpression(ctx.Subexpression(0))
+	lhs, err := v.visitExpression(ctx.Expression(0))
 	if err != nil {
 		return nil, nil, err
 	}
-	rhs, err := v.visitSubexpression(ctx.Subexpression(1))
+	rhs, err := v.visitExpression(ctx.Expression(1))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -483,8 +469,8 @@ func (v *Visitor) visitBinaryExpression(ctx binaryExpressionContext) (expr.Expr,
 	return lhs, rhs, nil
 }
 
-func (v *Visitor) visitNegationSubexpression(ctx *parser.NegationSubexpressionContext) (expr.Expr, error) {
-	e, err := v.visitSubexpression(ctx.Subexpression())
+func (v *Visitor) visitNegationExpression(ctx *parser.NegationExpressionContext) (expr.Expr, error) {
+	e, err := v.visitExpression(ctx.Expression())
 	if err != nil {
 		return nil, err
 	}
@@ -513,7 +499,7 @@ func (v *Visitor) visitLiteral(ctx parser.ILiteralContext) (expr.Expr, error) {
 	case *parser.MapLiteralContext:
 		return v.visitMapLiteral(ctx)
 	}
-	return nil, ErrInternalf(ctx, "unexpected literal subexpression: %q", ctx.GetText())
+	return nil, ErrInternalf(ctx, "unexpected literal expression: %q", ctx.GetText())
 }
 
 func (v *Visitor) visitStringLiteral(ctx *parser.StringLiteralContext) (expr.Expr, error) {
@@ -583,8 +569,8 @@ func (v *Visitor) visitParamList(ctx parser.IParamListContext) ([]invocation.Par
 		return nil, nil
 	}
 	var params []invocation.Parameter
-	for _, sub := range ctx.AllSubexpression() {
-		e, err := v.visitSubexpression(sub)
+	for _, sub := range ctx.AllExpression() {
+		e, err := v.visitExpression(sub)
 		if err != nil {
 			return nil, err
 		}

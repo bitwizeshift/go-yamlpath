@@ -40,6 +40,15 @@ var tableV1 = sync.OnceValue(func() *invocation.Table {
 	// String functions
 	table.Add("lower", funcs.Lower).SetArity(arity.None())
 	table.Add("upper", funcs.Upper).SetArity(arity.None())
+	table.Add("startsWith", funcs.StartsWith).SetArity(arity.Exactly(1))
+	table.Add("endsWith", funcs.EndsWith).SetArity(arity.Exactly(1))
+	table.Add("contains", funcs.Contains).SetArity(arity.Exactly(1))
+	table.Add("indexOf", funcs.IndexOf).SetArity(arity.Exactly(1))
+	table.Add("substring", funcs.Substring).SetArity(arity.ClosedRange(1, 2))
+	table.Add("replace", funcs.Replace).SetArity(arity.Exactly(2))
+	table.Add("length", funcs.Length).SetArity(arity.None())
+	table.Add("split", funcs.Split).SetArity(arity.Exactly(1))
+	table.Add("toChars", funcs.ToChars).SetArity(arity.None())
 
 	// Conversion functions
 	table.Add("toBoolean", funcs.ToBoolean).SetArity(arity.None())

@@ -74,7 +74,7 @@ func TestFirst(t *testing.T) {
 		}, {
 			name:    "Multiple elements, parameter returns error",
 			input:   []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
-			param:   invocationtest.ErrorParameter(testErr),
+			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:  "Multiple elements, parameter returns less than input",
@@ -129,7 +129,7 @@ func TestLast(t *testing.T) {
 		}, {
 			name:    "Multiple elements, parameter returns error",
 			input:   []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
-			param:   invocationtest.ErrorParameter(testErr),
+			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:  "Multiple elements, parameter returns less than input",
@@ -186,7 +186,7 @@ func TestSkip(t *testing.T) {
 		}, {
 			name:    "Multiple elements, parameter returns error",
 			input:   []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
-			param:   invocationtest.ErrorParameter(testErr),
+			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:  "Multiple elements, parameter returns less than input",

@@ -153,7 +153,7 @@ func TestStartsWith(t *testing.T) {
 		}, {
 			name:    "Argument returns error",
 			input:   []*yaml.Node{yamlconv.String("foo")},
-			arg:     invocationtest.ErrorParameter(testErr),
+			arg:     invocationtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:    "Argument is not a string",
@@ -231,7 +231,7 @@ func TestEndsWith(t *testing.T) {
 		}, {
 			name:    "Argument returns error",
 			input:   []*yaml.Node{yamlconv.String("foo")},
-			arg:     invocationtest.ErrorParameter(testErr),
+			arg:     invocationtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:    "Argument is not a string",
@@ -309,7 +309,7 @@ func TestContains(t *testing.T) {
 		}, {
 			name:    "Substring is an error",
 			input:   []*yaml.Node{yamlconv.String("foo")},
-			arg:     invocationtest.ErrorParameter(testErr),
+			arg:     invocationtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:    "Substring is not a string",
@@ -387,7 +387,7 @@ func TestIndexOf(t *testing.T) {
 		}, {
 			name:    "Substring is an error",
 			input:   []*yaml.Node{yamlconv.String("foo")},
-			arg:     invocationtest.ErrorParameter(testErr),
+			arg:     invocationtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:    "Substring is not a string",
@@ -481,7 +481,7 @@ func TestSubstring(t *testing.T) {
 		}, {
 			name:    "Index returns error",
 			input:   []*yaml.Node{yamlconv.String("foo")},
-			args:    []invocation.Parameter{invocationtest.ErrorParameter(testErr)},
+			args:    []invocation.Parameter{invocationtest.Error(testErr)},
 			wantErr: testErr,
 		}, {
 			name:    "Index is not an integer",
@@ -505,7 +505,7 @@ func TestSubstring(t *testing.T) {
 			input: []*yaml.Node{yamlconv.String("foo")},
 			args: []invocation.Parameter{
 				invocationtest.Int(0),
-				invocationtest.ErrorParameter(testErr),
+				invocationtest.Error(testErr),
 			},
 			wantErr: testErr,
 		}, {
@@ -605,7 +605,7 @@ func TestReplace(t *testing.T) {
 		}, {
 			name:    "Pattern is an error",
 			input:   []*yaml.Node{yamlconv.String("foo")},
-			args:    []invocation.Parameter{invocationtest.ErrorParameter(testErr)},
+			args:    []invocation.Parameter{invocationtest.Error(testErr)},
 			wantErr: testErr,
 		}, {
 			name:    "Pattern is not a string",
@@ -628,7 +628,7 @@ func TestReplace(t *testing.T) {
 		}, {
 			name:    "Replacement is an error",
 			input:   []*yaml.Node{yamlconv.String("foo")},
-			args:    []invocation.Parameter{invocationtest.String("foo"), invocationtest.ErrorParameter(testErr)},
+			args:    []invocation.Parameter{invocationtest.String("foo"), invocationtest.Error(testErr)},
 			wantErr: testErr,
 		}, {
 			name:    "Replacement is not a string",
@@ -709,7 +709,7 @@ func TestSplit(t *testing.T) {
 		}, {
 			name:    "Separator is an error",
 			input:   []*yaml.Node{yamlconv.String("foo")},
-			arg:     invocationtest.ErrorParameter(testErr),
+			arg:     invocationtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:    "Separator is not a string",
@@ -879,7 +879,7 @@ func TestMatches(t *testing.T) {
 		}, {
 			name:    "Pattern returns error",
 			input:   []*yaml.Node{yamlconv.String("foo")},
-			arg:     invocationtest.ErrorParameter(testErr),
+			arg:     invocationtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:    "Pattern is not a string",
@@ -968,7 +968,7 @@ func TestReplaceMatches(t *testing.T) {
 		}, {
 			name:    "Pattern returns error",
 			input:   []*yaml.Node{yamlconv.String("foo")},
-			args:    []invocation.Parameter{invocationtest.ErrorParameter(testErr)},
+			args:    []invocation.Parameter{invocationtest.Error(testErr)},
 			wantErr: testErr,
 		}, {
 			name:    "Pattern is not a string",
@@ -996,7 +996,7 @@ func TestReplaceMatches(t *testing.T) {
 		}, {
 			name:    "Replacement is an error",
 			input:   []*yaml.Node{yamlconv.String("foo")},
-			args:    []invocation.Parameter{invocationtest.String("foo"), invocationtest.ErrorParameter(testErr)},
+			args:    []invocation.Parameter{invocationtest.String("foo"), invocationtest.Error(testErr)},
 			wantErr: testErr,
 		}, {
 			name:    "Replacement is not a string",

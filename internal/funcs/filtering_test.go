@@ -43,7 +43,7 @@ func TestWhere(t *testing.T) {
 		}, {
 			name: "Criteria parameter returns error",
 			params: []invocation.Parameter{
-				invocationtest.ErrorParameter(testErr),
+				invocationtest.Error(testErr),
 			},
 			input:   []*yaml.Node{yamlconv.String("hello")},
 			wantErr: testErr,
@@ -85,7 +85,7 @@ func TestTransform(t *testing.T) {
 		}, {
 			name: "Projection parameter returns error",
 			params: []invocation.Parameter{
-				invocationtest.ErrorParameter(testErr),
+				invocationtest.Error(testErr),
 			},
 			input:   []*yaml.Node{yamlconv.String("hello")},
 			wantErr: testErr,
@@ -161,7 +161,7 @@ func TestSelect(t *testing.T) {
 		}, {
 			name: "Parameter returns error",
 			params: []invocation.Parameter{
-				invocationtest.ErrorParameter(testErr),
+				invocationtest.Error(testErr),
 			},
 			input:   []*yaml.Node{yamlconv.String("hello"), yamlconv.String("world")},
 			wantErr: testErr,

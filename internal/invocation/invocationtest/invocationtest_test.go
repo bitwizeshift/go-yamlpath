@@ -246,7 +246,7 @@ func TestNodes(t *testing.T) {
 func TestErrorParameter(t *testing.T) {
 	testErr := errors.New("test error")
 
-	sut := invocationtest.ErrorParameter(testErr)
+	sut := invocationtest.Error(testErr)
 
 	got, err := sut.GetArg(nil)
 

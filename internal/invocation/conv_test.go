@@ -73,7 +73,7 @@ func TestParseString(t *testing.T) {
 		}, {
 			name:    "Parameter contains error",
 			context: goodContext(yamlconv.String("test")),
-			param:   invocationtest.ErrorParameter(testErr),
+			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		},
 	}
@@ -114,7 +114,7 @@ func TestParseInt(t *testing.T) {
 		}, {
 			name:    "Parameter contains error",
 			context: goodContext(yamlconv.String("test")),
-			param:   invocationtest.ErrorParameter(testErr),
+			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		},
 	}
@@ -155,7 +155,7 @@ func TestParseBool(t *testing.T) {
 		}, {
 			name:    "Parameter contains error",
 			context: goodContext(yamlconv.String("test")),
-			param:   invocationtest.ErrorParameter(testErr),
+			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		},
 	}
@@ -196,7 +196,7 @@ func TestParseFloat(t *testing.T) {
 		}, {
 			name:    "Parameter contains error",
 			context: goodContext(yamlconv.String("test")),
-			param:   invocationtest.ErrorParameter(testErr),
+			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		},
 	}
@@ -237,7 +237,7 @@ func TestParseDecimal(t *testing.T) {
 		}, {
 			name:    "Parameter contains error",
 			context: goodContext(yamlconv.String("test")),
-			param:   invocationtest.ErrorParameter(testErr),
+			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		},
 	}

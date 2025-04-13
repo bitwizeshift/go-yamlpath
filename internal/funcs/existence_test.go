@@ -83,7 +83,7 @@ func TestExists(t *testing.T) {
 		}, {
 			name: "Non-empty input set with params that returns error is error",
 			params: []invocation.Parameter{
-				invocationtest.ErrorParameter(testErr),
+				invocationtest.Error(testErr),
 			},
 			input:   []*yaml.Node{yamlconv.String("hello")},
 			wantErr: testErr,
@@ -267,7 +267,7 @@ func TestAll(t *testing.T) {
 		}, {
 			name:    "Param returns error",
 			input:   []*yaml.Node{yamlconv.String("hello")},
-			param:   invocationtest.ErrorParameter(testErr),
+			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		},
 	}
@@ -315,7 +315,7 @@ func TestAny(t *testing.T) {
 		}, {
 			name:    "Param returns error",
 			input:   []*yaml.Node{yamlconv.String("hello")},
-			param:   invocationtest.ErrorParameter(testErr),
+			param:   invocationtest.Error(testErr),
 			wantErr: testErr,
 		}, {
 			name:  "Param returns false then true",

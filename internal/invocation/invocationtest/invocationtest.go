@@ -139,7 +139,7 @@ func Nodes[T yamlconv.Primitive](v ...T) *FakeParameter {
 	return SuccessParameter(yamlconv.Nodes(v...)...)
 }
 
-// ErrorParameter creates a new [FakeParameter] that always returns an error.
-func ErrorParameter(err error) *FakeParameter {
+// Error creates a new [FakeParameter] that always returns an error.
+func Error(err error) *FakeParameter {
 	return NewParameter().AddError(err)
 }

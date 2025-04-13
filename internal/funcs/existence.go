@@ -5,7 +5,7 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 	"rodusek.dev/pkg/yamlpath/internal/yamlcmp"
 	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
-	"rodusek.dev/pkg/yamlpath/internal/yamlutil"
+	"rodusek.dev/pkg/yamlpath/internal/yamlhash"
 )
 
 // Empty returns true if the current node is empty, false otherwise.
@@ -58,7 +58,7 @@ func Distinct(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, 
 	var result []*yaml.Node
 
 	for _, node := range current {
-		key := yamlutil.Hash(node)
+		key := yamlhash.Hash(node)
 		others, ok := seen[key]
 		if !ok {
 			seen[key] = append(seen[key], node)

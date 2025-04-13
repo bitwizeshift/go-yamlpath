@@ -1,4 +1,7 @@
-package yamlutil
+/*
+Package yamlhash provides a hash function for YAML nodes.
+*/
+package yamlhash
 
 import (
 	"crypto/sha1"

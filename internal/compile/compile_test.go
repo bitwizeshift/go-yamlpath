@@ -108,6 +108,79 @@ func TestNewTree(t *testing.T) {
 		}, {
 			name:  "delimited identifier",
 			input: `foo.bar-baz`,
+		}, {
+			name:  "additive expression",
+			input: `1 + 2`,
+		}, {
+			name:  "subtractive expression",
+			input: `1 - 2`,
+		}, {
+			name:  "multiplicative expression",
+			input: `1 * 2`,
+		}, {
+			name:  "divisive expression",
+			input: `1 / 2`,
+		}, {
+			name:  "modulo expression",
+			input: `1 % 2`,
+		}, {
+			name:  "concatenation expression",
+			input: `"foo" + "bar"`,
+		}, {
+			name:  "negative polarity expression",
+			input: `-$.foo`,
+		}, {
+			name:  "positive polarity expression",
+			input: `+$.foo`,
+		}, {
+			name:  "not expression",
+			input: `not $.foo`,
+		}, {
+			name:  "not exclamation expression",
+			input: `!$.foo`,
+		}, {
+			name:  "and expression",
+			input: `$.foo and $.bar`,
+		}, {
+			name:  "or expression",
+			input: `$.foo or $.bar`,
+		}, {
+			name:  "less than expression",
+			input: `$.foo < $.bar`,
+		}, {
+			name:  "less than or equal expression",
+			input: `$.foo <= $.bar`,
+		}, {
+			name:  "greater than expression",
+			input: `$.foo > $.bar`,
+		}, {
+			name:  "greater than or equal expression",
+			input: `$.foo >= $.bar`,
+		}, {
+			name:  "equal expression",
+			input: `$.foo == $.bar`,
+		}, {
+			name:  "not equal expression",
+			input: `$.foo != $.bar`,
+		}, {
+			name:  "in expression",
+			input: `$.foo in ["bar", "baz"]`,
+		}, {
+			name:  "not in expression",
+			input: `$.foo nin ["bar", "baz"]`,
+		}, {
+			name:  "subsetof expression",
+			input: `$.foo subsetof ["bar", "baz"]`,
+		}, {
+			name:  "match expression",
+			input: `$.foo =~ /bar/`,
+		}, {
+			name:  "match expression with flags",
+			input: `$.foo =~ /bar/i`,
+		}, {
+			name:    "match expression with bad regex",
+			input:   `$.foo =~ /[a-z/`,
+			wantErr: cmpopts.AnyError,
 		},
 	}
 

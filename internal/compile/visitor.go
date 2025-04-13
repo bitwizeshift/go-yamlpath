@@ -227,8 +227,6 @@ func (v *Visitor) visitSubexpression(ctx parser.ISubexpressionContext) (expr.Exp
 		return v.visitLiteral(ctx.Literal())
 	case *parser.UnionSubexpressionContext:
 		return v.visitUnionSubexpression(ctx)
-	case *parser.AggregationSubexpressionContext:
-		return v.visitAggregation(ctx.Aggregation())
 	case *parser.ParenthesisSubexpressionContext:
 		return v.visitSubexpression(ctx.Subexpression())
 	case *parser.RootSubexpressionContext:
@@ -479,6 +477,10 @@ func (v *Visitor) visitLiteral(ctx parser.ILiteralContext) (expr.Expr, error) {
 		return v.visitBooleanLiteral(ctx)
 	case *parser.NullLiteralContext:
 		return v.visitNullLiteral(ctx)
+	case *parser.ListLiteralContext:
+		return v.visitListLiteral(ctx)
+	case *parser.MapLiteralContext:
+		return v.visitMapLiteral(ctx)
 	}
 	return nil, ErrInternalf(ctx, "unexpected literal subexpression: %q", ctx.GetText())
 }
@@ -511,23 +513,7 @@ func (v *Visitor) visitNullLiteral(_ *parser.NullLiteralContext) (expr.Expr, err
 	}, nil
 }
 
-//------------------------------------------------------------------------------
-// Aggregations
-//------------------------------------------------------------------------------
-
-func (v *Visitor) visitAggregation(ctx parser.IAggregationContext) (expr.Expr, error) {
-	switch ctx := ctx.(type) {
-	case *parser.ListAggregationContext:
-		return v.visitListAggregation(ctx)
-	case *parser.MapAggregationContext:
-		return v.visitMapAggregation(ctx)
-	case *parser.LiteralAggregationContext:
-		return v.visitLiteral(ctx.Literal())
-	}
-	return nil, ErrInternalf(ctx, "unexpected aggregation type: %T", ctx)
-}
-
-func (v *Visitor) visitListAggregation(ctx *parser.ListAggregationContext) (expr.Expr, error) {
+func (v *Visitor) visitListLiteral(ctx *parser.ListLiteralContext) (expr.Expr, error) {
 	nodes, err := v.visitYAMLText(ctx.GetText())
 	if err != nil {
 		return nil, err
@@ -537,7 +523,7 @@ func (v *Visitor) visitListAggregation(ctx *parser.ListAggregationContext) (expr
 	}, nil
 }
 
-func (v *Visitor) visitMapAggregation(ctx *parser.MapAggregationContext) (expr.Expr, error) {
+func (v *Visitor) visitMapLiteral(ctx *parser.MapLiteralContext) (expr.Expr, error) {
 	nodes, err := v.visitYAMLText(ctx.GetText())
 	if err != nil {
 		return nil, err

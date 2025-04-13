@@ -22,7 +22,6 @@ indexParam
 subexpression
       : expression                                              # rootSubexpression
       | literal                                                 # literalSubexpression
-      | aggregation                                             # aggregationSubexpression
       | '(' subexpression ')'                                   # parenthesisSubexpression
       | ('!' | 'not') subexpression                             # negationSubexpression
       | ('+' | '-') expression                                  # polaritySubexpression
@@ -42,20 +41,16 @@ literal
       | NUMBER                                            # numberLiteral
       | ('true' | 'false')                                # booleanLiteral
       | 'null'                                            # nullLiteral
-      ;
-
-aggregation
-      : '[' (listEntries)? ']'                            # listAggregation
-      | '{' (mapEntries)? '}'                             # mapAggregation
-      | literal                                           # literalAggregation
+      | '[' (listEntries)? ']'                            # listLiteral
+      | '{' (mapEntries)? '}'                             # mapLiteral
       ;
 
 listEntries
-      : (aggregation) (',' aggregation)*
+      : (literal) (',' literal)*
       ;
 
 mapEntries
-      : STRING ':' aggregation (',' STRING ':' aggregation)*
+      : STRING ':' literal (',' STRING ':' literal)*
       ;
 
 invocation

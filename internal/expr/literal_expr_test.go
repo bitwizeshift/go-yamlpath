@@ -12,45 +12,42 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/yamltest"
 )
 
-func TestWildcardBracketExpr(t *testing.T) {
+func TestLiteralExpr(t *testing.T) {
 	testCases := []struct {
 		name    string
+		value   *yaml.Node
 		input   []*yaml.Node
 		want    []*yaml.Node
 		wantErr error
 	}{
 		{
-			name:  "Empty node returns empty node",
-			input: []*yaml.Node{},
-			want:  []*yaml.Node{},
-		}, {
-			name: "Sequence node returns all element",
-			input: []*yaml.Node{
-				yamltest.MustParseNode(`["Alice", "Bob"]`),
-			},
-			want: []*yaml.Node{
-				yamlconv.String("Alice"),
-				yamlconv.String("Bob"),
-			},
-		}, {
-			name: "Mapping node returns empty node",
+			name:  "Input node does not affect output",
+			value: yamlconv.String("Hello world"),
 			input: []*yaml.Node{
 				yamltest.MustParseNode(`{"name": "Alice", "age": 30}`),
 			},
-			want: []*yaml.Node{},
+			want: []*yaml.Node{
+				yamlconv.String("Hello world"),
+			},
+		}, {
+			name:  "Sequence node returns all elements",
+			value: yamlconv.String("Hello world"),
+			want: []*yaml.Node{
+				yamlconv.String("Hello world"),
+			},
 		},
 	}
 
-	var sut expr.WildcardBracketExpr
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			sut := &expr.LiteralExpr{Nodes: []*yaml.Node{tc.value}}
 			got, err := sut.Eval(expr.NewContext(tc.input))
 
 			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
-				t.Errorf("WildcardBracketExpr.Eval() error = %v, want %v", got, want)
+				t.Errorf("LiteralExpr.Eval() error = %v, want %v", got, want)
 			}
 			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
-				t.Errorf("WildcardBracketExpr.Eval() = %v, want %v", got, want)
+				t.Errorf("LiteralExpr.Eval() = %v, want %v", got, want)
 			}
 		})
 	}

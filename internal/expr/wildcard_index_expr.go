@@ -5,13 +5,13 @@ import (
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
 )
 
-// WildcardBracketExpr is a representation of the `[*]` expression in
+// WildcardIndexExpr is a representation of the `[*]` expression in
 // YAMLPath, which will select all fields of a sequence of elements from the
 // current node.
-type WildcardBracketExpr struct{}
+type WildcardIndexExpr struct{}
 
 // Eval evaluates the wildcard expression against the provided nodes.
-func (*WildcardBracketExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
+func (*WildcardIndexExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	var result []*yaml.Node
 
 	nodes := ctx.Current()

@@ -231,7 +231,7 @@ func (v *Visitor) visitBracketParam(ctx parser.IIndexParamContext) (expr.Expr, e
 }
 
 func (v *Visitor) visitWildcardIndex(_ *parser.WildcardIndexContext) (expr.Expr, error) {
-	return &expr.WildcardBracketExpr{}, nil
+	return &expr.WildcardIndexExpr{}, nil
 }
 
 func (v *Visitor) visitSliceIndex(ctx *parser.SliceIndexContext) (expr.Expr, error) {
@@ -507,25 +507,25 @@ func (v *Visitor) visitStringLiteral(ctx *parser.StringLiteralContext) (expr.Exp
 	if err != nil {
 		return nil, NewSemanticErrorf(ctx, "string: %s", ctx.GetText())
 	}
-	return &expr.ValueExpr{
+	return &expr.LiteralExpr{
 		Nodes: []*yaml.Node{yamlconv.String(s)},
 	}, nil
 }
 
 func (v *Visitor) visitNumberLiteral(ctx *parser.NumberLiteralContext) (expr.Expr, error) {
-	return &expr.ValueExpr{
+	return &expr.LiteralExpr{
 		Nodes: []*yaml.Node{yamlconv.NumberString(ctx.GetText())},
 	}, nil
 }
 
 func (v *Visitor) visitBooleanLiteral(ctx *parser.BooleanLiteralContext) (expr.Expr, error) {
-	return &expr.ValueExpr{
+	return &expr.LiteralExpr{
 		Nodes: []*yaml.Node{yamlconv.BoolString(ctx.GetText())},
 	}, nil
 }
 
 func (v *Visitor) visitNullLiteral(_ *parser.NullLiteralContext) (expr.Expr, error) {
-	return &expr.ValueExpr{
+	return &expr.LiteralExpr{
 		Nodes: []*yaml.Node{yamlconv.Null()},
 	}, nil
 }
@@ -535,7 +535,7 @@ func (v *Visitor) visitListLiteral(ctx *parser.ListLiteralContext) (expr.Expr, e
 	if err != nil {
 		return nil, err
 	}
-	return &expr.ValueExpr{
+	return &expr.LiteralExpr{
 		Nodes: nodes,
 	}, nil
 }
@@ -545,7 +545,7 @@ func (v *Visitor) visitMapLiteral(ctx *parser.MapLiteralContext) (expr.Expr, err
 	if err != nil {
 		return nil, err
 	}
-	return &expr.ValueExpr{
+	return &expr.LiteralExpr{
 		Nodes: nodes,
 	}, nil
 }

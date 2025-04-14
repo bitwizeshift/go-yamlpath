@@ -1,4 +1,4 @@
-Feature: Regex match comparison
+Feature: Regex match operator
 
   JSONPath defines a regex-based match comparison operator. This operator is
   used to match a string against a regular expression.

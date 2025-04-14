@@ -24,6 +24,8 @@ func (e *SubsetOfExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 	if err != nil {
 		return nil, err
 	}
+	left = e.unwrap(left)
+	right = e.unwrap(right)
 
 	for _, l := range left {
 		found := false
@@ -34,10 +36,20 @@ func (e *SubsetOfExpr) Eval(ctx invocation.Context) ([]*yaml.Node, error) {
 			}
 		}
 		if !found {
-			return []*yaml.Node{yamlconv.Bool(false)}, nil
+			return yamlconv.Bools(false), nil
 		}
 	}
-	return []*yaml.Node{yamlconv.Bool(true)}, nil
+	return yamlconv.Bools(true), nil
+}
+
+// unwrap nodes by examining whether the result is a single sequence node and,
+// if it is, unwrapping it so that the "in" operator may compare against the
+// individual elements of the sequence.
+func (e *SubsetOfExpr) unwrap(nodes []*yaml.Node) []*yaml.Node {
+	if len(nodes) == 1 && nodes[0].Kind == yaml.SequenceNode {
+		return nodes[0].Content
+	}
+	return nodes
 }
 
 var _ Expr = (*SubsetOfExpr)(nil)

@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath"
+	"rodusek.dev/pkg/yamlpath/internal/yamlconv"
 )
 
 type inputFlag struct {
@@ -30,6 +33,71 @@ func (s *inputFlag) Set(path string) error {
 
 func (s *inputFlag) Type() string {
 	return "path"
+}
+
+type constantFlags struct {
+	opts *[]yamlpath.Option
+}
+
+func (c *constantFlags) String() string {
+	return ""
+}
+func (c *constantFlags) Set(flag string) error {
+	kv := strings.SplitN(flag, "=", 2)
+	if len(kv) != 2 {
+		return fmt.Errorf("invalid constant format, expected key=value")
+	}
+	key := kv[0]
+	value := kv[1]
+
+	var kind string
+	kind, key = c.parseKey(key)
+	switch kind {
+	case "bool":
+		b, err := strconv.ParseBool(value)
+		if err != nil {
+			return err
+		}
+		*c.opts = append(*c.opts, yamlpath.WithConstant(key, yamlconv.Bool(b)))
+	case "int":
+		i, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			return err
+		}
+		*c.opts = append(*c.opts, yamlpath.WithConstant(key, yamlconv.Int(i)))
+	case "float":
+		f, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			return err
+		}
+		*c.opts = append(*c.opts, yamlpath.WithConstant(key, yamlconv.Float(f)))
+	case "string":
+		*c.opts = append(*c.opts, yamlpath.WithConstant(key, yamlconv.String(value)))
+	case "auto":
+		var node yaml.Node
+		if err := yaml.Unmarshal([]byte(value), &node); err != nil {
+			return err
+		}
+		*c.opts = append(*c.opts, yamlpath.WithConstant(key, &node))
+	}
+
+	return nil
+}
+
+func (c *constantFlags) parseKey(input string) (kind string, key string) {
+	parts := strings.SplitN(input, ":", 2)
+	if len(parts) == 1 {
+		return "auto", parts[0]
+	}
+	switch parts[0] {
+	case "bool", "int", "float", "string":
+		return parts[0], parts[1]
+	}
+	return "auto", key
+}
+
+func (c *constantFlags) Type() string {
+	return "constant"
 }
 
 type outputFlag struct {
@@ -64,8 +132,9 @@ func (n *nopCloser) Close() error {
 var _ pflag.Value = (*outputFlag)(nil)
 
 type Command struct {
-	writer io.WriteCloser
-	reader io.ReadCloser
+	writer  io.WriteCloser
+	reader  io.ReadCloser
+	options []yamlpath.Option
 }
 
 func (c *Command) Reader(cmd *cobra.Command) io.ReadCloser {
@@ -85,6 +154,7 @@ func (c *Command) Writer(cmd *cobra.Command) io.WriteCloser {
 func (c *Command) RegisterFlags(fs *pflag.FlagSet) {
 	fs.VarP(&inputFlag{stream: &c.reader}, "input", "i", "input path to YAML file")
 	fs.VarP(&outputFlag{stream: c.writer}, "output", "o", "output path to YAML file")
+	fs.VarP(&constantFlags{opts: &c.options}, "constant", "c", "constant value to use in the YAMLPath expression")
 }
 
 func (c *Command) RegisterCommand(cmd *cobra.Command) {
@@ -104,7 +174,7 @@ func (c *Command) Run(cmd *cobra.Command, args []string) {
 	defer in.Close()
 	defer out.Close()
 
-	yp, err := yamlpath.Compile(args[0])
+	yp, err := yamlpath.Compile(args[0], c.options...)
 	if err != nil {
 		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "error: %v\n", err)
 		os.Exit(1)

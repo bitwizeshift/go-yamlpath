@@ -153,6 +153,58 @@ func TestIsFloat(t *testing.T) {
 		})
 	}
 }
+
+func TestIsNumber(t *testing.T) {
+	testCases := []struct {
+		name    string
+		input   []*yaml.Node
+		want    []*yaml.Node
+		wantErr error
+	}{
+		{
+			name:  "Empty input",
+			input: []*yaml.Node{},
+			want:  []*yaml.Node{},
+		}, {
+			name:  "Single integer input",
+			input: []*yaml.Node{yamlconv.Int(42)},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
+		}, {
+			name:  "Single float input",
+			input: []*yaml.Node{yamlconv.Float(42.0)},
+			want:  []*yaml.Node{yamlconv.Bool(true)},
+		}, {
+			name:  "Single non-number input",
+			input: []*yaml.Node{yamlconv.String("foo")},
+			want:  []*yaml.Node{yamlconv.Bool(false)},
+		}, {
+			name: "Multiple inputs with mixed types",
+			input: []*yaml.Node{
+				yamlconv.Number(42),
+				yamlconv.String("foo"),
+			},
+			want: []*yaml.Node{
+				yamlconv.Bool(false),
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := expr.NewContext(tc.input)
+
+			got, err := funcs.IsNumber(ctx)
+
+			if got, want := err, tc.wantErr; !cmp.Equal(got, want, cmpopts.EquateErrors()) {
+				t.Fatalf("IsNumber() error = %v, want %v", got, want)
+			}
+			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
+				t.Errorf("IsNumber() = %v, want %v", got, want)
+			}
+		})
+	}
+}
+
 func TestIsBoolean(t *testing.T) {
 	testCases := []struct {
 		name    string

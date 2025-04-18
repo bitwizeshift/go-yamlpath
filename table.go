@@ -82,6 +82,7 @@ var tableV1 = sync.OnceValue(func() *invocation.Table {
 	// Reflection
 	table.Add("reflect", funcs.Reflect).SetArity(arity.None())
 	table.Add("isString", funcs.IsString).SetArity(arity.None())
+	table.Add("isNumber", funcs.IsNumber).SetArity(arity.None())
 	table.Add("isInteger", funcs.IsInteger).SetArity(arity.None())
 	table.Add("isFloat", funcs.IsFloat).SetArity(arity.None())
 	table.Add("isBoolean", funcs.IsBoolean).SetArity(arity.None())

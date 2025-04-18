@@ -2,6 +2,7 @@ package funcs
 
 import (
 	"fmt"
+	"slices"
 
 	"gopkg.in/yaml.v3"
 	"rodusek.dev/pkg/yamlpath/internal/invocation"
@@ -149,6 +150,11 @@ func IsFloat(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, e
 	return hasTag(ctx, yaml.ScalarNode, "!!float")
 }
 
+// IsNumber checks if the current node is a number (integer or float).
+func IsNumber(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
+	return hasTag(ctx, yaml.ScalarNode, "!!int", "!!float")
+}
+
 // IsBoolean checks if the current node is a boolean.
 func IsBoolean(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
 	return hasTag(ctx, yaml.ScalarNode, "!!bool")
@@ -185,7 +191,7 @@ func IsMapping(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node,
 	return hasTag(ctx, yaml.MappingNode, "!!map")
 }
 
-func hasTag(ctx invocation.Context, kind yaml.Kind, tag string) ([]*yaml.Node, error) {
+func hasTag(ctx invocation.Context, kind yaml.Kind, tags ...string) ([]*yaml.Node, error) {
 	current := ctx.Current()
 	if len(current) == 0 {
 		return nil, nil
@@ -193,7 +199,7 @@ func hasTag(ctx invocation.Context, kind yaml.Kind, tag string) ([]*yaml.Node, e
 	if len(current) == 1 {
 		node := current[0]
 		return []*yaml.Node{
-			yamlconv.Bool(node.Kind == kind && node.Tag == tag),
+			yamlconv.Bool(node.Kind == kind && slices.Contains(tags, node.Tag)),
 		}, nil
 	}
 	return []*yaml.Node{yamlconv.Bool(false)}, nil

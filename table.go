@@ -67,9 +67,16 @@ var tableV1 = sync.OnceValue(func() *invocation.Table {
 	table.Add("sum", funcs.Sum).SetArity(arity.Any())
 
 	// Conversion functions
-	table.Add("toBoolean", funcs.ToBoolean).SetArity(arity.None())
 	table.Add("toString", funcs.ToString).SetArity(arity.None())
+	table.Add("convertsToString", funcs.ConvertsToString).SetArity(arity.None())
+	table.Add("toBoolean", funcs.ToBoolean).SetArity(arity.None())
+	table.Add("convertsToBoolean", funcs.ConvertsToBoolean).SetArity(arity.None())
 	table.Add("toNumber", funcs.ToNumber).SetArity(arity.None())
+	table.Add("convertsToNumber", funcs.ConvertsToNumber).SetArity(arity.None())
+	table.Add("toInteger", funcs.ToInteger).SetArity(arity.None())
+	table.Add("convertsToInteger", funcs.ConvertsToInteger).SetArity(arity.None())
+	table.Add("toFloat", funcs.ToFloat).SetArity(arity.None())
+	table.Add("convertsToFloat", funcs.ConvertsToFloat).SetArity(arity.None())
 	table.Add("toSequence", funcs.ToSequence).SetArity(arity.None())
 
 	// Reflection

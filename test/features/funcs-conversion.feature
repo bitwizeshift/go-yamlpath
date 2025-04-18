@@ -237,6 +237,142 @@ Feature: Funcs - Conversion
       When the yamlpath `$.people[*].toNumber()` is evaluated
       Then an error is raised
 
+  Rule: toInteger() converts a single value in the collection to an integer
+
+    Converts a single value in the collection to an integer. If the collection
+    contains more than one value, an error is raised to the calling environment.
+    If the collection is empty, this returns an empty collection.
+
+    Scenario: Collection is empty
+
+      Given the yaml input:
+        """
+        people: []
+        """
+      When the yamlpath `$.people[*].toInteger()` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Collection contains single string
+
+      Given the yaml input:
+        """
+        age: "30"
+        """
+      When the yamlpath `$.age.toInteger()` is evaluated
+      Then the evaluation result is:
+        """
+        30
+        """
+
+    Scenario: Collection contains single integer
+
+      Given the yaml input:
+        """
+        age: 30
+        """
+      When the yamlpath `$.age.toInteger()` is evaluated
+      Then the evaluation result is:
+        """
+        30
+        """
+
+    Scenario: Collection contains single boolean
+
+      Given the yaml input:
+        """
+        is_active: true
+        """
+      When the yamlpath `$.is_active.toInteger()` is evaluated
+      Then the evaluation result is:
+        """
+        1
+        """
+
+    Scenario: Collection contains multiple elements
+
+      Given the yaml input:
+        """
+        people:
+          - name: "John"
+          - name: "Jane"
+        """
+      When the yamlpath `$.people[*].toInteger()` is evaluated
+      Then an error is raised
+
+  Rule: toFloat() converts a single value in the collection to a float
+
+    Converts a single value in the collection to a float. If the collection
+    contains more than one value, an error is raised to the calling environment.
+    If the collection is empty, this returns an empty collection.
+
+    Scenario: Collection is empty
+
+      Given the yaml input:
+        """
+        people: []
+        """
+      When the yamlpath `$.people[*].toFloat()` is evaluated
+      Then the evaluation result is empty
+
+    Scenario: Collection contains single string
+
+      Given the yaml input:
+        """
+        height: "1.8"
+        """
+      When the yamlpath `$.height.toFloat()` is evaluated
+      Then the evaluation result is:
+        """
+        1.8
+        """
+
+    Scenario: Collection contains single integer
+
+      Given the yaml input:
+        """
+        height: 1
+        """
+      When the yamlpath `$.height.toFloat()` is evaluated
+      Then the evaluation result is:
+        """
+        1
+        """
+
+    Scenario: Collection contains single float
+
+      Given the yaml input:
+        """
+        height: 1.8
+        """
+      When the yamlpath `$.height.toFloat()` is evaluated
+      Then the evaluation result is:
+        """
+        1.8
+        """
+
+    Scenario: Collection contains single boolean
+
+      Given the yaml input:
+        """
+        height: true
+        """
+      When the yamlpath `$.height.toFloat()` is evaluated
+      Then the evaluation result is:
+        """
+        1
+        """
+
+    Scenario: Collection contains multiple elements
+
+      Given the yaml input:
+        """
+        people:
+          - name: "John"
+          - name: "Jane"
+        """
+      When the yamlpath `$.people[*].toFloat()` is evaluated
+      Then an error is raised
+
   Rule: toSequence() converts a single value in the collection to a sequence
 
     Converts a single value in the collection to a sequence. If the collection

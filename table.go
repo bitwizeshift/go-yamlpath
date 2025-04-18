@@ -52,6 +52,20 @@ var tableV1 = sync.OnceValue(func() *invocation.Table {
 	table.Add("matches", funcs.Matches).SetArity(arity.Exactly(1))
 	table.Add("replaceMatches", funcs.ReplaceMatches).SetArity(arity.Exactly(2))
 
+	// Math functions
+	table.Add("abs", funcs.Abs).SetArity(arity.None())
+	table.Add("ceil", funcs.Ceil).SetArity(arity.None())
+	table.Add("floor", funcs.Floor).SetArity(arity.None())
+	table.Add("exp", funcs.Exp).SetArity(arity.None())
+	table.Add("ln", funcs.Ln).SetArity(arity.None())
+	table.Add("log", funcs.Log).SetArity(arity.None())
+	table.Add("pow", funcs.Pow).SetArity(arity.Exactly(1))
+	table.Add("round", funcs.Round).SetArity(arity.ClosedRange(0, 1))
+	table.Add("truncate", funcs.Truncate).SetArity(arity.None())
+	table.Add("min", funcs.Min).SetArity(arity.Any())
+	table.Add("max", funcs.Max).SetArity(arity.Any())
+	table.Add("sum", funcs.Sum).SetArity(arity.Any())
+
 	// Conversion functions
 	table.Add("toBoolean", funcs.ToBoolean).SetArity(arity.None())
 	table.Add("toString", funcs.ToString).SetArity(arity.None())

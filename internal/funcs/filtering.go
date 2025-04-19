@@ -42,22 +42,6 @@ func Transform(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.
 	return result, nil
 }
 
-// Keys returns the keys of the current mapping node.
-func Keys(ctx invocation.Context, _ ...invocation.Parameter) ([]*yaml.Node, error) {
-	var result []*yaml.Node
-	current := ctx.Current()
-
-	for _, node := range current {
-		if node.Kind != yaml.MappingNode {
-			continue
-		}
-		for i := 0; (i + 1) < len(node.Content); i += 2 {
-			result = append(result, node.Content[i])
-		}
-	}
-	return result, nil
-}
-
 // Select returns the selected keys from the current mapping or the selected
 // indices from the current sequence.
 func Select(ctx invocation.Context, params ...invocation.Parameter) ([]*yaml.Node, error) {

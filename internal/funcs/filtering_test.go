@@ -108,39 +108,6 @@ func TestTransform(t *testing.T) {
 	}
 }
 
-func TestKeys(t *testing.T) {
-	testCases := []struct {
-		name  string
-		input []*yaml.Node
-		want  []*yaml.Node
-	}{
-		{
-			name:  "Keys of a mapping",
-			input: []*yaml.Node{yamltest.MustParseNode(`{"foo": "bar", "baz": "qux"}`)},
-			want:  []*yaml.Node{yamlconv.String("foo"), yamlconv.String("baz")},
-		}, {
-			name:  "Keys of a sequence",
-			input: []*yaml.Node{yamltest.MustParseNode(`["foo", "bar", "baz", "qux"]`)},
-			want:  []*yaml.Node{},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			ctx := expr.NewContext(tc.input)
-
-			got, err := funcs.Keys(ctx)
-
-			if err != nil {
-				t.Fatalf("Keys() error = %v", err)
-			}
-			if got, want := got, tc.want; !yamlcmp.EqualRange(got, want) {
-				t.Errorf("Keys() = %v, want %v", got, want)
-			}
-		})
-	}
-}
-
 func TestSelect(t *testing.T) {
 	testErr := errors.New("test error")
 	testCases := []struct {

@@ -28,8 +28,12 @@ var tableV1 = sync.OnceValue(func() *invocation.Table {
 	// Filter functions
 	table.Add("where", funcs.Where).SetArity(arity.Exactly(1))
 	table.Add("transform", funcs.Transform).SetArity(arity.Exactly(1))
-	table.Add("keys", funcs.Keys).SetArity(arity.None())
 	table.Add("select", funcs.Select).SetArity(arity.Any())
+
+	// Navigation
+	table.Add("keys", funcs.Keys).SetArity(arity.None())
+	table.Add("children", funcs.Children).SetArity(arity.None())
+	table.Add("descendants", funcs.Descendants).SetArity(arity.None())
 
 	// Subsetting functions
 	table.Add("first", funcs.First).SetArity(arity.AtMost(1))

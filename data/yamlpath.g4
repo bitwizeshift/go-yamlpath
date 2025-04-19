@@ -8,7 +8,6 @@ path: expression EOF ;
 
 expression
       : term                                              # termExpression
-      | expression '..' (invocation)?                     # recursiveExpression
       | expression '.' invocation                         # fieldExpression
       | expression '[' indexParam ']'                     # indexExpression
       | '(' expression ')'                                # parenthesisExpression

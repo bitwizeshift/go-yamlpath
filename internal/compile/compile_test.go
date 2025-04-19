@@ -38,9 +38,6 @@ func TestNewTree(t *testing.T) {
 			name:  "quoted field expression",
 			input: `$."foo bar"`,
 		}, {
-			name:  "recursive descent with field expression",
-			input: `$..foo`,
-		}, {
 			name:  "bracket wildcard expression",
 			input: `$[*]`,
 		}, {

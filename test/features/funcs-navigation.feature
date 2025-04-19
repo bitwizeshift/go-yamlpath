@@ -33,30 +33,6 @@ Feature: Funcs - Navigation
         "Jane"
         """
 
-    Scenario: Recursive-descent of map with keys
-
-      Given the yaml input:
-        """
-        people:
-          John:
-            age: 30
-          Jane:
-            age: 25
-        """
-      When the yamlpath `$..keys()` is evaluated
-      Then the evaluation result is:
-        """
-        "people"
-        ---
-        "John"
-        ---
-        "Jane"
-        ---
-        "age"
-        ---
-        "age"
-        """
-
   Rule: children() returns the children of a map
 
     Returns the children of all direct children of a map node.

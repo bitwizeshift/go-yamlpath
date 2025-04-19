@@ -45,8 +45,8 @@ are provided in the same way. The follow features are supported:
 
 * ✅ Root and Current node selection with `$` and `@`[^1]
 * ✅ Child node selection with `.<name>`
-* ✅ Recursive descent with `..`
-* ✅ Array index selection with `[<number>]`[^2]
+* ✅ Recursive descent with `descendants()` [^2]
+* ✅ Array index selection with `[<number>]`[^3]
 * ✅ Array slice selection with `[<start>:<end>:<step>]`
 * ✅ Union of multiple selections with `<path> | <path>`
 * ✅ Filtering with the `where` function, e.g. `$.people.where(name == "bitwizeshift")`
@@ -57,16 +57,19 @@ are provided in the same way. The follow features are supported:
 * ✅ Arithmetic operators with `+`, `-`, `*`, `/`, `%`
 * ✅ String concatenation with `key + "string"`
 * ✅ Function support (including custom user-defined functions!)
-* ✅ Dynamic subexpressions; any expression can be used as inputs to functions[^3]
+* ✅ Dynamic subexpressions; any expression can be used as inputs to functions[^4]
 * ✅ External constants that can be provided at compile-time
 
 [^1]: These are optional in YAMLPath definitions. The path is always assumed to
       be the "current" context path if unspecified; but can be provided for
       disambiguation.
-[^2]: In YAMLPath, only indices are selected with the index operator. Fields are
+[^2]: The `descendants()` function provides feature-parity with JSONPath's
+      recursive descent operator `..`. This is a more explicit way to select
+      descendants, and is more readable.
+[^3]: In YAMLPath, only indices are selected with the index operator. Fields are
       selected with the `.` operator. To select fields with a string value, the
       `select` function may be used (e.g. `$.select("some key")`).
-[^3]: Dynamic subexpressions along with external constants provide rough
+[^4]: Dynamic subexpressions along with external constants provide rough
       feature-parity with JSONPath's "script" functinality, since it enables the
       calling language to provide data dynamically to YAMLPath expressions.
 

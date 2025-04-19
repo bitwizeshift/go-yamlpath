@@ -35,8 +35,6 @@ func (v *Visitor) visitExpression(ctx parser.IExpressionContext) (expr.Expr, err
 		return v.visitTermExpression(ctx)
 	case *parser.FieldExpressionContext:
 		return v.visitFieldExpression(ctx)
-	case *parser.RecursiveExpressionContext:
-		return v.visitRecursiveExpression(ctx)
 	case *parser.IndexExpressionContext:
 		return v.visitIndexExpression(ctx)
 	case *parser.AdditiveExpressionContext:
@@ -109,19 +107,6 @@ func (v *Visitor) visitFieldExpression(ctx *parser.FieldExpressionContext) (expr
 		return nil, err
 	}
 	result.Append(right)
-	return result, nil
-}
-
-func (v *Visitor) visitRecursiveExpression(ctx *parser.RecursiveExpressionContext) (expr.Expr, error) {
-	var result expr.SequenceExpr
-	result.Append(&expr.RecursiveDescentExpr{})
-	if invocation := ctx.Invocation(); invocation != nil {
-		right, err := v.visitInvocation(invocation)
-		if err != nil {
-			return nil, err
-		}
-		result.Append(right)
-	}
 	return result, nil
 }
 
